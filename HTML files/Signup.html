@@ -7,34 +7,34 @@
     <link rel="stylesheet" href="styleSignUp.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-    
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
     <div class="signup-section">
         <h2>Sign Up</h2>
         <form action="#" method="POST">
             <div class="group">
-                <label for="name">User Name:</label>
-                <input type="text" id="name" name="name" required>
+                <i class='bx bx-user group-i'></i>
+                <input type="text" id="name" placeholder="Username" required>
             </div>
-
+    
             <div class="group">
-                <label for="email">AUB Email:</label>
-                <input type="text" id="email" name="email" required>
+                <i class='bx bx-envelope group-i'></i>
+                <input type="text" id="email" placeholder="Email" name="email" required>
             </div>
-
+    
             <div class="group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <i class='bx bx-lock group-i'></i>
+                <input type="password" id="password" placeholder="Password" name="password" required>
             </div>
-
+    
             <div class="group">
-                <label for="passwordConfirm">Confirm Password:</label>
-                <input type="password" id="passwordConfirm" name="passwordConfirm" required>
+                <i class='bx bx-lock group-i'></i>
+                <input type="password" id="passwordConfirm" placeholder="Confirm Password" name="passwordConfirm" required>
             </div>
-
+    
             <button type="submit">Sign Up</button>
         </form>
-    </div>
+    </div>    
 </body>
 </html>
