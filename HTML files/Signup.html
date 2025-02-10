@@ -25,9 +25,9 @@
                 <input type="text" id="email" placeholder="Email" name="email" required>
             </div>
 
-            <div class="group">
+            <div class="group" >
                 <i class='bx bx-lock group-i' id="lockIcon" onclick="hiddenPassword('password', 'lockIcon')"></i>
-                <input type="password" id="password" placeholder="Password" name="password" required oninput="checkPassword()">
+                <input type="password" id="password" placeholder="Password" name="password" required oninput="checkPassword()"  onfocus="showReq()" onblur="hideReq()">
             </div>
 
             <div class="requirments-wrapper">
@@ -67,6 +67,7 @@
 
     <script>
         function hiddenPassword(inputId, iconId) {
+        
             let input = document.getElementById(inputId);
             let icon = document.getElementById(iconId);
             if (input.type == "password") {
@@ -77,6 +78,7 @@
                 input.type = "password";
                 icon.classList.replace("bx-lock-open", "bx-lock");
             }
+            
         }
 
         function checkPassword() {
@@ -105,6 +107,13 @@
                     element.style.fontWeight='normal';
                 }
             });
+        }
+        function showReq(){
+            document.getElementsByClassName("requirments-wrapper")[0].style.display="block";
+            }
+
+        function hideReq(){
+            document.getElementsByClassName("requirments-wrapper")[0].style.display="none";
         }
     </script>
 </body>
