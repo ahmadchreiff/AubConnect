@@ -50,6 +50,52 @@ input{
     font-size: 17px;
     color:gray
 }
+.requirments-wrapper{
+    background-color: white;
+    border: none;
+    border-radius: 20px;
+    width:304px;
+    height:90px;
+  margin-left:27px;
+
+}
+ .requirment-list{
+    margin-top: 5px;
+     padding-left:12px ;
+     padding-top:5px;
+
+}
+.requirment-list li{
+    font-size:14px;
+    font-family:'lora';
+    display: flex;
+}
+
+.requirment-list li i{
+    color: gray;
+    padding-right: 2px;
+    padding-top: 3px;
+    font-size: 13px;
+}
+
+input:focus{
+    outline:none;
+}
+#confirmLock{
+    cursor: pointer;
+}
+#lockIcon{
+    cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
 
 
 
