@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up Form</title>
+    
     <link rel="stylesheet" href="styleSignUp.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
@@ -14,75 +15,60 @@
 <body>
     <div class="signup-section">
         <h2>Sign Up</h2>
-        <form action="#" method="POST">
+        <form action="#" method="POST" onsubmit="return validateForm(event)">
+            
             <div class="group">
                 <i class='bx bx-user group-i'></i>
                 <input type="text" id="name" placeholder="Username" required>
+                <div id="nameError" class="error-message"></div>
             </div>
 
             <div class="group">
-                <i class='bx bx-envelope group-i'></i>
+                <i class='bx bx-envelope group-i' id="envelope"></i>
                 <input type="text" id="email" placeholder="Email" name="email" required>
+                <div id="emailError" class="error-message"></div>
             </div>
 
-            <div class="group" >
-                <i class='bx bx-lock group-i' id="lockIcon" onclick="hiddenPassword('password', 'lockIcon')"></i>
-                <input type="password" id="password" placeholder="Password" name="password" required oninput="checkPassword()"  onfocus="showReq()" onblur="hideReq()">
+            <div class="group">
+                <i class='bx bx-lock group-i' id="lockIcon" onclick="togglePassword('password', 'lockIcon')"></i>
+                <input type="password" id="password" placeholder="Password" name="password" required oninput="checkPassword()" onfocus="showReq()" onblur="hideReq()">
+                <div id="passwordError" class="error-message"></div> 
             </div>
 
             <div class="requirments-wrapper">
                 <ul class="requirment-list">
-                    <li id="lengthReq">
-                        <i class="bx bx-circle"></i>
-                        <span>At least 8 character length</span>
-                    </li>
-                    <li id="lowercaseReq">
-                        <i class="bx bx-circle"></i>
-                        <span>At least 1 lowercase letter (a..z)</span>
-                    </li>
-                    <li id="uppercaseReq">
-                        <i class="bx bx-circle"></i>
-                        <span>At least 1 uppercase (A...Z)</span>
-                    </li>
-                    <li id="symbolReq">
-                        <i class="bx bx-circle"></i>
-                        <span>At least 1 special symbol (!...%)</span>
-                    </li>
-                    <li id="numberReq">
-                        <i class="bx bx-circle"></i>
-                        <span>At least 1 number (0...9)</span>
-                    </li>
+                    <li id="lengthReq"><i class="bx bx-circle"></i><span>At least 8 characters</span></li>
+                    <li id="lowercaseReq"><i class="bx bx-circle"></i><span>At least 1 lowercase letter</span></li>
+                    <li id="uppercaseReq"><i class="bx bx-circle"></i><span>At least 1 uppercase letter</span></li>
+                    <li id="symbolReq"><i class="bx bx-circle"></i><span>At least 1 special character</span></li>
+                    <li id="numberReq"><i class="bx bx-circle"></i><span>At least 1 number</span></li>
                 </ul>
             </div>
 
             <div class="group">
-                <i class='bx bx-lock group-i' id="confirmLock" onclick="hiddenPassword('passwordConfirm', 'confirmLock')"></i>
-                <input type="password" id="passwordConfirm" placeholder="Confirm Password" name="passwordConfirm"
-                    required>
+                <i class='bx bx-lock group-i' id="confirmLock" onclick="togglePassword('passwordConfirm', 'confirmLock')"></i>
+                <input type="password" id="passwordConfirm" placeholder="Confirm Password" name="passwordConfirm" required>
+                <div id="passwordConfirmError" class="error-message"></div> 
             </div>
-
+            
+            
             <button type="submit">Sign Up</button>
         </form>
     </div>
 
     <script>
-        function hiddenPassword(inputId, iconId) {
-        
+        function togglePassword(inputId, iconId) {
             let input = document.getElementById(inputId);
             let icon = document.getElementById(iconId);
-            if (input.type == "password") {
-                input.type = "text";
-                icon.classList.replace("bx-lock", "bx-lock-open");
-            }
-            else {
-                input.type = "password";
-                icon.classList.replace("bx-lock-open", "bx-lock");
-            }
-            
+            input.type = input.type === "password" ? "text" : "password";
+            icon.classList.toggle("bx-lock");
+            icon.classList.toggle("bx-lock-open");
         }
 
         function checkPassword() {
             const password = document.getElementById("password").value;
+            const passwordField = document.getElementById("password");
+
             const requirements = [
                 { regex: /.{8,}/, id: "lengthReq" },
                 { regex: /[a-z]/, id: "lowercaseReq" },
@@ -90,31 +76,99 @@
                 { regex: /[^A-Za-z0-9]/, id: "symbolReq" },
                 { regex: /\d/, id: "numberReq" }
             ];
-
+            let valid=true;
             requirements.forEach(req => {
                 const element = document.getElementById(req.id);
-                const isValid = req.regex.test(password);
                 const icon = element.querySelector('i');
-                
-                if (isValid) {
+                if (req.regex.test(password)) {
                     icon.classList.replace("bx-circle", "bx-check-circle");
                     element.style.color = 'green';
-                    element.style.fontWeight ='bold';
-
+                    element.style.fontWeight = 'bold';
+                    
+                  
                 } else {
                     icon.classList.replace("bx-check-circle", "bx-circle");
                     element.style.color = 'initial';
-                    element.style.fontWeight='normal';
+                    element.style.fontWeight = 'normal';
+                    valid=false;  
                 }
             });
-        }
-        function showReq(){
-            document.getElementsByClassName("requirments-wrapper")[0].style.display="block";
+    
+                return valid;
             }
+        
 
-        function hideReq(){
-            document.getElementsByClassName("requirments-wrapper")[0].style.display="none";
+        function showReq() {
+            document.querySelector(".requirments-wrapper").style.display = "block";
         }
+
+        function hideReq() {
+            document.querySelector(".requirments-wrapper").style.display = "none";
+        }
+
+        function validateForm(event) {
+    const password = document.getElementById("password").value;
+    const passwordConfirm = document.getElementById("passwordConfirm").value;
+    const email = document.getElementById("email").value;
+    const emailRegex = /^[a-zA-Z0-9]+@mail\.aub\.edu$/;
+
+    let showError = false;
+  resetErrormessage();
+  if(!emailRegex.test(email)){
+    event.preventDefault();
+    document.getElementById("email").style.border = '1.5px solid black';
+        document.getElementById("email").style.height = '36px';
+        showError = true;
+        document.getElementById("emailError").textContent = "Please enter a valid AUB email (e.g., username@mail.aub.edu)";
+        document.getElementById("emailError").style.visibility = "visible";
+        document.getElementById("envelope").style.paddingBottom="14px";
+
+}
+
+    if (password !== passwordConfirm) {
+        event.preventDefault();
+        document.getElementById("passwordConfirm").style.border = '1.5px solid black';
+        document.getElementById("passwordConfirm").style.height = '36px';
+        showError = true;
+        document.getElementById("passwordConfirmError").textContent = "Passwords do not match.";
+    document.getElementById("passwordConfirmError").style.visibility = "visible";
+    document.getElementById("lockIcon").style.paddingBottom="14px";
+}
+    
+    if (!checkPassword()) {
+        event.preventDefault();
+        document.getElementById("password").style.border = '1.5px solid black';
+        document.getElementById("password").style.height = '36px';
+        showError = true;
+            document.getElementById("passwordError").textContent = "Password doesn't meet the requirments";
+   document.getElementById("passwordError").style.visibility = "visible";
+   document.getElementById("lockIcon").style.paddingBottom="14px";
+}
+ 
+
+    if (showError) {
+        return false;  
+    }
+
+    return true;
+}
+
+function resetErrormessage() {
+ 
+    const errorMessages = document.querySelectorAll(".error-message");
+    errorMessages.forEach((msg) => {
+        msg.style.visibility = "hidden";
+    });
+    
+    const fields = document.querySelectorAll("input");
+    fields.forEach((field) => {
+        field.style.border = '';  
+        field.style.height = '';  
+    });
+}
+   
+
+
     </script>
 </body>
 
