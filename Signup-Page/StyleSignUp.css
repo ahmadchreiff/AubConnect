@@ -1,11 +1,17 @@
 
 .signup-section{
-    background-color: #860033;
+    background-color: white;
     width :360px;
-    height: 480px;
+    height: 430px;
     margin:auto;
     border-radius:60px ;
-    margin-top:113px
+    margin-top:10px;
+    border :2px solid #860033;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+    box-sizing: border-box; 
+    transition: height 0.15s; 
     
   
 }
@@ -16,36 +22,43 @@ body{
 
 h2{
     text-align: center;
-    padding-top:28px ;
+    padding-top:2px ;
     font-family:'Lora' ;
-   color: aliceblue;
+   color: #860033;
    font-size: 40px;
 
 }
 
 .group{
- margin-top: 20px;
- position: relative;
+    margin-top: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+   
 
 }
 
 input{
     border-radius: 15px;
     height:28px;
-    width:290px;
+    width:260px;
     border: none;
     font-family:'Roboto';
     font-size: 14px;
     margin-left: 27px;
     padding-left:10px;
+    padding-right:30px;
  transition: height 0.3s;
+ border :1px solid #860033;
+ flex-grow: 1;
   
 }
 #name:focus,#email:focus,#password:focus,#passwordConfirm:focus{
     height: 35px;
-   
+    
 }
-
+.signup-section:focus-within {
+    height: 480px; }
 .group-i {
     position: absolute;
     left: 303px; 
@@ -62,6 +75,7 @@ input{
     height:90px;
   margin-left:27px;
   display:none;
+  flex-grow: 1;
  
 }
 
@@ -72,7 +86,7 @@ input{
 
 }
 .requirment-list li{
-    font-size:14px;
+    font-size:13px;
     font-family:'lora';
     display: flex;
     color:rgb(62, 62, 62);
@@ -91,13 +105,43 @@ input:focus{
 #confirmLock,#lockIcon{
     cursor: pointer;
 }
+.error-message {
+    color:black;
+    font-size: 11px;
+    margin-top: 1px;
+    visibility: hidden;  
+    padding-left:31px;
+    font-family: 'lora';
 
+}
+button{
+    color : black;
+    background-color: white;
+    border: 2px solid #860033;
+    margin-top:20px;
+    margin-left:130px;
+    padding-top:10px;
+    padding-bottom:10px;
+    padding-left: 25px;
+    padding-right: 25px;
+    border-radius: 14px;
+    font-family: 'lora';
+    font-size:  14px;
+    cursor:pointer;
+    align-self: center;
 
+}
+button:hover {
+    box-Shadow:3px 3px 3px rgba(0, 0, 0, 0.4);
+     
+}
+p{
+    font-size: 11px;
+    padding-top:15px;
+    padding-left:50px;
+    flex-grow:1;
 
-
-
-
-
+}
 
 
 
