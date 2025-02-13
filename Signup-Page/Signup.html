@@ -53,6 +53,8 @@
             
             
             <button type="submit">Sign Up</button>
+            <p>Already have an account? <a href="login.html"><span>Login here.</span></a></p>
+
         </form>
     </div>
 
@@ -100,11 +102,11 @@
 
         function showReq() {
             document.querySelector(".requirments-wrapper").style.display = "block";
-        }
+         document.querySelector(".signup-section").style.height = "530px";}
 
         function hideReq() {
             document.querySelector(".requirments-wrapper").style.display = "none";
-        }
+         document.querySelector(".signup-section").style.height = "430px";}
 
         function validateForm(event) {
     const password = document.getElementById("password").value;
@@ -116,10 +118,10 @@
   resetErrormessage();
   if(!emailRegex.test(email)){
     event.preventDefault();
-    document.getElementById("email").style.border = '1.5px solid black';
+     document.getElementById("email").style. boxShadow= '3px 3px 3px rgba(0, 0, 0, 0.4)';
         document.getElementById("email").style.height = '36px';
         showError = true;
-        document.getElementById("emailError").textContent = "Please enter a valid AUB email (e.g., username@mail.aub.edu)";
+        document.getElementById("emailError").textContent = " ⚠️Please enter a valid AUB email (e.g,username@mail.aub.edu)";
         document.getElementById("emailError").style.visibility = "visible";
         document.getElementById("envelope").style.paddingBottom="14px";
 
@@ -127,20 +129,20 @@
 
     if (password !== passwordConfirm) {
         event.preventDefault();
-        document.getElementById("passwordConfirm").style.border = '1.5px solid black';
+        document.getElementById("passwordConfirm").style. boxShadow= '3px 3px 3px rgba(0, 0, 0, 0.4)';
         document.getElementById("passwordConfirm").style.height = '36px';
         showError = true;
-        document.getElementById("passwordConfirmError").textContent = "Passwords do not match.";
+        document.getElementById("passwordConfirmError").textContent = " ⚠️Passwords do not match ";
     document.getElementById("passwordConfirmError").style.visibility = "visible";
     document.getElementById("lockIcon").style.paddingBottom="14px";
 }
     
     if (!checkPassword()) {
         event.preventDefault();
-        document.getElementById("password").style.border = '1.5px solid black';
+        document.getElementById("password").style. boxShadow= '3px 3px 3px rgba(0, 0, 0, 0.4)';
         document.getElementById("password").style.height = '36px';
         showError = true;
-            document.getElementById("passwordError").textContent = "Password doesn't meet the requirments";
+            document.getElementById("passwordError").textContent = " ⚠️Password doesn't meet the requirments ";
    document.getElementById("passwordError").style.visibility = "visible";
    document.getElementById("lockIcon").style.paddingBottom="14px";
 }
