@@ -5,10 +5,12 @@ import "boxicons/css/boxicons.min.css";
 
 const Signup = () => {
   const [password, setPassword] = useState("");
+  const [passwordFormateError, setPasswordFormatError] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [requirementsVisible, setRequirementsVisible] = useState(false);
-
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
   const requirements = [
     { regex: /.{8,}/, id: "lengthReq", text: "At least 8 characters" },
     { regex: /[a-z]/, id: "lowercaseReq", text: "At least 1 lowercase letter" },
@@ -41,6 +43,17 @@ const Signup = () => {
     }
   };
 
+  const validateEmailFormat = () => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@mail\.aub\.edu$/;
+    if (!emailRegex.test(email)) {
+      setEmailError("Please use an AUB email");
+    } else {
+      setPasswordError("");
+    }
+  }
+
+
+
   const togglePassword = (inputId) => {
     const input = document.getElementById(inputId);
     input.type = input.type === "password" ? "text" : "password";
@@ -57,9 +70,16 @@ const Signup = () => {
 
         <div className="group">
           <i className="bx bx-envelope group-i"></i>
-          <input type="email" placeholder="Email" required />
+          <input
+            type="email"
+            placeholder="Email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={validateEmailFormat}
+          />
         </div>
-
+        {emailError && <p className="error-message"><i className="bx bx-error-circle"></i> {emailError}</p>}
         <div className="group">
           <i className="bx bx-lock group-i" onClick={() => togglePassword("password")}></i>
           <input
@@ -69,7 +89,14 @@ const Signup = () => {
             value={password}
             onChange={(e) => checkPassword(e.target.value)}
             onFocus={() => setRequirementsVisible(true)}
-            onBlur={() => setRequirementsVisible(false)}
+            onBlur={() => {
+              setRequirementsVisible(false);
+              setPasswordFormatError(password && !requirements.every(({ regex }) => regex.test(password))
+                ? "Password doesn't meet the requirements"
+                : ""
+              );
+            }}
+
             required
           />
           {requirementsVisible && (
@@ -84,7 +111,7 @@ const Signup = () => {
             </div>
           )}
         </div>
-
+        {passwordFormateError && <p className="error-message"><i className="bx bx-error-circle"></i> {passwordFormateError}</p>}
         <div className="group">
           <i className="bx bx-lock group-i" onClick={() => togglePassword("passwordConfirm")}></i>
           <input
