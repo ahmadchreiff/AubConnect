@@ -11,6 +11,9 @@ const Signup = () => {
   const [requirementsVisible, setRequirementsVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [passwordVisible, setPasswordVisible] = useState(false);  // Track password visibility
+  const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);  // Track confirm password visibility
+
   const requirements = [
     { regex: /.{8,}/, id: "lengthReq", text: "At least 8 characters" },
     { regex: /[a-z]/, id: "lowercaseReq", text: "At least 1 lowercase letter" },
@@ -48,15 +51,16 @@ const Signup = () => {
     if (!emailRegex.test(email)) {
       setEmailError("Please use an AUB email");
     } else {
-      setPasswordError("");
+      setEmailError("");
     }
-  }
+  };
 
-
-
-  const togglePassword = (inputId) => {
-    const input = document.getElementById(inputId);
-    input.type = input.type === "password" ? "text" : "password";
+  const togglePassword = (field) => {
+    if (field === "password") {
+      setPasswordVisible(!passwordVisible);
+    } else if (field === "passwordConfirm") {
+      setPasswordConfirmVisible(!passwordConfirmVisible);
+    }
   };
 
   return (
@@ -67,7 +71,6 @@ const Signup = () => {
           <i className="bx bx-user group-i"></i>
           <input type="text" placeholder="Username" required />
         </div>
-
         <div className="group">
           <i className="bx bx-envelope group-i"></i>
           <input
@@ -81,9 +84,12 @@ const Signup = () => {
         </div>
         {emailError && <p className="error-message"><i className="bx bx-error-circle"></i> {emailError}</p>}
         <div className="group">
-          <i className="bx bx-lock group-i" onClick={() => togglePassword("password")}></i>
+          <i 
+            className={`bx ${passwordVisible ? 'bx-lock-open' : 'bx-lock'} group-i`} 
+            onClick={() => togglePassword("password")}
+          ></i>
           <input
-            type="password"
+            type={passwordVisible ? "text" : "password"}
             id="password"
             placeholder="Password"
             value={password}
@@ -96,26 +102,32 @@ const Signup = () => {
                 : ""
               );
             }}
-
             required
           />
           {requirementsVisible && (
             <div className="requirments-wrapper">
               <ul className="requirment-list">
-                {requirements.map(({ id, text }) => (
-                  <li key={id} id={id}>
-                    <i className="bx bx-circle"></i> {text}
-                  </li>
-                ))}
+                {requirements.map(({ id, text, regex }) => {
+                  const isValid = regex.test(password);
+                  return (
+                    <li key={id} id={id}>
+                      <i className={`bx ${isValid ? 'bx-check-circle' : 'bx-circle'}`}></i> {text}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
         </div>
         {passwordFormateError && <p className="error-message"><i className="bx bx-error-circle"></i> {passwordFormateError}</p>}
+
         <div className="group">
-          <i className="bx bx-lock group-i" onClick={() => togglePassword("passwordConfirm")}></i>
+          <i 
+            className={`bx ${passwordConfirmVisible ? 'bx-lock-open' : 'bx-lock'} group-i`} 
+            onClick={() => togglePassword("passwordConfirm")}
+          ></i>
           <input
-            type="password"
+            type={passwordConfirmVisible ? "text" : "password"}
             id="passwordConfirm"
             placeholder="Confirm Password"
             value={passwordConfirm}
@@ -126,8 +138,10 @@ const Signup = () => {
         </div>
         {passwordError && <p className="error-message"><i className="bx bx-error-circle"></i> {passwordError}</p>}
 
+        {/* Submit Button */}
         <button type="submit" className="signup-btn">Sign Up</button>
 
+        {/* Login Redirect */}
         <div className="login-redirect">
           Already a registered user? <Link to="/login">Login</Link> {/* Link to login */}
         </div>
