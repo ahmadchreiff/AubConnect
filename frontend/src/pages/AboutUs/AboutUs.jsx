@@ -1,5 +1,9 @@
 import React from "react";
+<<<<<<< HEAD
 import "./AboutUs-Styles.css";
+=======
+import "./AboutUs-style.css";
+>>>>>>> ahmad
 
 const AboutUs = () => {
   return (
@@ -52,4 +56,8 @@ const AboutUs = () => {
   );
 };
 
+<<<<<<< HEAD
 export default AboutUs;
+=======
+export default AboutUs;
+>>>>>>> ahmad

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom"; // Import Link for navigation
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate for redirection
+import axios from "axios"; // Import axios
 import "./signup-style.css";
 import "boxicons/css/boxicons.min.css";
 
@@ -11,8 +12,16 @@ const Signup = () => {
   const [requirementsVisible, setRequirementsVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
+<<<<<<< HEAD
   const [passwordVisible, setPasswordVisible] = useState(false);  // Track password visibility
   const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);  // Track confirm password visibility
+=======
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);
+  const [username, setUsername] = useState(""); // Add username state
+  const [error, setError] = useState(""); // For backend errors
+  const navigate = useNavigate(); // For redirection after successful signup
+>>>>>>> ahmad
 
   const requirements = [
     { regex: /.{8,}/, id: "lengthReq", text: "At least 8 characters" },
@@ -61,15 +70,61 @@ const Signup = () => {
     } else if (field === "passwordConfirm") {
       setPasswordConfirmVisible(!passwordConfirmVisible);
     }
+<<<<<<< HEAD
+=======
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent page refresh
+  
+    // Validate email and password
+    validateEmailFormat();
+    validatePasswordMatch();
+  
+    if (emailError || passwordError || passwordFormateError) {
+      return; // Stop if there are validation errors
+    }
+  
+    try {
+      // Send a POST request to the backend
+      const response = await axios.post("http://localhost:5001/api/auth/signup", {
+        name: username, // Use the username as the name
+        username,
+        email,
+        password,
+      });
+  
+      // Handle successful signup
+      console.log("Signup successful:", response.data);
+      navigate("/login"); // Redirect to the login page
+    } catch (err) {
+      // Log the full error object
+      console.error("Signup error:", err);
+  
+      // Display a more specific error message
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Signup failed. Please try again."
+      );
+    }
+>>>>>>> ahmad
   };
 
   return (
     <div className="signup-section">
       <h2>Sign Up</h2>
-      <form>
+      {error && <p className="error-message"><i className="bx bx-error-circle"></i> {error}</p>}
+      <form onSubmit={handleSubmit}>
         <div className="group">
           <i className="bx bx-user group-i"></i>
-          <input type="text" placeholder="Username" required />
+          <input
+            type="text"
+            placeholder="Username"
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
         </div>
         <div className="group">
           <i className="bx bx-envelope group-i"></i>
@@ -84,8 +139,13 @@ const Signup = () => {
         </div>
         {emailError && <p className="error-message"><i className="bx bx-error-circle"></i> {emailError}</p>}
         <div className="group">
+<<<<<<< HEAD
           <i 
             className={`bx ${passwordVisible ? 'bx-lock-open' : 'bx-lock'} group-i`} 
+=======
+          <i
+            className={`bx ${passwordVisible ? "bx-lock-open" : "bx-lock"} group-i`}
+>>>>>>> ahmad
             onClick={() => togglePassword("password")}
           ></i>
           <input
@@ -97,9 +157,16 @@ const Signup = () => {
             onFocus={() => setRequirementsVisible(true)}
             onBlur={() => {
               setRequirementsVisible(false);
+<<<<<<< HEAD
               setPasswordFormatError(password && !requirements.every(({ regex }) => regex.test(password))
                 ? "Password doesn't meet the requirements"
                 : ""
+=======
+              setPasswordFormatError(
+                password && !requirements.every(({ regex }) => regex.test(password))
+                  ? "Password doesn't meet the requirements"
+                  : ""
+>>>>>>> ahmad
               );
             }}
             required
@@ -111,7 +178,11 @@ const Signup = () => {
                   const isValid = regex.test(password);
                   return (
                     <li key={id} id={id}>
+<<<<<<< HEAD
                       <i className={`bx ${isValid ? 'bx-check-circle' : 'bx-circle'}`}></i> {text}
+=======
+                      <i className={`bx ${isValid ? "bx-check-circle" : "bx-circle"}`}></i> {text}
+>>>>>>> ahmad
                     </li>
                   );
                 })}
@@ -119,11 +190,23 @@ const Signup = () => {
             </div>
           )}
         </div>
+<<<<<<< HEAD
         {passwordFormateError && <p className="error-message"><i className="bx bx-error-circle"></i> {passwordFormateError}</p>}
 
         <div className="group">
           <i 
             className={`bx ${passwordConfirmVisible ? 'bx-lock-open' : 'bx-lock'} group-i`} 
+=======
+        {passwordFormateError && (
+          <p className="error-message">
+            <i className="bx bx-error-circle"></i> {passwordFormateError}
+          </p>
+        )}
+
+        <div className="group">
+          <i
+            className={`bx ${passwordConfirmVisible ? "bx-lock-open" : "bx-lock"} group-i`}
+>>>>>>> ahmad
             onClick={() => togglePassword("passwordConfirm")}
           ></i>
           <input
@@ -136,20 +219,32 @@ const Signup = () => {
             required
           />
         </div>
-        {passwordError && <p className="error-message"><i className="bx bx-error-circle"></i> {passwordError}</p>}
+        {passwordError && (
+          <p className="error-message">
+            <i className="bx bx-error-circle"></i> {passwordError}
+          </p>
+        )}
 
         {/* Submit Button */}
+<<<<<<< HEAD
         <button type="submit" className="signup-btn">Sign Up</button>
+=======
+        <button type="submit" className="signup-btn">
+          Sign Up
+        </button>
+>>>>>>> ahmad
 
         {/* Login Redirect */}
         <div className="login-redirect">
-          Already a registered user? <Link to="/login">Login</Link> {/* Link to login */}
+          Already a registered user? <Link to="/login">Login</Link>
         </div>
       </form>
 
       {/* Back to Home Button */}
       <div className="back-to-home">
-        <Link to="/" className="back-btn">Back to Home</Link>
+        <Link to="/" className="back-btn">
+          Back to Home
+        </Link>
       </div>
     </div>
   );
