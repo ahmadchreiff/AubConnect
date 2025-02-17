@@ -12,16 +12,11 @@ const Signup = () => {
   const [requirementsVisible, setRequirementsVisible] = useState(false);
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-<<<<<<< HEAD
-  const [passwordVisible, setPasswordVisible] = useState(false);  // Track password visibility
-  const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);  // Track confirm password visibility
-=======
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);
   const [username, setUsername] = useState(""); // Add username state
   const [error, setError] = useState(""); // For backend errors
   const navigate = useNavigate(); // For redirection after successful signup
->>>>>>> ahmad
 
   const requirements = [
     { regex: /.{8,}/, id: "lengthReq", text: "At least 8 characters" },
@@ -70,8 +65,6 @@ const Signup = () => {
     } else if (field === "passwordConfirm") {
       setPasswordConfirmVisible(!passwordConfirmVisible);
     }
-<<<<<<< HEAD
-=======
   };
 
   const handleSubmit = async (e) => {
@@ -108,7 +101,6 @@ const Signup = () => {
         "Signup failed. Please try again."
       );
     }
->>>>>>> ahmad
   };
 
   return (
@@ -139,13 +131,8 @@ const Signup = () => {
         </div>
         {emailError && <p className="error-message"><i className="bx bx-error-circle"></i> {emailError}</p>}
         <div className="group">
-<<<<<<< HEAD
-          <i 
-            className={`bx ${passwordVisible ? 'bx-lock-open' : 'bx-lock'} group-i`} 
-=======
           <i
             className={`bx ${passwordVisible ? "bx-lock-open" : "bx-lock"} group-i`}
->>>>>>> ahmad
             onClick={() => togglePassword("password")}
           ></i>
           <input
@@ -157,16 +144,10 @@ const Signup = () => {
             onFocus={() => setRequirementsVisible(true)}
             onBlur={() => {
               setRequirementsVisible(false);
-<<<<<<< HEAD
-              setPasswordFormatError(password && !requirements.every(({ regex }) => regex.test(password))
-                ? "Password doesn't meet the requirements"
-                : ""
-=======
               setPasswordFormatError(
                 password && !requirements.every(({ regex }) => regex.test(password))
                   ? "Password doesn't meet the requirements"
                   : ""
->>>>>>> ahmad
               );
             }}
             required
@@ -178,11 +159,7 @@ const Signup = () => {
                   const isValid = regex.test(password);
                   return (
                     <li key={id} id={id}>
-<<<<<<< HEAD
-                      <i className={`bx ${isValid ? 'bx-check-circle' : 'bx-circle'}`}></i> {text}
-=======
                       <i className={`bx ${isValid ? "bx-check-circle" : "bx-circle"}`}></i> {text}
->>>>>>> ahmad
                     </li>
                   );
                 })}
@@ -190,13 +167,6 @@ const Signup = () => {
             </div>
           )}
         </div>
-<<<<<<< HEAD
-        {passwordFormateError && <p className="error-message"><i className="bx bx-error-circle"></i> {passwordFormateError}</p>}
-
-        <div className="group">
-          <i 
-            className={`bx ${passwordConfirmVisible ? 'bx-lock-open' : 'bx-lock'} group-i`} 
-=======
         {passwordFormateError && (
           <p className="error-message">
             <i className="bx bx-error-circle"></i> {passwordFormateError}
@@ -206,7 +176,6 @@ const Signup = () => {
         <div className="group">
           <i
             className={`bx ${passwordConfirmVisible ? "bx-lock-open" : "bx-lock"} group-i`}
->>>>>>> ahmad
             onClick={() => togglePassword("passwordConfirm")}
           ></i>
           <input
@@ -226,13 +195,9 @@ const Signup = () => {
         )}
 
         {/* Submit Button */}
-<<<<<<< HEAD
-        <button type="submit" className="signup-btn">Sign Up</button>
-=======
         <button type="submit" className="signup-btn">
           Sign Up
         </button>
->>>>>>> ahmad
 
         {/* Login Redirect */}
         <div className="login-redirect">
