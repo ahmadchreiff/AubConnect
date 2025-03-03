@@ -1,0 +1,170 @@
+
+div {
+    font-family: Arial, sans-serif;
+}
+
+textarea {
+    min-width: 600px;
+    height: 80px;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    box-sizing: border-box;
+    display: block;
+    outline: none;
+    resize: none;
+}
+
+.comment-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+button {
+    padding: 8px 15px;
+    background-color: #860033;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 9px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+    align-self: flex-start;
+    outline: none;
+}
+
+button:hover {
+    background-color: #ff3366;
+}
+
+.comments {
+    background-color: #fff;
+    border-radius: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.comments span {
+    font-size: 13px;
+    display: block;
+    margin: 1px;
+    text-align: start;
+    padding-left: 5px;
+}
+
+.reply {
+    border-left: 2px solid #ddd;
+    padding: 10px;
+    width: 100%;
+}
+
+button.ReplyCancle {
+    outline: none;
+}
+
+.SeeMore {
+    background-color: transparent;
+    border: none;
+    color: gray;
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+}
+
+.SeeMore:hover {
+    text-decoration: underline;
+    background-color: white;
+}
+
+label {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.reply-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.anonymous-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    color: #555;
+    padding-top: 11px;
+}
+
+.reply-input-container textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    resize: none;
+    outline: none;
+    margin-top: 10px;
+}
+
+.reply-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.comment-container {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-body {
+    display: block;
+    font-size: 14px;
+}
+
+.comment-container textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    resize: none;
+    outline: none;
+    display: block;
+}
+
+.button-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+    flex-wrap: wrap;
+}
+
+.reply {
+    margin-left: 20px;
+    border-left: 2px solid #ddd;
+    padding-left: 10px;
+}
