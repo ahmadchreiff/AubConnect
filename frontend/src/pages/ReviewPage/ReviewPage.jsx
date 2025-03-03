@@ -160,7 +160,15 @@ const ReviewPage = () => {
             ))}
           </div>
         </div>
-        
+        <div className="form-group">
+          <label>Review:</label>
+          <textarea
+            name="reviewText"
+            value={newReview.reviewText}
+            onChange={handleInputChange}
+            placeholder="Write your review here..."
+          />
+        </div>
         
        
       
