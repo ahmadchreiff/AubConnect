@@ -6,6 +6,47 @@
     <title>AUBConnect</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .like-btn, .dislike-btn, .comment-btn {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .like-btn:hover, .dislike-btn:hover, .comment-btn:hover {
+            background-color: #e0e0e0;
+            transform: scale(1.1);
+        }
+
+        .like-btn i, .dislike-btn i, .comment-btn i {
+            color: #800020 !important;
+            font-size: 16px;
+        }
+
+        .like-btn span, .dislike-btn span, .comment-btn span {
+            color: #800020;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <header class="navbar">
@@ -36,11 +77,9 @@
                     <p>"Great course! Highly recommended."</p>
                     <a href="#">Read More →</a>
                     <div class="review-actions">
-                        <button class="like-btn"><i class="fas fa-thumbs-up"></i> <span class="like-count">(12)</span> 
-                        </button>
-                        <button class="comment-btn"><i class="fas fa-comment"></i><span class="comment-count">(5)</span> 
-                        </button>
-            
+                        <button class="like-btn"><i class="fas fa-thumbs-up"></i> <span class="like-count">(12)</span></button>
+                        <button class="dislike-btn"><i class="fas fa-thumbs-down"></i> <span class="dislike-count">(3)</span></button>
+                        <button class="comment-btn"><i class="fas fa-comment"></i> <span class="comment-count">(5)</span></button>
                     </div>
                 </div>
             </section>
