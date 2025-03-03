@@ -177,7 +177,7 @@ const ReviewPage = () => {
               checked={newReview.anonymous}
               onChange={handleInputChange}
             />
-            Submit Anonymously
+        {/* SUBMIT ANONYMOUS REVIEW */}
           </label>
         </div>
         <button onClick={submitReview}>
