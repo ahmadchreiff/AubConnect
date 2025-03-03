@@ -42,17 +42,21 @@ const POST = () => {
 
     const onEdit = (postIndex, parentIndices, newBody) => {
         const updatedPosts = [...posts];
-        if (parentIndices.length === 0) {
-            updatedPosts[postIndex].body = newBody;
-        } else {
-            let currentLevel = updatedPosts[postIndex].post;
-            for (let i = 0; i < parentIndices.length; i++) {
-                currentLevel = currentLevel[parentIndices[i]].post;
-            }
-            currentLevel.body = newBody;
+        let currentLevel = updatedPosts;
+
+        // Traverse to the correct nested comment
+        for (let i = 0; i < parentIndices.length; i++) {
+            currentLevel = currentLevel[postIndex].post;
+            postIndex = parentIndices[i];
         }
+
+        // Edit the correct comment
+        if (currentLevel[postIndex]) {
+            currentLevel[postIndex].body = newBody;
+        }
+
         setPosts(updatedPosts);
-        setEditPost(null); // Close the edit pop-up
+        setEditPost(null);
     };
 
     return (
@@ -66,7 +70,10 @@ const POST = () => {
                             post={post}
                             onReply={(replyBody, parentIndices) => onReply(index, replyBody, parentIndices)}
                             onDelete={(parentIndices) => setDeletePost({ postIndex: index, parentIndices })}
-                            onEdit={(parentIndices) => setEditPost({ postIndex: index, parentIndices, currentBody: post.body })}
+                            onEdit={(parentIndices, currentBody) => {
+                                console.log("Opening Edit Mode for:", { index, parentIndices, currentBody });
+                                setEditPost({ postIndex: index, parentIndices, currentBody });
+                            }}
                         />
                     </div>
                 ))}
@@ -103,18 +110,19 @@ const POST = () => {
         </div>
     );
 };
+
 const CommentInput = ({ onPost }) => {
     const [postBody, setPostBody] = useState("");
     const [isAnonymous, setIsAnonymous] = useState(false);
 
     const handlePostSubmit = () => {
-        if(postBody.trim()===""){
-            alert("Sorry,you can't submit an empty post!");
+        if (postBody.trim() === "") {
+            alert("Sorry, you can't submit an empty post!");
             return;
         }
         const newPost = {
             body: postBody,
-            username: isAnonymous ? "Anonymous" : "userName",//user name must be chnaged to the actual username  
+            username: isAnonymous ? "Anonymous" : "userName", // user name must be changed to the actual username
             post: [],
         };
         onPost(newPost);
@@ -146,6 +154,7 @@ const CommentInput = ({ onPost }) => {
         </div>
     );
 };
+
 const PostItem = ({ post, onReply, onDelete, onEdit, parentIndices = [] }) => {
     const [isReplying, setIsReplying] = useState(false);
     const [replyBody, setReplyBody] = useState("");
@@ -161,7 +170,7 @@ const PostItem = ({ post, onReply, onDelete, onEdit, parentIndices = [] }) => {
 
     const handleReplySubmit = () => {
         if (replyBody.trim() === "") {
-            alert("Sorry,reply can not be empty!");
+            alert("Sorry, reply cannot be empty!");
             return;
         }
         onReply(replyBody, parentIndices, isAnonymous ? "Anonymous" : "userName");
@@ -211,7 +220,10 @@ const PostItem = ({ post, onReply, onDelete, onEdit, parentIndices = [] }) => {
                             Submit
                         </button>
                     )}
-                      <button onClick={() => onEdit(parentIndices)} className="edit">
+                    <button
+                        onClick={() => onEdit(parentIndices, post.body)} // Pass the correct body here
+                        className="edit"
+                    >
                         Edit
                     </button>
                     <button onClick={() => onDelete(parentIndices)} className="delete">
@@ -223,8 +235,6 @@ const PostItem = ({ post, onReply, onDelete, onEdit, parentIndices = [] }) => {
                             {showReplies ? "Hide" : `See More (${post.post.length} replies)`}
                         </button>
                     )}
-
-                    
                 </div>
             </div>
 
