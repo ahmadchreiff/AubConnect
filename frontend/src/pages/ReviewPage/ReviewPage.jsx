@@ -169,10 +169,21 @@ const ReviewPage = () => {
             placeholder="Write your review here..."
           />
         </div>
-        
-       
-      
-
+        <div className="form-group">
+          <label>
+            <input
+              type="checkbox"
+              name="anonymous"
+              checked={newReview.anonymous}
+              onChange={handleInputChange}
+            />
+            Submit Anonymously
+          </label>
+        </div>
+        <button onClick={submitReview}>
+          {editReviewId !== null ? "Update Review" : "Submit Review"}
+        </button>
+      </div>
       <div className="reviews-list">
         <h2>Latest Reviews</h2>
         {reviews.map((review) => (
