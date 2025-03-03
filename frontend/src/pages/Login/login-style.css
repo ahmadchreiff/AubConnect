@@ -1,0 +1,133 @@
+/* General Styling */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Login Section */
+.login-section {
+  background-color: #860033;
+  width: 360px;
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Heading */
+h2 {
+  color: #fff;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* Input Field Group */
+.group {
+  position: relative;
+  width: 100%;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+}
+
+/* Input Fields */
+input {
+  width: 100%;
+  height: 36px;
+  padding: 10px 40px 10px 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+/* Input Focus Effect */
+input:focus {
+  height: 40px;
+  border-color: #860033;
+  box-shadow: 0 0 8px rgba(134, 0, 51, 0.5);
+  background-color: #eee;
+}
+
+/* Icons inside Inputs */
+.group-i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: gray;
+  cursor: pointer;
+}
+
+/* Login Button */
+.login-btn {
+  background: white;
+  color: #860033;
+  border: none;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+
+.login-btn:hover {
+  background: #ff3366;
+  color: white;
+}
+
+/* Signup Redirect */
+.signup-redirect {
+  margin-top: 15px;
+  font-size: 14px;
+  color: white;
+}
+
+.signup-redirect a {
+  color: #ffccd5;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.signup-redirect a:hover {
+  color: #ff99aa;
+}
+
+/* Back to Home Button */
+.back-to-home {
+  margin-top: 15px;  /* Adjust space between button and input fields */
+  display: flex;
+  justify-content: center;
+}
+
+.back-btn {
+  background-color: #f2f2f2;  /* Lighter background to make it less prominent */
+  color: #7f7f7f;  /* Dimmer color */
+  border: 1px solid #ccc;  /* Border to make it subtle */
+  padding: 8px 0;  /* Adjust padding to make it smaller */
+  width: 100%;  /* Ensure the button is the same width as the input fields */
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: normal;  /* Use a lighter font-weight for secondary actions */
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.back-btn:hover {
+  background-color: #e0e0e0;  /* Even lighter background on hover */
+  color: #5a5a5a;  /* Darker text color on hover for contrast */
+  border-color: #bbb;  /* Subtle border change on hover */
+}
+
