@@ -179,3 +179,18 @@ button:hover {
 .vote-buttons button:hover {
   background-color: #860033;
 }
+
+.reviews-container {
+  max-height: 800px; /* Increase height */
+  width: 90%; /* Increase width if necessary */
+}
+
+.review-card {
+  width: 300px; /* Increase width */
+  height: 250px; /* Increase height */
+}
+
+.modal {
+  width: 95%; /* Increase width */
+  max-width: 600px; /* Expand max width */
+}
