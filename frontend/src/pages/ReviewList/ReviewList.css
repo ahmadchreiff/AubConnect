@@ -3,6 +3,9 @@
   display: flex;
   flex-direction: column;
   height: 100vh; /* Full height of the viewport */
+  margin-left: 0; /* Ensure no extra margin on the left */
+  margin-right: auto; /* Center the container if needed */
+  max-width: 100%; /* Ensure it doesn't overflow horizontally */
 }
 
 .add-review-button {
@@ -29,9 +32,10 @@
   padding: 10px;
   background-color: #f9f9f9;
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Ensure 4 reviews per row */
+  grid-template-columns: repeat(4, 1fr); /* Always 4 reviews per row */
   gap: 15px; /* Space between reviews */
-  max-height: 600px; /* Fixed height for the scrollable container */
+  max-height: 800px; /* Fixed height for the scrollable container */
+  width: 100%; /* Ensure the container takes full width */
 }
 
 /* Individual review card */
@@ -41,8 +45,6 @@
   border-radius: 8px;
   background-color: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  width: 250px; /* Fixed width for each review card */
-  height: 200px; /* Fixed height for each review card */
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Ensure content is spaced evenly */
@@ -86,7 +88,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   width: 90%;
-  max-width: 500px;
+  max-width: 600px;
 }
 
 .modal h2 {
@@ -180,17 +182,27 @@ button:hover {
   background-color: #860033;
 }
 
-.reviews-container {
-  max-height: 800px; /* Increase height */
-  width: 90%; /* Increase width if necessary */
+/* Responsive Design Adjustments */
+@media (max-width: 1200px) {
+  .reviews-container {
+    grid-template-columns: repeat(4, 1fr); /* Keep 4 reviews per row */
+  }
 }
 
-.review-card {
-  width: 300px; /* Increase width */
-  height: 250px; /* Increase height */
+@media (max-width: 992px) {
+  .reviews-container {
+    grid-template-columns: repeat(3, 1fr); /* 3 reviews per row for medium screens */
+  }
 }
 
-.modal {
-  width: 95%; /* Increase width */
-  max-width: 600px; /* Expand max width */
+@media (max-width: 768px) {
+  .reviews-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 reviews per row for small screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .reviews-container {
+    grid-template-columns: 1fr; /* 1 review per row for very small screens */
+  }
 }
