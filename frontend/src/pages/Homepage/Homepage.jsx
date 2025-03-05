@@ -5,18 +5,6 @@ import "./Homepage.css";
 const Homepage = () => {
   return (
     <div className="homepage">
-      <header className="navbar">
-        <div className="logo">AUBConnect</div>
-        <div className="search-bar">
-          <input type="text" placeholder="Search by Professor..." />
-          <input type="text" placeholder="Search by Course..." />
-        </div>
-        <nav className="nav-links">
-          <Link to="/reviews">Post a Review</Link>
-          <Link to="/profile">Profile</Link>
-          <Link to="/logout">Log Out</Link>
-        </nav>
-      </header>
 
       <div className="container">
         <aside className="sidebar">

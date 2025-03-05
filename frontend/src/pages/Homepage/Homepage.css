@@ -1,60 +1,21 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f4;
+/* Modern color scheme */
+:root {
+  --primary-color: #860033;
+  --secondary-color: #ffd700;
+  --background-color: #f4f4f4;
+  --card-background: #ffffff;
+  --text-color: #333333;
+  --modal-background: rgba(255, 255, 255, 0.9);
+  --modal-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Body and container styles */
+.homepage {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-.navbar {
-  background-color: #860033;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 20px;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.navbar .logo {
-  font-size: 24px;
-  font-weight: bold;
-  margin-right: 20px; /* Space between logo and search bar */
-}
-
-.search-bar {
-  display: flex;
-  gap: 10px;
-  flex-grow: 1; /* Allow search bar to take up remaining space */
-  max-width: 500px; /* Limit search bar width */
-}
-
-.search-bar input {
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  flex-grow: 1; /* Make search inputs take equal space */
-}
-
-.nav-links {
-  display: flex;
-  gap: 15px; /* Space between nav links */
-  margin-left: 20px; /* Space between search bar and "Post a Review" */
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
-  transition: color 0.2s ease;
-}
-
-.nav-links a:hover {
-  color: #cccccc;
+  background-color: var(--background-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .container {
@@ -62,23 +23,30 @@ body {
   padding: 20px;
   flex-grow: 1;
   box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
 }
 
+/* Sidebar styles */
 .sidebar {
   width: 200px;
-  background-color: #fff;
+  background-color: var(--card-background);
   padding: 15px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-right: 20px;
 }
 
 .sidebar p {
   font-weight: bold;
   font-size: 18px;
+  color: var(--text-color);
 }
 
 .sidebar a {
   display: block;
-  color: #860033;
+  color: var(--primary-color);
   margin: 10px 0;
   text-decoration: none;
   transition: color 0.2s ease;
@@ -88,28 +56,36 @@ body {
   color: #f5a5a5;
 }
 
+/* Main content styles */
 .main-content {
   flex-grow: 1;
-  margin-left: 20px;
   min-width: 300px;
 }
 
 .recent-reviews h2 {
   font-size: 24px;
   margin-bottom: 20px;
+  color: var(--text-color);
 }
 
 .review-card {
-  background-color: white;
+  background-color: var(--card-background);
   padding: 20px;
   margin-bottom: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .review-card h3 {
   font-size: 18px;
   margin-bottom: 10px;
+  color: var(--text-color);
 }
 
 .review-rating {
@@ -124,17 +100,24 @@ body {
   gap: 2px;
 }
 
+.review-rating .stars span {
+  color: var(--secondary-color);
+  font-size: 18px;
+}
+
 .review-text {
   margin-bottom: 15px;
   line-height: 1.5;
+  color: var(--text-color);
 }
 
 .read-more {
-  color: #860033;
+  color: var(--primary-color);
   text-decoration: none;
   font-weight: bold;
   display: inline-block;
   margin-bottom: 15px;
+  transition: color 0.2s ease;
 }
 
 .read-more:hover {
@@ -149,7 +132,7 @@ body {
 
 .like-btn, .comment-btn {
   background-color: transparent;
-  color: #860033;
+  color: var(--primary-color);
   padding: 8px 15px;
   border-radius: 5px;
   cursor: pointer;
@@ -162,30 +145,22 @@ body {
 
 .like-btn:hover, .comment-btn:hover {
   color: white;
-  background-color: #860033;
+  background-color: var(--primary-color);
   transform: scale(1.05);
 }
 
 .footer {
-  background-color: #860033;
+  background-color: var(--primary-color);
   color: white;
   text-align: center;
   padding: 10px;
   width: 100%;
   box-sizing: border-box;
+  margin-top: auto;
 }
 
+/* Responsive Design */
 @media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .search-bar {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
   .container {
     flex-direction: column;
     align-items: center;
