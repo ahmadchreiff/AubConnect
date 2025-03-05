@@ -1,59 +1,83 @@
+/* Modern color scheme */
+:root {
+  --primary-color: #860033;
+  --secondary-color: #ffd700;
+  --background-color: #f5f5f5;
+  --card-background: #ffffff;
+  --text-color: #333333;
+  --modal-background: rgba(255, 255, 255, 0.9);
+  --modal-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Body and container styles */
 .review-list-page {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Full height of the viewport */
-  margin-left: 0; /* Ensure no extra margin on the left */
-  margin-right: auto; /* Center the container if needed */
-  max-width: 100%; /* Ensure it doesn't overflow horizontally */
+  align-items: center;
+  background-color: var(--background-color);
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Add review button */
 .add-review-button {
   display: inline-block;
   margin-bottom: 20px;
   padding: 10px 20px;
-  background-color: #860033;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .add-review-button:hover {
-  background-color: #860033;
+  background-color: #6a0026;
 }
 
-/* Scrollable container for reviews */
-.reviews-container {
-  flex: 1; /* Take up remaining space */
-  overflow-y: auto; /* Enable vertical scrolling */
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
-  background-color: #f9f9f9;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Always 4 reviews per row */
-  gap: 15px; /* Space between reviews */
-  max-height: 800px; /* Fixed height for the scrollable container */
-  width: 100%; /* Ensure the container takes full width */
-}
-
-/* Individual review card */
-.review-card {
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* Loading spinner */
+.loading-spinner {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Ensure content is spaced evenly */
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+/* Reviews container */
+.reviews-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+  max-height: 80vh; /* Limits the height of the container */
+  overflow-y: auto; /* Enables vertical scrolling */
+}
+
+/* Review card */
+.review-card {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: var(--card-background);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .review-title {
   margin: 0 0 10px;
   font-size: 18px;
   font-weight: bold;
+  color: var(--text-color);
 }
 
 .rating {
@@ -63,10 +87,11 @@
 .star {
   font-size: 20px;
   color: #ccc;
+  transition: color 0.3s ease;
 }
 
 .star.filled {
-  color: #ffd700;
+  color: var(--secondary-color);
 }
 
 /* Modal styles */
@@ -80,19 +105,40 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal {
-  background: white;
+  background: var(--modal-background);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--modal-shadow);
   width: 90%;
   max-width: 600px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 .modal h2 {
   margin-top: 0;
+  color: var(--text-color);
 }
 
 .review-form {
@@ -108,6 +154,7 @@
 
 .form-group label {
   margin-bottom: 5px;
+  color: var(--text-color);
 }
 
 .form-group input,
@@ -116,6 +163,7 @@
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 14px;
 }
 
 .form-group textarea {
@@ -124,43 +172,49 @@
 
 button {
   padding: 10px 20px;
-  background-color: #860033;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-  background-color: #860033;
+  background-color: #6a0026;
 }
 
 .error-message {
   color: red;
+  margin-bottom: 10px;
 }
 
 .success-message {
   color: green;
+  margin-bottom: 10px;
 }
 
 /* Actions buttons (Edit and Delete) */
 .actions {
   display: flex;
-  gap: 10px; /* Add space between buttons */
-  margin-top: 10px; /* Add some margin above the buttons */
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .action-btn {
   padding: 5px 10px;
-  background-color: #860033;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
 }
 
 .action-btn:hover {
-  background-color: #860033;
+  background-color: #6a0026;
 }
 
 .vote-buttons {
@@ -171,38 +225,22 @@ button:hover {
 
 .vote-buttons button {
   padding: 5px 10px;
-  background-color: #860033;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s ease;
 }
 
 .vote-buttons button:hover {
-  background-color: #860033;
+  background-color: #6a0026;
 }
 
 /* Responsive Design Adjustments */
-@media (max-width: 1200px) {
-  .reviews-container {
-    grid-template-columns: repeat(4, 1fr); /* Keep 4 reviews per row */
-  }
-}
-
-@media (max-width: 992px) {
-  .reviews-container {
-    grid-template-columns: repeat(3, 1fr); /* 3 reviews per row for medium screens */
-  }
-}
-
 @media (max-width: 768px) {
   .reviews-container {
-    grid-template-columns: repeat(2, 1fr); /* 2 reviews per row for small screens */
-  }
-}
-
-@media (max-width: 480px) {
-  .reviews-container {
-    grid-template-columns: 1fr; /* 1 review per row for very small screens */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }

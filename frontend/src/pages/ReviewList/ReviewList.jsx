@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import "./ReviewList.css";
+import { ClipLoader } from "react-spinners"; // For loading spinner
 
 const ReviewList = () => {
   const [reviews, setReviews] = useState([]);
@@ -17,6 +18,7 @@ const ReviewList = () => {
   });
   const [editReviewId, setEditReviewId] = useState(null);
   const [loggedInUsername, setLoggedInUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   // Fetch reviews and set logged-in username
   useEffect(() => {
@@ -27,6 +29,8 @@ const ReviewList = () => {
       } catch (err) {
         setError("Failed to fetch reviews.");
         console.error("Error fetching reviews:", err);
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     };
 
@@ -269,44 +273,50 @@ const ReviewList = () => {
       )}
 
       {/* List of reviews */}
-      <div className="reviews-container">
-        {reviews.map((review) => (
-          <div key={review._id} className="review-card">
-            <h3 className="review-title">
-              {review.username} - {review.title} ({review.type})
-            </h3>
-            <div className="rating">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span
-                  key={star}
-                  className={`star ${star <= review.rating ? "filled" : ""}`}
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-            <p>{review.reviewText}</p>
-            <div className="vote-buttons">
-              <button onClick={() => handleUpvote(review._id)}>
-                👍 {review.upvotes?.length || 0}
-              </button>
-              <button onClick={() => handleDownvote(review._id)}>
-                👎 {review.downvotes?.length || 0}
-              </button>
-            </div>
-            {review.username === loggedInUsername && (
-              <div className="actions">
-                <button onClick={() => handleEditReview(review._id)} className="action-btn">
-                  Edit
+      {isLoading ? (
+        <div className="loading-spinner">
+          <ClipLoader color="#860033" size={50} />
+        </div>
+      ) : (
+        <div className="reviews-container">
+          {reviews.map((review) => (
+            <div key={review._id} className="review-card">
+              <h3 className="review-title">
+                {review.username} - {review.title} ({review.type})
+              </h3>
+              <div className="rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={`star ${star <= review.rating ? "filled" : ""}`}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <p>{review.reviewText}</p>
+              <div className="vote-buttons">
+                <button onClick={() => handleUpvote(review._id)}>
+                  👍 {review.upvotes?.length || 0}
                 </button>
-                <button onClick={() => handleDeleteReview(review._id)} className="action-btn">
-                  Delete
+                <button onClick={() => handleDownvote(review._id)}>
+                  👎 {review.downvotes?.length || 0}
                 </button>
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              {review.username === loggedInUsername && (
+                <div className="actions">
+                  <button onClick={() => handleEditReview(review._id)} className="action-btn">
+                    Edit
+                  </button>
+                  <button onClick={() => handleDeleteReview(review._id)} className="action-btn">
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
