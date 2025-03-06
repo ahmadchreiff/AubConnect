@@ -1,0 +1,131 @@
+body {
+  background: linear-gradient(135deg, #f9f9f9, #ffffff); /* Light gradient for neutral feel */
+  color: #333;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.review-page {
+  max-width: 900px;
+  margin: 20px auto;  /* Reduced margin to avoid exceeding top of the page */
+  padding: 15px;      /* Reduced padding for more compact layout */
+  background-color: rgba(255, 255, 255, 0.9); /* Slightly transparent background */
+  border-radius: 10px; /* Reduced border radius for a more compact look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  height: 100vh;      /* Ensure content doesn't exceed viewport height */
+  overflow-y: auto;   /* Enable scrolling if content exceeds viewport */
+}
+
+.header {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #860033; /* AUB Dark Red */
+  margin-bottom: 20px; /* Reduced margin */
+}
+
+.review-form {
+  background: #ffffff;
+  padding: 20px;   /* Reduced padding */
+  border-radius: 10px; /* Reduced border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;  /* Reduced margin */
+}
+
+.form-group {
+  margin-bottom: 15px;  /* Reduced space between input fields */
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #860033; /* AUB Dark Red */
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 8px;   /* Reduced padding */
+  border: 2px solid #860033; /* AUB Dark Red */
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-top: 5px;
+}
+
+.rating {
+  display: flex;
+  gap: 8px; /* Reduced gap between stars */
+}
+
+.star {
+  cursor: pointer;
+  font-size: 28px;
+  color: #ccc;
+}
+
+.star.filled {
+  color: #ffcc00;
+}
+
+button {
+  background-color: #860033; /* AUB Dark Red */
+  color: white;
+  padding: 8px 18px; /* Reduced padding for smaller button */
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #7d002e; /* Slightly darker shade for hover */
+}
+
+.reviews-list {
+  margin-top: 30px;
+}
+
+.review-card {
+  background: #ffffff;
+  padding: 18px; /* Reduced padding */
+  border: 1px solid #ddd;
+  border-radius: 10px; /* Reduced border radius */
+  margin-bottom: 15px;  /* Reduced margin between cards */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.review-title {
+  font-size: 1.5rem;
+  color: #860033; /* AUB Dark Red */
+  margin-bottom: 10px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px; /* Reduced gap between action buttons */
+  justify-content: flex-start;
+}
+
+.action-btn, .vote-btn {
+  padding: 8px 15px; /* Reduced padding */
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.action-btn:hover, .vote-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.vote-btn {
+  background-color: #e2e2e2;
+  color: #860033; /* AUB Dark Red */
+  border: 1px solid #860033; /* AUB Dark Red */
+}
+
+.vote-btn:hover {
+  background-color: #860033; /* AUB Dark Red */
+  color: white;
+}

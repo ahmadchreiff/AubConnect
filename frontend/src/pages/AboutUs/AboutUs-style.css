@@ -1,0 +1,38 @@
+h1 {
+  margin: 0;
+  padding-top: 30px;
+  text-align: left;
+  position: relative;
+  width: 100%;
+  color:black;
+}
+
+
+.about-us-container h2{
+ color:black;
+  font-size: 20px;
+  font-family:'lora';
+  font-style: bold;
+ 
+}
+
+.about-us-container p{
+  color:rgb(49, 47, 47);
+  font-size: 16px;
+  font-family: 'lora';
+
+}
+
+.about-us-container {
+  width: 100%;  
+  margin: 0 auto;  
+  padding: 20px;  
+  text-align: left;  
+  max-width: 800px;
+}
+
+body {
+  background-color: white;
+  padding: 0;
+}
+
