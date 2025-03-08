@@ -13,6 +13,8 @@ const Homepage = () => {
         </div>
         <nav className="nav-links">
           <Link to="/reviews">Post a Review</Link>
+          <Link to="/past-reviews">Past Reviews</Link>
+
           <Link to="/profile">Profile</Link>
           <Link to="/logout">Log Out</Link>
         </nav>

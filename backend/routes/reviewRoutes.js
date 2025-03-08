@@ -1,9 +1,27 @@
-// routes/reviewRoutes.js
 const express = require("express");
 const router = express.Router();
 const Review = require("../models/Review");
 
-// Existing routes
+router.get("/user/:username", async (req, res) => {
+    // Fetch reviews for a specific user
+    const { username } = req.params;
+    const reviews = await Review.find({ username });
+    res.json(reviews);
+});
+
+router.get("/user/:username/past", async (req, res) => {
+    // Fetch past reviews for a specific user
+    const { username } = req.params;
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7); // Get reviews from the past week
+    const pastReviews = await Review.find({ 
+        username,
+        createdAt: { $gte: oneWeekAgo } // Filter reviews created in the last week
+    });
+
+    res.json(pastReviews);
+});
+
 router.post("/", async (req, res) => {
   try {
     const { type, title, rating, reviewText, username } = req.body;
