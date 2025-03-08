@@ -29,7 +29,7 @@ h2 {
 .group {
   position: relative;
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 13px;
   display: flex;
   align-items: center;
 }
@@ -50,7 +50,7 @@ input {
 input:focus {
   height: 40px;
   border-color: #860033;
-  box-shadow: 0 0 8px rgba(134, 0, 51, 0.5);
+  box-shadow: 0 0 8px rgba(20, 1, 8, 0.5);
   background-color: #eee;
 }
 
@@ -162,19 +162,18 @@ input:focus {
 
 /* Error Message */
 .error-message {
-  color: #d32f2f;
-  font-size: 14px;
-  padding: 8px;
-  border-radius: 8px;
+  color: #f2f2f2;
+  font-size: 12px;;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 2px;
 }
 
 /* Error Message Icon */
 .error-message i {
-  font-size: 16px;
-  color: #d32f2f;
+  font-size: 14px;
+  color:  #f2f2f2;
+  padding: bottom 1.2em;
 }
 
 /* Back to Home Button */
@@ -182,6 +181,7 @@ input:focus {
   margin-top: 20px;  /* Adjust space between button and form */
   display: flex;
   justify-content: center;
+  color:black;
 }
 
 .back-btn {
