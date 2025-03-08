@@ -1,13 +1,14 @@
-// backend/routes/authRoutes.js
 const express = require('express');
-const { signup, login } = require('../controllers/authController');
-
 const router = express.Router();
+const { sendVerificationCode, verifyCode, login } = require('../controllers/authController');
 
-// Signup route
-router.post('/signup', signup);
+// Route to send verification code
+router.post('/send-verification-code', sendVerificationCode);
 
-// Login route
+// Route to verify the code
+router.post('/verify-code', verifyCode);
+
+// Route to log in
 router.post('/login', login);
 
 module.exports = router;

@@ -27,7 +27,12 @@ const Login = () => {
 
       // Handle successful login
       console.log("Login successful:", response.data);
-      navigate("/"); // Redirect to the homepage
+
+      // Save the token to localStorage (if using JWT)
+      localStorage.setItem("token", response.data.token);
+
+      // Redirect to the homepage
+      navigate(response.data.redirectUrl);
     } catch (err) {
       // Handle errors
       setError(err.response?.data?.message || "Login failed. Please try again.");
