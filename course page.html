@@ -1,23 +1,34 @@
 <!DOCTYPE html>
+
 <head>
     <meta charset="UTF-8">
     <title>Homepage</title>
-    <link rel="stylesheet" href="courses.css">
+    <link rel="stylesheet" href="styles2.css">
+    <script src="script.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Impact&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <header>
-        <h1>AUBConnect</h1> 
+    <div class="lines" onclick="toggleSidebar()">☰</div>
+
+    <div class="sidebar" id="sidebar">
+        <a href="#" class="close-btn" onclick="toggleSidebar()">×</a>
+        <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <a href="#">Home</a>
+        <a href="#">Account</a>
+        <a href="#">Courses</a>
+        <a href="#">Professors</a>
+    </div>
         <div class="nav-bar">
-  
             <div class="search-bar">
                 <input type="text" placeholder="Search by professor">
                 <input type="text" placeholder="Search by course">
                 <button class="search-icon"><i class="fas fa-search"></i></button>
             </div>
-         </div>
+        </div>
     </header>
     <main>
         <section class="filters">
@@ -39,7 +50,8 @@
                     <option value="physics">Physics</option>
                     <option value="Political Studies">Political Studies and Public Administratoin</option>
                     <option value="psychology">Psychology</option>
-                    <option value="Sociology anthropology and media studies">Sociology, Anthropology, and Media Studies</option>
+                    <option value="Sociology anthropology and media studies">Sociology, Anthropology, and Media Studies
+                    </option>
 
                 </select>
             </div>
@@ -47,17 +59,19 @@
         <section>
             <div class="course-card">
                 <div class="course-info">
-                <h3>CMPS 214</h3>
-                <p>Computer Science</p>
-                <p> <span class="bold">25%</span> would take again | <span class="bold">4.7</span> level of difficulty</p>
-              </div>
-              <div class="rating yellow">4.5</div>
+                    <h3>CMPS 214</h3>
+                    <p>Computer Science</p>
+                    <p> <span class="bold">25%</span> would take again | <span class="bold">4.7</span> level of
+                        difficulty</p>
+                </div>
+                <div class="rating yellow">4.5</div>
             </div>
             <div class="course-card">
                 <div class="course-info">
                     <h3>PHYS 200</h3>
                     <p>Physics</p>
-                    <p> <span class="bold">40%</span> would take again | <span class="bold">4.5</span> level of difficulty</p>
+                    <p> <span class="bold">40%</span> would take again | <span class="bold">4.5</span> level of
+                        difficulty</p>
                 </div>
                 <div class="rating green">4.6</div>
             </div>
@@ -65,36 +79,40 @@
                 <div class="course-info">
                     <h3>MATH 218</h3>
                     <p>Mathematics</p>
-                    <p><span class="bold">53%</span> would take again | <span class="bold">3.9</span> level of difficulty</p>
+                    <p><span class="bold">53%</span> would take again | <span class="bold">3.9</span> level of
+                        difficulty</p>
                 </div>
                 <div class="rating yellow">3.2</div>
             </div>
-        </div>
-        <div class="course-card">
-            <div class="course-info">
-                <h3>BIOL 201</h3>
-                <p>Biology</p>
-                <p><span class="bold">16%</span> would take again | <span class="bold">4.8</span> level of difficulty</p>
             </div>
-            <div class="rating red">2.6</div>
-        </div>
-    </div>
-    <div class="course-card">
-        <div class="course-info">
-            <h3>PSYCH 201</h3>
-            <p>Pyschology</p>
-            <p><span class="bold">22%</span> would take again | <span class="bold">4.7</span> level of difficulty</p>
-        </div>
-        <div class="rating red">2.7</div>
-    </div>
-</div>
-<div class="course-card">
-    <div class="course-info">
-        <h3>SOAN 203</h3>
-        <p>Sociology</p>
-        <p><span class="bold">75%</span> would take again | <span class="bold">3.9</span> level of difficulty</p>
-    </div>
-    <div class="rating green">4.0</div>
-</div>
+            <div class="course-card">
+                <div class="course-info">
+                    <h3>BIOL 201</h3>
+                    <p>Biology</p>
+                    <p><span class="bold">16%</span> would take again | <span class="bold">4.8</span> level of
+                        difficulty</p>
+                </div>
+                <div class="rating red">2.6</div>
+            </div>
+            </div>
+            <div class="course-card">
+                <div class="course-info">
+                    <h3>PSYCH 201</h3>
+                    <p>Pyschology</p>
+                    <p><span class="bold">22%</span> would take again | <span class="bold">4.7</span> level of
+                        difficulty</p>
+                </div>
+                <div class="rating red">2.7</div>
+            </div>
+            </div>
+            <div class="course-card">
+                <div class="course-info">
+                    <h3>SOAN 203</h3>
+                    <p>Sociology</p>
+                    <p><span class="bold">75%</span> would take again | <span class="bold">3.9</span> level of
+                        difficulty</p>
+                </div>
+                <div class="rating green">4.0</div>
+            </div>
         </section>
     </main>
