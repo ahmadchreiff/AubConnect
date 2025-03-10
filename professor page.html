@@ -2,7 +2,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Homepage</title>
-    <link rel="stylesheet" href="professors.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Impact&display=swap" rel="stylesheet">
@@ -12,7 +13,15 @@
 </head>
 <body>
     <header>
-        <h1>AUBConnect</h1>
+        <div class="lines" onclick="toggleSidebar()">☰</div>
+        <div class="sidebar" id="sidebar">
+            <a href="#" class="close-btn" onclick="toggleSidebar()">×</a>
+            <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            <a href="#">Home</a>
+            <a href="#">Account</a>
+            <a href="#">Courses</a>
+            <a href="#">Professors</a>
+        </div>
         <div class="nav-bar">
   
             <div class="search-bar">
