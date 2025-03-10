@@ -5,6 +5,7 @@ import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
 import AboutUs from "./pages/AboutUs/AboutUs";
 import ReviewList from "./pages/ReviewList/ReviewList"; // Import the new ReviewList component
+import PastReviewsPage from "./pages/ReviewPage/PastReviewsPage"; // Import the PastReviewsPage component
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
         <Route path="/homepage" element={<Homepage />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/reviews" element={<ReviewList />} /> {/* Use ReviewList instead of ReviewPage */}
+        <Route path="/past-reviews" element={<PastReviewsPage />} />
       </Routes>
     </Router>
   );
