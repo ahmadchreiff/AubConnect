@@ -8,28 +8,28 @@
     z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     height: 28px;
-}
-
-.nav-container img {
+  }
+  
+  .nav-container img {
     margin-right: auto;
-}
-
-.nav-container {
+  }
+  
+  .nav-container {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding-right: 5px;
     height: 100%;
-}
-
-img {
+  }
+  
+  .navBar img {
     width: 40px;
     height: 25px;
     object-fit: cover;
     display: inline;
-}
-
-.nav-links {
+  }
+  
+  .nav-links {
     list-style: none;
     display: flex;
     gap: 8px;
@@ -37,9 +37,9 @@ img {
     padding: 0;
     height: 100%;
     align-items: center;
-}
-
-.nav-links li a {
+  }
+  
+  .nav-links li a {
     color: white;
     font-size: 10px;
     text-decoration: none;
@@ -49,19 +49,21 @@ img {
     display: flex;
     align-items: center;
     height: 100%;
-}
-
-.nav-links li a:hover {
+  }
+  
+  .nav-links li a:hover {
     transform: scale(1.1);
     text-decoration: underline;
-}
-
-body {
+  }
+  
+  /* Body Styles */
+  body {
     margin: 0;
     overflow-x: hidden;
-}
-
-.first-part {
+  }
+  
+  /* First Part Styles */
+  .first-part {
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -70,12 +72,13 @@ body {
     box-sizing: border-box;
     overflow: hidden;
     position: relative;
-    background-image: url('images/openingImgae.jpeg'); /* Set the image as a background */
+    background-image: url('./images/openingImgae.jpeg'); /* Set the image as a background */
     background-size: cover; /* Cover the entire container */
     background-position: center; /* Center the image */
     background-repeat: no-repeat; /* Prevent repeating */
-}
-.first-part img {
+  }
+  
+  .first-part img {
     height: 100%;
     width: 100%;
     object-fit: cover;
@@ -83,11 +86,10 @@ body {
     top: 0;
     left: 0;
     z-index: 1;
-    object-position: center center; /* This ensures the image is centered and maintains its aspect ratio */
-}
-
-
-.first-part::after {
+    object-position: center center; /* Ensure the image is centered and maintains its aspect ratio */
+  }
+  
+  .first-part::after {
     content: '';
     position: absolute;
     top: 0;
@@ -95,15 +97,15 @@ body {
     width: 100%;
     height: 100%;
     background: linear-gradient(
-        to right,
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.8) 30%,
-        rgba(255, 255, 255, 0) 100%
+      to right,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0.8) 30%,
+      rgba(255, 255, 255, 0) 100%
     );
     z-index: 2;
-}
-
-.intro {
+  }
+  
+  .intro {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -118,25 +120,25 @@ body {
     z-index: 3;
     text-align: center;
     transition: width 0.3s ease, left 0.3s ease;
-}
-
-.first-part h1 {
+  }
+  
+  .first-part h1 {
     font-size: 3.5vw;
     color: black;
     font-weight: bold;
     margin-bottom: 1vh;
     transition: font-size 0.3s ease;
-}
-
-.first-part p {
+  }
+  
+  .first-part p {
     color: rgb(41, 40, 40);
     font-size: 2vw;
     margin-bottom: 2vh;
     line-height: 1.5;
     transition: font-size 0.3s ease;
-}
-
-.first-part button {
+  }
+  
+  .first-part button {
     background-color: black;
     color: white;
     border: none;
@@ -146,14 +148,14 @@ body {
     cursor: pointer;
     border-radius: 10px;
     transition: transform 0.4s ease, width 0.3s ease, font-size 0.3s ease;
-}
-
-.first-part button:hover {
+  }
+  
+  .first-part button:hover {
     transform: scale(1.1);
-}
-
-/* Additional Sections */
-.section {
+  }
+  
+  /* Additional Sections */
+  .section {
     height: 100vh;
     display: flex;
     justify-content: center;
@@ -161,45 +163,46 @@ body {
     font-size: 5vw;
     color: white;
     background-color: #333;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
+  }
+  
+  /* Media Queries */
+  @media (max-width: 768px) {
     .intro {
-        width: 50%;
-        left: 20px;
+      width: 50%;
+      left: 20px;
     }
-
+  
     .first-part h1 {
-        font-size: 4vw;
+      font-size: 4vw;
     }
-
+  
     .first-part p {
-        font-size: 2vw;
+      font-size: 2vw;
     }
-
+  
     .first-part button {
-        font-size: 2vw;
-        width: 20vw;
+      font-size: 2vw;
+      width: 20vw;
     }
-}
-
-@media (max-width: 480px) {
+  }
+  
+  @media (max-width: 480px) {
     .intro {
-        width: 70%;
-        left: 10px;
+      width: 70%;
+      left: 10px;
     }
-
+  
     .first-part h1 {
-        font-size: 5vw;
+      font-size: 5vw;
     }
-
+  
     .first-part p {
-        font-size: 3vw;
+      font-size: 3vw;
     }
-
+  
     .first-part button {
-        font-size: 2vw;
-        width: 25vw;
+      font-size: 2vw;
+      width: 25vw;
     }
-}
+  }
+  

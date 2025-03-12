@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Landing from './pages/landingPage/Landing';  // Import Landing component
+import Landing from './pages/Landing/Landing';  // Import Landing component
 import Homepage from './pages/Homepage/Homepage';
 import Signup from './pages/Signup/Signup';
 import Login from './pages/Login/Login';
@@ -11,10 +11,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Default route: Landing page */}
-        <Route path="/" element={<Landing />} /> {/* Make the landing page the root */}
-        
-        {/* Other routes */}
+        {/* Default route (Landing page) */}
+        <Route path="/" element={<Landing />} />
+        <Route path="/landing" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/homepage" element={<Homepage />} />
