@@ -1,5 +1,4 @@
 import React from 'react';
-import './Landing-Styles.css'; // Import the CSS file
 import logo from './images/logoIcon-fotor-2025031020293.png'; // Import the logo image
 import openingImage from './images/openingImgae.jpeg'; // Import the background image
 
