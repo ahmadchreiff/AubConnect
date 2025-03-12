@@ -3,12 +3,15 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ClipLoader } from "react-spinners";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import "boxicons/css/boxicons.min.css";
 
-const ReviewList = () => {
+const ReviewsPage = () => {
   const [reviews, setReviews] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [newReview, setNewReview] = useState({
     type: "course",
     title: "",
@@ -21,6 +24,7 @@ const ReviewList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [sortOption, setSortOption] = useState("newest");
+  const navigate = useNavigate();
 
   // Fetch reviews and set logged-in username
   useEffect(() => {
@@ -49,7 +53,6 @@ const ReviewList = () => {
   const getUsernameFromToken = () => {
     const token = localStorage.getItem("token");
     if (!token) {
-      setError("You must be logged in to post a review.");
       return null;
     }
 
@@ -66,7 +69,10 @@ const ReviewList = () => {
   const handleUpvote = async (id) => {
     try {
       const username = getUsernameFromToken();
-      if (!username) return;
+      if (!username) {
+        setError("You must be logged in to upvote reviews.");
+        return;
+      }
 
       const response = await axios.post(
         `http://localhost:5001/api/reviews/${id}/upvote`,
@@ -81,8 +87,11 @@ const ReviewList = () => {
           review._id === id ? response.data.review : review
         )
       );
+      
+      setSuccess("Review upvoted!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Failed to upvote review.");
+      setError(err.response?.data?.message || "Failed to upvote review.");
       console.error("Error upvoting review:", err);
     }
   };
@@ -91,7 +100,10 @@ const ReviewList = () => {
   const handleDownvote = async (id) => {
     try {
       const username = getUsernameFromToken();
-      if (!username) return;
+      if (!username) {
+        setError("You must be logged in to downvote reviews.");
+        return;
+      }
 
       const response = await axios.post(
         `http://localhost:5001/api/reviews/${id}/downvote`,
@@ -106,8 +118,11 @@ const ReviewList = () => {
           review._id === id ? response.data.review : review
         )
       );
+      
+      setSuccess("Review downvoted!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Failed to downvote review.");
+      setError(err.response?.data?.message || "Failed to downvote review.");
       console.error("Error downvoting review:", err);
     }
   };
@@ -126,7 +141,26 @@ const ReviewList = () => {
 
   const submitReview = async () => {
     const username = getUsernameFromToken();
-    if (!username) return;
+    if (!username) {
+      setError("You must be logged in to post a review.");
+      return;
+    }
+
+    // Validate form
+    if (!newReview.title.trim()) {
+      setError("Please enter a title for your review.");
+      return;
+    }
+
+    if (newReview.rating === 0) {
+      setError("Please select a rating.");
+      return;
+    }
+
+    if (!newReview.reviewText.trim()) {
+      setError("Please write your review.");
+      return;
+    }
 
     try {
       const reviewData = {
@@ -136,11 +170,23 @@ const ReviewList = () => {
 
       if (editReviewId) {
         // Update the review
-        const response = await axios.put(`http://localhost:5001/api/reviews/${editReviewId}`, reviewData);
+        const response = await axios.put(
+          `http://localhost:5001/api/reviews/${editReviewId}`, 
+          reviewData,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
         console.log("Review updated:", response.data);
       } else {
         // Submit a new review
-        const response = await axios.post("http://localhost:5001/api/reviews", reviewData);
+        const response = await axios.post(
+          "http://localhost:5001/api/reviews", 
+          reviewData,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
         console.log("Review submitted:", response.data);
       }
 
@@ -162,7 +208,7 @@ const ReviewList = () => {
       setSuccess(editReviewId ? "Review updated successfully!" : "Review posted successfully!");
       setTimeout(() => setSuccess(""), 3000); // Clear success message after 3 seconds
     } catch (err) {
-      setError("Failed to submit review.");
+      setError(err.response?.data?.message || "Failed to submit review.");
       console.error("Error submitting review:", err);
     }
   };
@@ -170,7 +216,13 @@ const ReviewList = () => {
   const handleEditReview = (id) => {
     const reviewToEdit = reviews.find((review) => review._id === id);
     if (reviewToEdit) {
-      setNewReview(reviewToEdit);
+      setNewReview({
+        type: reviewToEdit.type,
+        title: reviewToEdit.title,
+        rating: reviewToEdit.rating,
+        reviewText: reviewToEdit.reviewText,
+        anonymous: reviewToEdit.username === "Anonymous",
+      });
       setEditReviewId(id);
       setIsModalOpen(true);
     }
@@ -181,18 +233,22 @@ const ReviewList = () => {
     if (!isConfirmed) return;
 
     const username = getUsernameFromToken();
-    if (!username) return;
+    if (!username) {
+      setError("You must be logged in to delete a review.");
+      return;
+    }
 
     try {
       await axios.delete(`http://localhost:5001/api/reviews/${id}`, {
         data: { username },
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       const updatedReviews = reviews.filter((review) => review._id !== id);
       setReviews(updatedReviews);
-      setSuccess("Review deleted successfully!"); // Set success message
-      setTimeout(() => setSuccess(""), 3000); // Clear success message after 3 seconds
+      setSuccess("Review deleted successfully!");
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError("Failed to delete review.");
+      setError(err.response?.data?.message || "Failed to delete review.");
       console.error("Error deleting review:", err);
     }
   };
@@ -218,10 +274,20 @@ const ReviewList = () => {
     };
   };
 
-  // Filter reviews
+  // Filter and search reviews
   const filteredReviews = () => {
     let filtered = [...reviews];
     
+    // Apply search query
+    if (searchQuery.trim() !== "") {
+      filtered = filtered.filter(review => 
+        review.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        review.reviewText.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        review.username.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply type filter
     if (filter === "courses") {
       filtered = filtered.filter(review => review.type === "course");
     } else if (filter === "professors") {
@@ -235,7 +301,8 @@ const ReviewList = () => {
       filtered.sort((a, b) => a.rating - b.rating);
     } else if (sortOption === "mostHelpful") {
       filtered.sort((a, b) => 
-        (b.upvotes?.length || 0) - (a.upvotes?.length || 0)
+        ((b.upvotes?.length || 0) - (b.downvotes?.length || 0)) - 
+        ((a.upvotes?.length || 0) - (a.downvotes?.length || 0))
       );
     } else {
       // newest (default)
@@ -246,71 +313,165 @@ const ReviewList = () => {
   };
 
   const getRatingColor = (rating) => {
-    if (rating >= 4) return "text-green-500";
-    if (rating >= 3) return "text-yellow-500";
-    return "text-red-500";
+    if (rating >= 4) return "bg-green-100 text-green-700";
+    if (rating >= 3) return "bg-yellow-100 text-yellow-700";
+    return "bg-red-100 text-red-700";
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <header className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-8 px-4">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold mb-4">Campus Reviews</h1>
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <div className="flex flex-wrap gap-x-6 gap-y-2">
-                <div className="flex items-center">
-                  <div className="h-8 w-8 rounded-full bg-pink-100 flex items-center justify-center mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#860033]" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{calculateStats().courseCount}</p>
-                    <p className="text-xs text-gray-500">Courses</p>
-                  </div>
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            {/* Logo and brand */}
+            <div className="flex items-center">
+              <Link to="/" className="flex-shrink-0 flex items-center">
+                <div className="h-10 w-10 mr-2">
+                  <svg viewBox="0 0 100 100" className="h-full w-full fill-current text-[#860033]">
+                    <path d="M50,15 C35,15 25,25 25,40 C25,50 30,55 40,65 C45,70 50,85 50,85 C50,85 55,70 60,65 C70,55 75,50 75,40 C75,25 65,15 50,15 Z"></path>
+                  </svg>
                 </div>
-                
-                <div className="flex items-center">
-                  <div className="h-8 w-8 rounded-full bg-amber-100 flex items-center justify-center mr-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-700" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{calculateStats().professorCount}</p>
-                    <p className="text-xs text-gray-500">Professors</p>
-                  </div>
-                </div>
-                
-                {calculateStats().highestRated.title !== 'N/A' && (
-                  <div className="flex items-center">
-                    <div className="h-8 w-8 rounded-full bg-yellow-100 flex items-center justify-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-700" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">Top Rated: {calculateStats().highestRated.title}</p>
-                      <p className="text-xs text-gray-500">{calculateStats().highestRated.rating} / 5</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <p className="text-sm opacity-80 mt-2">{reviews.length} total reviews</p>
+                <span className="font-serif text-xl tracking-tight text-[#860033]">AubConnect</span>
+              </Link>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsModalOpen(true)}
-              className="bg-white text-[#860033] px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-pink-50 transition-all duration-300"
-            >
-              + Add a Review
-            </motion.button>
+
+            {/* Navigation */}
+            <div className="flex items-center gap-3">
+              <Link to="/courses" className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium">
+                Courses
+              </Link>
+              <Link to="/professors" className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium">
+                Professors
+              </Link>
+              <Link to="/reviews" className="text-[#860033] px-3 py-2 text-sm font-medium border-b-2 border-[#860033]">
+                Reviews
+              </Link>
+              <Link to="/about" className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium">
+                About
+              </Link>
+              
+              {loggedInUsername ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-700 text-sm">
+                    Hi, {loggedInUsername}
+                  </span>
+                  <button 
+                    onClick={() => {
+                      localStorage.removeItem("token");
+                      setLoggedInUsername("");
+                      navigate("/login");
+                    }}
+                    className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link to="/login" className="text-gray-700 hover:text-[#860033] ml-3 px-3 py-2 text-sm font-medium border border-gray-300 rounded-lg">
+                    Log In
+                  </Link>
+                  <Link to="/register" className="bg-[#860033] text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-[#6a0026] transition-all duration-200">
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Hero Section with Stats */}
+      <section className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Campus Reviews</h1>
+              <p className="text-lg opacity-90">
+                See what students are saying about courses and professors at AUB
+              </p>
+              
+              <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
+                <div className="flex items-center">
+                  <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
+                    <i className="bx bx-book-alt text-lg"></i>
+                  </div>
+                  <div>
+                    <p className="text-xl font-semibold">{calculateStats().courseCount}</p>
+                    <p className="text-sm text-white/80">Courses</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center">
+                  <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
+                    <i className="bx bx-user text-lg"></i>
+                  </div>
+                  <div>
+                    <p className="text-xl font-semibold">{calculateStats().professorCount}</p>
+                    <p className="text-sm text-white/80">Professors</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center">
+                  <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
+                    <i className="bx bx-message-square-detail text-lg"></i>
+                  </div>
+                  <div>
+                    <p className="text-xl font-semibold">{reviews.length}</p>
+                    <p className="text-sm text-white/80">Reviews</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  if (!loggedInUsername) {
+                    setError("You must be logged in to post a review.");
+                    return;
+                  }
+                  setIsModalOpen(true);
+                }}
+                className="bg-white text-[#860033] px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-pink-50 transition-all duration-300 flex items-center"
+              >
+                <i className="bx bx-plus mr-2 text-xl"></i> Add a Review
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Search Bar */}
+      <div className="bg-white border-b border-gray-200 py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i className="bx bx-search text-gray-400 text-xl"></i>
+            </div>
+            <input
+              type="text"
+              placeholder="Search for courses, professors, or keywords..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] transition-all"
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Notification Messages */}
       <div className="fixed top-5 right-5 z-50">
@@ -320,9 +481,16 @@ const ReviewList = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg mb-2"
+              className="bg-red-500 text-white px-4 py-3 rounded-lg shadow-lg mb-2 flex items-center"
             >
+              <i className="bx bx-error-circle mr-2 text-xl"></i>
               {error}
+              <button 
+                onClick={() => setError("")}
+                className="ml-3 text-white/80 hover:text-white"
+              >
+                <i className="bx bx-x"></i>
+              </button>
             </motion.div>
           )}
           {success && (
@@ -330,39 +498,47 @@ const ReviewList = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg"
+              className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center"
             >
+              <i className="bx bx-check-circle mr-2 text-xl"></i>
               {success}
+              <button 
+                onClick={() => setSuccess("")}
+                className="ml-3 text-white/80 hover:text-white"
+              >
+                <i className="bx bx-x"></i>
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Filters and Sorting */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Filters and Sorting */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex gap-4">
+          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
             <button 
-              className={`px-4 py-2 rounded-md transition-all ${filter === 'all' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
+              className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'all' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => setFilter('all')}
             >
               All Reviews
             </button>
             <button 
-              className={`px-4 py-2 rounded-md transition-all ${filter === 'courses' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
+              className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'courses' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => setFilter('courses')}
             >
               Courses
             </button>
             <button 
-              className={`px-4 py-2 rounded-md transition-all ${filter === 'professors' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
+              className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'professors' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => setFilter('professors')}
             >
               Professors
             </button>
           </div>
           <div className="flex items-center">
-            <label className="mr-2 text-gray-600">Sort by:</label>
+            <label className="mr-2 text-gray-600 whitespace-nowrap">Sort by:</label>
             <select 
               value={sortOption} 
               onChange={(e) => setSortOption(e.target.value)}
@@ -381,6 +557,25 @@ const ReviewList = () => {
           <div className="flex justify-center items-center h-64">
             <ClipLoader color="#860033" size={50} />
           </div>
+        ) : filteredReviews().length === 0 ? (
+          <div className="bg-white rounded-lg shadow-md p-8 text-center mt-8">
+            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <i className="bx bx-search text-gray-400 text-3xl"></i>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews found</h3>
+            <p className="text-gray-500 mb-4">
+              {searchQuery ? "Try adjusting your search or filter criteria." : 
+                "Be the first to share your experience!"}
+            </p>
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery("")}
+                className="text-[#860033] font-medium hover:underline"
+              >
+                Clear search
+              </button>
+            )}
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             <AnimatePresence>
@@ -396,57 +591,61 @@ const ReviewList = () => {
                   <div className="p-5">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full mb-2"
-                          style={{ 
-                            backgroundColor: review.type === "course" ? "#FFF1F2" : "#FEF3C7",
-                            color: review.type === "course" ? "#860033" : "#854D0E" 
-                          }}
-                        >
-                          {review.type === "course" ? "Course" : "Professor"}
-                        </span>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
+                            review.type === "course" 
+                              ? "bg-pink-100 text-[#860033]" 
+                              : "bg-amber-100 text-amber-800"
+                          }`}>
+                            {review.type === "course" ? "Course" : "Professor"}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {formatDate(review.createdAt)}
+                          </span>
+                        </div>
                         <h3 className="text-xl font-bold text-gray-800">{review.title}</h3>
                         <p className="text-sm text-gray-500">
-                          by {review.anonymous ? "Anonymous" : review.username}
+                          by {review.username}
                         </p>
                       </div>
-                      <div className={`text-2xl font-bold rounded-full h-10 w-10 flex items-center justify-center ${getRatingColor(review.rating)}`}>
-                        {review.rating}
+                      <div className={`${getRatingColor(review.rating)} text-xl font-bold rounded-lg h-12 w-12 flex items-center justify-center`}>
+                        {review.rating.toFixed(1)}
                       </div>
                     </div>
                     
                     <div className="flex mb-4">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <svg 
-                          key={star} 
-                          className={`h-5 w-5 ${star <= review.rating ? `text-[#ffd700]` : `text-gray-300`}`}
-                          fill="currentColor" 
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
+                        <i 
+                          key={star}
+                          className={`bx ${star <= review.rating ? 'bxs-star text-[#ffd700]' : 'bx-star text-gray-300'} text-xl`}
+                        ></i>
                       ))}
                     </div>
                     
-                    <p className="text-gray-700 mb-5">{review.reviewText}</p>
+                    <p className="text-gray-700 mb-5 line-clamp-4">{review.reviewText}</p>
                     
                     <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
                       <div className="flex space-x-3">
                         <button 
                           onClick={() => handleUpvote(review._id)} 
-                          className="flex items-center space-x-1 px-3 py-1 bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033] rounded-full transition-colors"
+                          className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
+                            review.upvotes?.includes(loggedInUsername)
+                              ? "bg-[#860033]/10 text-[#860033]"
+                              : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
+                          }`}
                         >
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905v.714L7.5 9h-3a2 2 0 00-2 2v.5" />
-                          </svg>
+                          <i className={`bx ${review.upvotes?.includes(loggedInUsername) ? 'bxs-like' : 'bx-like'}`}></i>
                           <span>{review.upvotes?.length || 0}</span>
                         </button>
                         <button 
                           onClick={() => handleDownvote(review._id)} 
-                          className="flex items-center space-x-1 px-3 py-1 bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600 rounded-full transition-colors"
+                          className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
+                            review.downvotes?.includes(loggedInUsername)
+                              ? "bg-red-100 text-red-600"
+                              : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
+                          }`}
                         >
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 14l-4 4m0 0l-4-4m4 4V5" />
-                          </svg>
+                          <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'}`}></i>
                           <span>{review.downvotes?.length || 0}</span>
                         </button>
                       </div>
@@ -455,15 +654,15 @@ const ReviewList = () => {
                         <div className="flex space-x-2">
                           <button 
                             onClick={() => handleEditReview(review._id)} 
-                            className="text-sm text-[#860033] hover:text-[#6a0026] transition-colors"
+                            className="text-sm text-[#860033] hover:text-[#6a0026] transition-colors flex items-center"
                           >
-                            Edit
+                            <i className="bx bx-edit mr-1"></i> Edit
                           </button>
                           <button 
                             onClick={() => handleDeleteReview(review._id)} 
-                            className="text-sm text-red-600 hover:text-red-800 transition-colors"
+                            className="text-sm text-red-600 hover:text-red-800 transition-colors flex items-center"
                           >
-                            Delete
+                            <i className="bx bx-trash mr-1"></i> Delete
                           </button>
                         </div>
                       )}
@@ -484,17 +683,25 @@ const ReviewList = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={() => setIsModalOpen(false)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-white rounded-lg shadow-xl max-w-lg w-full overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-4 px-6">
+              <div className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-4 px-6 flex justify-between items-center">
                 <h2 className="text-xl font-bold">
                   {editReviewId ? "Edit Your Review" : "Share Your Experience"}
                 </h2>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <i className="bx bx-x text-2xl"></i>
+                </button>
               </div>
               
               <div className="p-6">
@@ -516,14 +723,14 @@ const ReviewList = () => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Title
+                      {newReview.type === "course" ? "Course Code/Name" : "Professor Name"}
                     </label>
                     <input
                       type="text"
                       name="title"
                       value={newReview.title}
                       onChange={handleInputChange}
-                      placeholder="Enter course or professor name"
+                      placeholder={newReview.type === "course" ? "e.g., CMPS 200" : "e.g., Dr. John Smith"}
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
                     />
                   </div>
@@ -540,15 +747,14 @@ const ReviewList = () => {
                           onClick={() => handleRatingChange(star)}
                           className="focus:outline-none"
                         >
-                          <svg 
-                            className={`h-8 w-8 ${star <= newReview.rating ? `text-[#ffd700]` : `text-gray-300`} cursor-pointer hover:text-[#ffd700] transition-colors`}
-                            fill="currentColor" 
-                            viewBox="0 0 20 20"
-                          >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
+                          <i
+                            className={`bx ${star <= newReview.rating ? 'bxs-star text-[#ffd700]' : 'bx-star text-gray-300'} text-3xl cursor-pointer hover:text-[#ffd700] transition-colors`}
+                          ></i>
                         </button>
                       ))}
+                      <span className="ml-2 text-gray-500 self-center">
+                        {newReview.rating > 0 ? `${newReview.rating}/5` : "Select a rating"}
+                      </span>
                     </div>
                   </div>
                   
@@ -560,10 +766,13 @@ const ReviewList = () => {
                       name="reviewText"
                       value={newReview.reviewText}
                       onChange={handleInputChange}
-                      placeholder="Write your review here..."
-                      rows="4"
+                      placeholder="Share your experience with this course or professor..."
+                      rows="5"
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] resize-none"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Be constructive and respectful in your review to help others make informed decisions.
+                    </p>
                   </div>
                   
                   <div className="flex items-center">
@@ -584,7 +793,7 @@ const ReviewList = () => {
                 <div className="mt-6 flex justify-end space-x-3">
                   <button 
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] transition-all duration-200"
                   >
                     Cancel
                   </button>
@@ -592,7 +801,7 @@ const ReviewList = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={submitReview}
-                    className="px-4 py-2 bg-gradient-to-r from-[#860033] to-[#6a0026] rounded-md text-white shadow-sm hover:from-[#9a0039] hover:to-[#7a002d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#860033]"
+                    className="px-4 py-2 bg-gradient-to-r from-[#860033] to-[#6a0026] rounded-md text-white shadow-sm hover:from-[#9a0039] hover:to-[#7a002d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#860033] transition-all duration-200"
                   >
                     {editReviewId ? "Update Review" : "Submit Review"}
                   </motion.button>
@@ -602,8 +811,35 @@ const ReviewList = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-auto">
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex items-center space-x-1 text-[#860033]">
+              <div className="h-8 w-8">
+                <svg viewBox="0 0 100 100" className="h-full w-full fill-current">
+                  <path d="M50,15 C35,15 25,25 25,40 C25,50 30,55 40,65 C45,70 50,85 50,85 C50,85 55,70 60,65 C70,55 75,50 75,40 C75,25 65,15 50,15 Z"></path>
+                </svg>
+              </div>
+              <span className="font-serif text-lg">AubConnect</span>
+            </div>
+            
+            <div className="flex items-center space-x-6">
+              <Link to="/about" className="text-sm text-gray-500 hover:text-gray-900">About</Link>
+              <Link to="/privacy" className="text-sm text-gray-500 hover:text-gray-900">Privacy</Link>
+              <Link to="/terms" className="text-sm text-gray-500 hover:text-gray-900">Terms</Link>
+              <Link to="/contact" className="text-sm text-gray-500 hover:text-gray-900">Contact</Link>
+            </div>
+            
+            <div className="text-sm text-gray-500">
+              &copy; {new Date().getFullYear()} American University of Beirut
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
 
-export default ReviewList;
+export default ReviewsPage;
