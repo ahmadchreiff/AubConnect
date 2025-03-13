@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import "boxicons/css/boxicons.min.css";
 
 const Login = () => {
@@ -11,6 +11,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   // Mount animation
   useEffect(() => {
@@ -33,17 +34,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:5001/api/auth/login", {
-        email,
-        password,
-      });
-
-      console.log("Login successful:", response.data);
-      localStorage.setItem("token", response.data.token);
+      const response = await login(email, password);
+      console.log("Login successful:", response);
       
       // Show success animation before redirecting
       setTimeout(() => {
-        navigate(response.data.redirectUrl);
+        navigate(response.redirectUrl || "/");
       }, 1000);
       
     } catch (err) {
@@ -223,8 +219,6 @@ const Login = () => {
                       </Link>
                     </div>
                   </div>
-                  
-                  {/* Removed the quick links section */}
                 </div>
               </div>
             </div>
@@ -232,45 +226,10 @@ const Login = () => {
             {/* Copyright */}
             <div className="mt-6 text-center text-gray-500 text-xs">
               <p>© {new Date().getFullYear()} American University of Beirut. All rights reserved.</p>
-              {/* Removed back to home button */}
             </div>
           </div>
         </div>
       </div>
-      
-      {/* Add these styles to your global CSS or a style tag */}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        
-        @keyframes slow-pan {
-          0% { transform: scale(1.05) translateX(0) translateY(0); }
-          33% { transform: scale(1.05) translateX(-1%) translateY(-1%); }
-          66% { transform: scale(1.05) translateX(1%) translateY(1%); }
-          100% { transform: scale(1.05) translateX(0) translateY(0); }
-        }
-        
-        .animate-shimmer {
-          animation: shimmer 2.5s infinite;
-        }
-        
-        .animate-slow-pan {
-          animation: slow-pan 20s ease-in-out infinite;
-        }
-        
-        .animate-shake {
-          animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        
-        @keyframes shake {
-          10%, 90% { transform: translate3d(-1px, 0, 0); }
-          20%, 80% { transform: translate3d(2px, 0, 0); }
-          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-          40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-      `}</style>
     </div>
   );
 };

@@ -231,10 +231,33 @@ const updateReview = async (req, res) => {
   }
 };
 
+/**
+ * Get reviews by username
+ * @route GET /api/reviews/user
+ */
+const getReviewsByUser = async (req, res) => {
+  try {
+    // Get username from authenticated user
+    const username = req.user.username;
+    
+    const reviews = await Review.find({ username })
+      .populate('department', 'name code')
+      .populate('course', 'name courseNumber');
+    
+    res.status(200).json({ reviews });
+  } catch (err) {
+    res.status(500).json({ 
+      message: "Failed to fetch user reviews.", 
+      error: err.message 
+    });
+  }
+};
+
 module.exports = { 
   postReview,
   getAllReviews,
   getReviewsByDepartment,
   getReviewsByCourse,
-  updateReview
+  updateReview,
+  getReviewsByUser 
 };

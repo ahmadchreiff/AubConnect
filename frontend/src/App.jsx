@@ -1,30 +1,44 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Homepage from "./pages/Home/Home";
-import Signup from "./pages/Signup/Signup";
-import Login from "./pages/Login/Login";
+import Signup from "./pages/Signup/signup";
+import Login from "./pages/Login/login";
 import ReviewList from "./pages/Reviews/Reviews";
 import DepartmentsPage from "./pages/Departments/DepartmentsPage";
 import DepartmentDetail from "./pages/Departments/DepartmentDetail";
 import CoursesPage from "./pages/Courses/CoursesPage";
 import CourseDetail from "./pages/Courses/CourseDetail";
+import UserProfile from "./pages/Profile/UserProfile";
+import MyReviews from "./pages/Reviews/MyReviews";
 
 const App = () => {
   return (
-    <Router>
-      <div className="max-w-7xl mx-auto">
-        <Routes>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/reviews" element={<ReviewList />} />          
-          <Route path="/departments" element={<DepartmentsPage />} />
-          <Route path="/departments/:id" element={<DepartmentDetail />} />
-          <Route path="/courses" element={<CoursesPage />} />
-          <Route path="/courses/:id" element={<CourseDetail />} />
-        </Routes>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div className="max-w-7xl mx-auto">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={<Login />} />
+            
+            {/* Protected routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Homepage />} />
+              <Route path="/homepage" element={<Homepage />} />          
+              <Route path="/reviews" element={<ReviewList />} />          
+              <Route path="/departments" element={<DepartmentsPage />} />
+              <Route path="/departments/:id" element={<DepartmentDetail />} />
+              <Route path="/courses" element={<CoursesPage />} />
+              <Route path="/courses/:id" element={<CourseDetail />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/my-reviews" element={<MyReviews />} />
+            </Route>
+          </Routes>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 };
 

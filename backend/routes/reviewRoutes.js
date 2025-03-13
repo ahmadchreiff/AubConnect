@@ -3,12 +3,17 @@ const express = require("express");
 const router = express.Router();
 const reviewController = require("../controllers/reviewController");
 const Review = require("../models/Review");
+const auth = require('../middleware/auth');  // Make sure to import your auth middleware
+
 
 // Create a review
 router.post("/", reviewController.postReview);
 
 // Get all reviews
 router.get("/", reviewController.getAllReviews);
+
+// Get reviews by authenticated user
+router.get("/user", auth, reviewController.getReviewsByUser);
 
 // Get reviews by department
 router.get("/department/:departmentId", reviewController.getReviewsByDepartment);

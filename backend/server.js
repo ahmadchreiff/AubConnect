@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-
+const userRoutes = require('./routes/userRoutes');
 dotenv.config();
 
 const app = express();
@@ -34,6 +34,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/departments", require("./routes/departmentRoutes")); // Add departments route
 app.use("/api/courses", require("./routes/courseRoutes")); // Add courses route
+app.use('/api/users', userRoutes);
 
 // Start the application
 startServer();

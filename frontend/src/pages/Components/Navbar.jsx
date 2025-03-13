@@ -1,35 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../../context/AuthContext";
+import UserDropdown from "../../components/UserDropdown";
 import "boxicons/css/boxicons.min.css";
 
 const Navbar = () => {
-  const [loggedInUsername, setLoggedInUsername] = useState("");
+  const { isAuthenticated } = useAuth();
   const location = useLocation();
-
-  useEffect(() => {
-    // Set the logged-in username
-    const username = getUsernameFromToken();
-    if (username) {
-      setLoggedInUsername(username);
-    }
-  }, []);
-
-  // Function to get the username from the JWT token
-  const getUsernameFromToken = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      return null;
-    }
-
-    try {
-      const decoded = jwtDecode(token);
-      return decoded.username;
-    } catch (err) {
-      console.error("Invalid token:", err);
-      return null;
-    }
-  };
 
   // Helper function to determine if a link is active
   const isActive = (path) => {
@@ -40,12 +17,6 @@ const Navbar = () => {
       return true;
     }
     return false;
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setLoggedInUsername("");
-    window.location.href = "/login";
   };
 
   return (
@@ -97,18 +68,8 @@ const Navbar = () => {
               About
             </Link>
             
-            {loggedInUsername ? (
-              <div className="flex items-center gap-3 ml-3">
-                <span className="text-gray-700 text-sm">
-                  Hi, {loggedInUsername}
-                </span>
-                <button 
-                  onClick={handleLogout}
-                  className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium"
-                >
-                  Logout
-                </button>
-              </div>
+            {isAuthenticated() ? (
+              <UserDropdown />
             ) : (
               <>
                 <Link to="/login" className="text-gray-700 hover:text-[#860033] ml-3 px-3 py-2 text-sm font-medium border border-gray-300 rounded-lg">
