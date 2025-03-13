@@ -6,7 +6,7 @@ import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 
 const SearchResults = () => {
-  const [results, setResults] = useState({ courses: [], departments: [] });
+  const [results, setResults] = useState({ courses: [], departments: [], professors: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
@@ -21,7 +21,7 @@ const SearchResults = () => {
         setLoading(true);
         
         if (!query) {
-          setResults({ courses: [], departments: [] });
+          setResults({ courses: [], departments: [], professors: [] });
           setLoading(false);
           return;
         }
@@ -74,6 +74,39 @@ const SearchResults = () => {
                         {course.department ? `${course.department.code} ${course.courseNumber}` : course.courseNumber}
                       </div>
                       <div className="text-gray-900">{course.name}</div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Professors Section */}
+            <div className="mb-10">
+              <h2 className="text-xl font-bold mb-4">Professors ({results.professors ? results.professors.length : 0})</h2>
+              
+              {!results.professors || results.professors.length === 0 ? (
+                <p className="text-gray-500">No professors found matching your search.</p>
+              ) : (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {results.professors.map(professor => (
+                    <Link 
+                      key={professor._id} 
+                      to={`/professors/${professor._id}`}
+                      className="block bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow"
+                    >
+                      <div className="font-bold text-[#6D0B24]">{professor.name}</div>
+                      <div className="text-gray-900">{professor.title}</div>
+                      {professor.departments && professor.departments.length > 0 && (
+                        <div className="text-gray-500 text-sm mt-1">
+                          {professor.departments.map(dept => dept.code).join(', ')}
+                        </div>
+                      )}
+                      {professor.avgRating > 0 && (
+                        <div className="flex items-center mt-2">
+                          <span className="text-yellow-500 mr-1">★</span>
+                          <span>{professor.avgRating.toFixed(1)}</span>
+                        </div>
+                      )}
                     </Link>
                   ))}
                 </div>

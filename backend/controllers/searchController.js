@@ -1,9 +1,10 @@
 // searchController.js
 const Course = require('../models/Course');
 const Department = require('../models/Department');
+const Professor = require('../models/Professor');
 
 /**
- * Search for courses and departments
+ * Search for courses, departments, and professors
  * @route GET /api/search
  */
 const searchCourses = async (req, res) => {
@@ -20,7 +21,7 @@ const searchCourses = async (req, res) => {
     const courseCodeRegex = /^([a-zA-Z]+)\s*(\d+)/;
     const courseCodeMatch = cleanQuery.match(courseCodeRegex);
     
-    let results = { courses: [], departments: [] };
+    let results = { courses: [], departments: [], professors: [] };
     
     if (courseCodeMatch) {
       // If it matches a course code pattern, split into department code and course number
@@ -39,11 +40,18 @@ const searchCourses = async (req, res) => {
         
         results.courses = courses;
         results.departments = [department];
+        
+        // Find professors who teach in this department
+        const professors = await Professor.find({
+          departments: department._id
+        }).populate('departments', 'name code');
+        
+        results.professors = professors;
       }
     }
     
     // If no course code match or no results found, perform a general search
-    if (results.courses.length === 0 && results.departments.length === 0) {
+    if (results.courses.length === 0 && results.departments.length === 0 && results.professors.length === 0) {
       const searchRegex = new RegExp(cleanQuery, 'i');
       
       // Search for courses by name, number, or description
@@ -63,8 +71,18 @@ const searchCourses = async (req, res) => {
         ]
       });
       
+      // Search for professors by name, title, or bio
+      const professors = await Professor.find({
+        $or: [
+          { name: searchRegex },
+          { title: searchRegex },
+          { bio: searchRegex }
+        ]
+      }).populate('departments', 'name code');
+      
       results.courses = courses;
       results.departments = departments;
+      results.professors = professors;
     }
     
     res.status(200).json({ results });
@@ -103,7 +121,15 @@ const getSearchSuggestions = async (req, res) => {
         { name: searchRegex },
         { courseNumber: searchRegex }
       ]
-    }).populate('department', 'code').limit(10);
+    }).populate('department', 'code').limit(8);
+    
+    // Get professor suggestions
+    const professors = await Professor.find({
+      $or: [
+        { name: searchRegex },
+        { title: searchRegex }
+      ]
+    }).populate('departments', 'code').limit(8);
     
     // Format the suggestions
     const suggestions = [
@@ -118,7 +144,18 @@ const getSearchSuggestions = async (req, res) => {
         text: `${course.department.code} ${course.courseNumber}`,
         subtext: course.name,
         type: 'course'
-      }))
+      })),
+      ...professors.map(professor => {
+        // Format department affiliations
+        const deptAffiliations = professor.departments.map(dept => dept.code).join(', ');
+        
+        return {
+          id: professor._id,
+          text: professor.name,
+          subtext: `${professor.title}${deptAffiliations ? ` (${deptAffiliations})` : ''}`,
+          type: 'professor'
+        };
+      })
     ];
     
     res.json({ suggestions });

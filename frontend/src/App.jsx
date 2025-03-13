@@ -10,6 +10,8 @@ import DepartmentsPage from "./pages/Departments/DepartmentsPage";
 import DepartmentDetail from "./pages/Departments/DepartmentDetail";
 import CoursesPage from "./pages/Courses/CoursesPage";
 import CourseDetail from "./pages/Courses/CourseDetail";
+import ProfessorsPage from "./pages/Professors/ProfessorsPage";
+import ProfessorDetail from "./pages/Professors/ProfessorDetail";
 import UserProfile from "./pages/Profile/UserProfile";
 import MyReviews from "./pages/Reviews/MyReviews";
 import SearchResults from './pages/Search/SearchResults';
@@ -33,6 +35,8 @@ const App = () => {
               <Route path="/departments/:id" element={<DepartmentDetail />} />
               <Route path="/courses" element={<CoursesPage />} />
               <Route path="/courses/:id" element={<CourseDetail />} />
+              <Route path="/professors" element={<ProfessorsPage />} />
+              <Route path="/professors/:id" element={<ProfessorDetail />} />
               <Route path="/profile" element={<UserProfile />} />
               <Route path="/my-reviews" element={<MyReviews />} />
               <Route path="/search" element={<SearchResults />} />

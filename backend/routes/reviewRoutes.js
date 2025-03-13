@@ -2,9 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const reviewController = require("../controllers/reviewController");
-const Review = require("../models/Review");
-const auth = require('../middleware/auth');  // Make sure to import your auth middleware
-
+const auth = require('../middleware/auth');
 
 // Create a review
 router.post("/", reviewController.postReview);
@@ -21,35 +19,14 @@ router.get("/department/:departmentId", reviewController.getReviewsByDepartment)
 // Get reviews by course
 router.get("/course/:courseId", reviewController.getReviewsByCourse);
 
+// Get reviews by professor
+router.get("/professor/:professorId", reviewController.getReviewsByProfessor);
+
 // Update a review
 router.put("/:id", reviewController.updateReview);
 
 // Delete a review
-router.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { username } = req.body;
-
-    const review = await Review.findById(id);
-    if (!review) {
-      return res.status(404).json({ message: "Review not found." });
-    }
-
-    if (review.username !== username) {
-      return res.status(403).json({ 
-        message: "You are not authorized to delete this review." 
-      });
-    }
-
-    await Review.findByIdAndDelete(id);
-    res.status(200).json({ message: "Review deleted successfully!" });
-  } catch (err) {
-    res.status(500).json({ 
-      message: "Failed to delete review.", 
-      error: err.message 
-    });
-  }
-});
+router.delete("/:id", reviewController.deleteReview);
 
 // Upvote a review
 router.post("/:id/upvote", async (req, res) => {

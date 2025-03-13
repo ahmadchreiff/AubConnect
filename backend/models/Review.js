@@ -18,7 +18,12 @@ const reviewSchema = new mongoose.Schema({
     ref: "Department",
     required: function() { return this.type === "course"; }
   },
-  // We'll keep title for now for backwards compatibility and professor reviews
+  // Professor-specific fields
+  professor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Professor",
+    required: function() { return this.type === "professor"; }
+  },
   title: { 
     type: String, 
     required: true 
