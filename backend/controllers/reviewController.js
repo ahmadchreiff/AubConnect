@@ -12,7 +12,6 @@ const postReview = async (req, res) => {
   try {
     const { 
       type, 
-      title, 
       rating, 
       reviewText, 
       username, 
@@ -24,7 +23,6 @@ const postReview = async (req, res) => {
     // Create the review object with common fields
     const reviewData = {
       type,
-      title,
       rating,
       reviewText,
       username
@@ -198,7 +196,6 @@ const updateReview = async (req, res) => {
     const { id } = req.params;
     const { 
       type, 
-      title, 
       rating, 
       reviewText, 
       username,

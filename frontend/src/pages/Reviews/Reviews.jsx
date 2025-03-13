@@ -6,12 +6,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
+import SearchableProfessorDropdown from "../../components/SearchableProfessorDropdown";
 import "boxicons/css/boxicons.min.css";
 
 const ReviewsPage = () => {
   const [reviews, setReviews] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [professors, setProfessors] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -22,6 +24,7 @@ const ReviewsPage = () => {
     title: "",
     department: "",
     course: "",
+    professor: "", 
     rating: 0,
     reviewText: "",
     anonymous: false,
@@ -33,7 +36,7 @@ const ReviewsPage = () => {
   const [sortOption, setSortOption] = useState("newest");
   const navigate = useNavigate();
 
-  // Fetch reviews, departments, and courses on mount
+  // Fetch reviews, departments, courses, and professors on mount
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -50,6 +53,10 @@ const ReviewsPage = () => {
         // Fetch all courses
         const coursesRes = await axios.get("http://localhost:5001/api/courses");
         setCourses(coursesRes.data);
+        
+        // Fetch all professors
+        const professorsRes = await axios.get("http://localhost:5001/api/professors");
+        setProfessors(professorsRes.data);
       } catch (err) {
         setError("Failed to fetch initial data.");
         console.error("Error fetching initial data:", err);
@@ -72,9 +79,6 @@ const ReviewsPage = () => {
     if (newReview.department) {
       const filtered = courses.filter(
         course => {
-          // Add this console log to debug the structure
-          console.log("Course department:", course.department);
-          
           // Check if department is an object with _id property
           if (typeof course.department === 'object' && course.department !== null) {
             return course.department._id === newReview.department;
@@ -210,8 +214,8 @@ const ReviewsPage = () => {
       }
     } else {
       // Professor review validation
-      if (!newReview.title.trim()) {
-        setError("Please enter a professor's name.");
+      if (!newReview.professor) {
+        setError("Please select a professor.");
         return;
       }
     }
@@ -264,6 +268,7 @@ const ReviewsPage = () => {
         title: "",
         department: "",
         course: "",
+        professor: "", 
         rating: 0,
         reviewText: "",
         anonymous: false,
@@ -288,6 +293,7 @@ const ReviewsPage = () => {
         title: reviewToEdit.title,
         department: reviewToEdit.department?._id || "",
         course: reviewToEdit.course?._id || "",
+        professor: reviewToEdit.professor?._id || "", 
         rating: reviewToEdit.rating,
         reviewText: reviewToEdit.reviewText,
         anonymous: reviewToEdit.username === "Anonymous",
@@ -784,15 +790,12 @@ const ReviewsPage = () => {
                   ) : (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Professor Name
+                        Professor
                       </label>
-                      <input
-                        type="text"
-                        name="title"
-                        value={newReview.title}
+                      <SearchableProfessorDropdown 
+                        professors={professors}
+                        selectedProfessor={newReview.professor}
                         onChange={handleInputChange}
-                        placeholder="e.g., Dr. John Smith"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
                       />
                     </div>
                   )}
