@@ -172,9 +172,7 @@ body {
     width: 100%;
     min-height: 100vh; /* Full viewport height */
     background-size: cover;
-  
-
-    background-color: rgba(97, 95, 95, 0.9); /* Slightly transparent background */
+    background-color: #f5f5f5;
 }
 
 /* Intro Box Styling */
@@ -203,12 +201,59 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-.section1 img{
-    width:40px;
-    height:70px;
-    padding-left: 100px;
-
+.media-container{
+    position: relative;
+   
+    width:900px;
+    height:500px;
+    left:120px;
+    box-shadow: 0 20px 10px -2px rgb(96, 94, 94);
+  
 }
+
+.img1{
+   position:absolute;
+   left: 0;
+   bottom:0;
+   object-fit: cover;
+   height:380px;
+   border-radius: 20px;
+   border:12px solid rgb(133, 234, 133);
+   transition: box-shadow 0.3s ease,height 0.3s ease;
+   
+}
+.img1:hover{
+    height:410px;
+    box-shadow: 0 4px 2px -2px rgb(96, 94, 94);
+}
+.img2{
+    position:absolute;
+    right: 0;
+    bottom:0;
+    object-fit: fill;
+    height:380px;
+    border:12px solid rgb(133, 216, 234);
+    border-radius: 20px;
+    transition: box-shadow 0.3s ease,height 0.3s ease;
+}
+.img2:hover{
+    height:410px;
+    box-shadow: 0 4px 2px -2px rgb(96, 94, 94);
+}
+.video-container video{
+    position: absolute;
+    height:410px;
+  bottom:0;
+  left:30%;
+  border-radius: 20px;
+  border:12px solid rgb(234, 133, 177);
+  transition: box-shadow 0.3s ease,height 0.3s ease;
+}
+.video-container video:hover{
+    height:420px;
+    box-shadow: 0 4px 2px -2px rgb(96, 94, 94);
+}
+
 
 
 
