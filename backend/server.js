@@ -3,7 +3,9 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const userRoutes = require('./routes/userRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 5001; // Ensure the port matches the frontend request
@@ -35,6 +37,7 @@ app.use("/api/reviews", require("./routes/reviewRoutes"));
 app.use("/api/departments", require("./routes/departmentRoutes")); // Add departments route
 app.use("/api/courses", require("./routes/courseRoutes")); // Add courses route
 app.use('/api/users', userRoutes);
+app.use('/api/search', searchRoutes);
 
 // Start the application
 startServer();

@@ -16,6 +16,14 @@ const HomePage = () => {
     { id: 5, name: "BUSS 215" }
   ];
 
+  // Handle search form submission
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Unified Navbar */}
@@ -35,7 +43,10 @@ const HomePage = () => {
           </div>
           
           {/* Search Box */}
-          <div className="w-full max-w-2xl mx-auto relative mb-8">
+          <form 
+            onSubmit={handleSearchSubmit} 
+            className="w-full max-w-2xl mx-auto relative mb-8"
+          >
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <i className="bx bx-search text-gray-400 text-xl"></i>
             </div>
@@ -46,10 +57,13 @@ const HomePage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-transparent text-lg"
             />
-            <Link to="/search" className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#860033] text-white px-5 py-2 rounded-full font-medium hover:bg-[#6a0026] transition-all">
+            <button 
+              type="submit" 
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#860033] text-white px-5 py-2 rounded-full font-medium hover:bg-[#6a0026] transition-all"
+            >
               Search
-            </Link>
-          </div>
+            </button>
+          </form>
           
           <p className="text-gray-500 mb-4">or</p>
           

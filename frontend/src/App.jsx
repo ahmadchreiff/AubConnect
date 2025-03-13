@@ -12,6 +12,7 @@ import CoursesPage from "./pages/Courses/CoursesPage";
 import CourseDetail from "./pages/Courses/CourseDetail";
 import UserProfile from "./pages/Profile/UserProfile";
 import MyReviews from "./pages/Reviews/MyReviews";
+import SearchResults from './pages/Search/SearchResults';
 
 const App = () => {
   return (
@@ -34,6 +35,7 @@ const App = () => {
               <Route path="/courses/:id" element={<CourseDetail />} />
               <Route path="/profile" element={<UserProfile />} />
               <Route path="/my-reviews" element={<MyReviews />} />
+              <Route path="/search" element={<SearchResults />} />
             </Route>
           </Routes>
         </div>
