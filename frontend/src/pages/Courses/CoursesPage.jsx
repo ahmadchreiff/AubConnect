@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import Navbar from "../Components/Navbar";
+import Footer from "../Components/Footer";
 import "boxicons/css/boxicons.min.css";
 
 const CoursesPage = () => {
@@ -68,46 +70,8 @@ const CoursesPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="bg-white border-b border-gray-200 py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            {/* Logo and brand */}
-            <div className="flex items-center">
-              <Link to="/" className="flex-shrink-0 flex items-center">
-                <div className="h-10 w-10 mr-2">
-                  <svg viewBox="0 0 100 100" className="h-full w-full fill-current text-[#860033]">
-                    <path d="M50,15 C35,15 25,25 25,40 C25,50 30,55 40,65 C45,70 50,85 50,85 C50,85 55,70 60,65 C70,55 75,50 75,40 C75,25 65,15 50,15 Z"></path>
-                  </svg>
-                </div>
-                <span className="font-serif text-xl tracking-tight text-[#860033]">AubConnect</span>
-              </Link>
-            </div>
-            
-            {/* Navigation */}
-            <div className="flex items-center gap-3">
-              <Link to="/departments" className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium">
-                Departments
-              </Link>
-              <Link to="/courses" className="text-[#860033] hover:text-[#6a0026] px-3 py-2 text-sm font-medium">
-                Courses
-              </Link>
-              <Link to="/professors" className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium">
-                Professors
-              </Link>
-              <Link to="/about" className="text-gray-700 hover:text-[#860033] px-3 py-2 text-sm font-medium">
-                About
-              </Link>
-              <Link to="/login" className="text-gray-700 hover:text-[#860033] ml-3 px-3 py-2 text-sm font-medium border border-gray-300 rounded-lg">
-                Log In
-              </Link>
-              <Link to="/signup" className="bg-[#860033] text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-[#6a0026] transition-all duration-200">
-                Sign Up
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Unified Navbar */}
+      <Navbar />
 
       {/* Main Content */}
       <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -266,32 +230,8 @@ const CoursesPage = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-1 text-[#860033]">
-              <div className="h-8 w-8">
-                <svg viewBox="0 0 100 100" className="h-full w-full fill-current">
-                  <path d="M50,15 C35,15 25,25 25,40 C25,50 30,55 40,65 C45,70 50,85 50,85 C50,85 55,70 60,65 C70,55 75,50 75,40 C75,25 65,15 50,15 Z"></path>
-                </svg>
-              </div>
-              <span className="font-serif text-lg">AubConnect</span>
-            </div>
-            
-            <div className="flex items-center space-x-6">
-              <Link to="/about" className="text-sm text-gray-500 hover:text-gray-900">About</Link>
-              <Link to="/privacy" className="text-sm text-gray-500 hover:text-gray-900">Privacy</Link>
-              <Link to="/terms" className="text-sm text-gray-500 hover:text-gray-900">Terms</Link>
-              <Link to="/contact" className="text-sm text-gray-500 hover:text-gray-900">Contact</Link>
-            </div>
-            
-            <div className="text-sm text-gray-500">
-              &copy; {new Date().getFullYear()} American University of Beirut
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Unified Footer */}
+      <Footer />
     </div>
   );
 };

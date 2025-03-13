@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Homepage from "./pages/Home/Homepage";
+import Homepage from "./pages/Home/Home";
 import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
-import ReviewList from "./pages/Reviews/ReviewList";
+import ReviewList from "./pages/Reviews/Reviews";
 import DepartmentsPage from "./pages/Departments/DepartmentsPage";
 import DepartmentDetail from "./pages/Departments/DepartmentDetail";
 import CoursesPage from "./pages/Courses/CoursesPage";
