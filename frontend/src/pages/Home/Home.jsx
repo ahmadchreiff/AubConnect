@@ -1,11 +1,18 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import "boxicons/css/boxicons.min.css";
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const searchInputRef = useRef(null);
+  const suggestionsRef = useRef(null);
+  const navigate = useNavigate();
   
   // Sample trending courses
   const trendingCourses = [
@@ -16,12 +23,70 @@ const HomePage = () => {
     { id: 5, name: "BUSS 215" }
   ];
 
+  // Fetch suggestions when search query changes
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (searchQuery.trim().length < 2) {
+        setSuggestions([]);
+        return;
+      }
+      
+      setIsLoading(true);
+      try {
+        const response = await axios.get(
+          `http://localhost:5001/api/search/suggestions?query=${encodeURIComponent(searchQuery)}`
+        );
+        setSuggestions(response.data.suggestions);
+        setShowSuggestions(true);
+      } catch (err) {
+        console.error("Error fetching suggestions:", err);
+        setSuggestions([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Use debounce to prevent too many requests
+    const timeoutId = setTimeout(() => {
+      fetchSuggestions();
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        searchInputRef.current && 
+        !searchInputRef.current.contains(event.target) &&
+        suggestionsRef.current && 
+        !suggestionsRef.current.contains(event.target)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   // Handle search form submission
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion) => {
+    if (suggestion.type === 'course') {
+      navigate(`/courses/${suggestion.id}`);
+    } else if (suggestion.type === 'department') {
+      navigate(`/departments/${suggestion.id}`);
+    }
+    setShowSuggestions(false);
   };
 
   return (
@@ -43,27 +108,55 @@ const HomePage = () => {
           </div>
           
           {/* Search Box */}
-          <form 
-            onSubmit={handleSearchSubmit} 
-            className="w-full max-w-2xl mx-auto relative mb-8"
-          >
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <i className="bx bx-search text-gray-400 text-xl"></i>
-            </div>
-            <input
-              type="text"
-              placeholder="Search for a course or professor"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-transparent text-lg"
-            />
-            <button 
-              type="submit" 
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#860033] text-white px-5 py-2 rounded-full font-medium hover:bg-[#6a0026] transition-all"
-            >
-              Search
-            </button>
-          </form>
+          <div className="w-full max-w-2xl mx-auto relative mb-8">
+            <form onSubmit={handleSearchSubmit} className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <i className="bx bx-search text-gray-400 text-xl"></i>
+              </div>
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search for a course or professor"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery.trim().length >= 2 && setShowSuggestions(true)}
+                className="w-full pl-12 pr-4 py-4 bg-white border border-gray-300 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-transparent text-lg"
+              />
+              <button 
+                type="submit" 
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#860033] text-white px-5 py-2 rounded-full font-medium hover:bg-[#6a0026] transition-all"
+              >
+                Search
+              </button>
+            </form>
+            
+            {/* Suggestions Dropdown */}
+            {showSuggestions && (
+              <div 
+                ref={suggestionsRef}
+                className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto"
+              >
+                {isLoading ? (
+                  <div className="p-3 text-center text-gray-500">Loading suggestions...</div>
+                ) : suggestions.length > 0 ? (
+                  <ul>
+                    {suggestions.map((suggestion) => (
+                      <li 
+                        key={`${suggestion.type}-${suggestion.id}`}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex flex-col border-b border-gray-100 last:border-b-0"
+                      >
+                        <span className="font-medium text-[#860033]">{suggestion.text}</span>
+                        <span className="text-sm text-gray-600">{suggestion.subtext}</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : searchQuery.trim().length >= 2 ? (
+                  <div className="p-3 text-center text-gray-500">No matches found</div>
+                ) : null}
+              </div>
+            )}
+          </div>
           
           <p className="text-gray-500 mb-4">or</p>
           

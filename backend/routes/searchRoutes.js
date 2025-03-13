@@ -1,10 +1,12 @@
-// In a new file searchRoutes.js
+// searchRoutes.js
 const express = require('express');
 const router = express.Router();
-const { searchCourses } = require('../controllers/searchController'); // Adjust path as needed
+const { searchCourses, getSearchSuggestions } = require('../controllers/searchController');
 
 // Search endpoint
 router.get('/', searchCourses);
 
+// Suggestions endpoint
+router.get('/suggestions', getSearchSuggestions);
 
 module.exports = router;

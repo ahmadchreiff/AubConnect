@@ -74,4 +74,58 @@ const searchCourses = async (req, res) => {
   }
 };
 
-module.exports = { searchCourses };
+/**
+ * Get search suggestions as user types
+ * @route GET /api/search/suggestions
+ */
+const getSearchSuggestions = async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || query.trim() === '') {
+      return res.json({ suggestions: [] });
+    }
+
+    const cleanQuery = query.trim();
+    const searchRegex = new RegExp(cleanQuery, 'i');
+    
+    // Get department suggestions
+    const departments = await Department.find({ 
+      $or: [
+        { name: searchRegex },
+        { code: searchRegex }
+      ]
+    }).limit(5);
+    
+    // Get course suggestions
+    const courses = await Course.find({
+      $or: [
+        { name: searchRegex },
+        { courseNumber: searchRegex }
+      ]
+    }).populate('department', 'code').limit(10);
+    
+    // Format the suggestions
+    const suggestions = [
+      ...departments.map(dept => ({
+        id: dept._id,
+        text: dept.code,
+        subtext: dept.name,
+        type: 'department'
+      })),
+      ...courses.map(course => ({
+        id: course._id,
+        text: `${course.department.code} ${course.courseNumber}`,
+        subtext: course.name,
+        type: 'course'
+      }))
+    ];
+    
+    res.json({ suggestions });
+  } catch (err) {
+    console.error('Search suggestions error:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+module.exports = { searchCourses, getSearchSuggestions };
