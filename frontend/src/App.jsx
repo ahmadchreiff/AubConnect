@@ -5,19 +5,29 @@ import Signup from "./pages/Signup/Signup";
 import Login from "./pages/Login/Login";
 import ReviewList from "./pages/ReviewList/ReviewList";
 import PastReviewsPage from "./pages/ReviewPage/PastReviewsPage";
+import DepartmentsPage from "./pages/Departments/DepartmentsPage";
+import DepartmentDetail from "./pages/Departments/DepartmentDetail";
+import CoursesPage from "./pages/Courses/CoursesPage";
+import CourseDetail from "./pages/Courses/CourseDetail";
 
 // No need to import App.css as we'll be using Tailwind utility classes
 
 const App = () => {
   return (
     <Router>
-      <div className="max-w-7xl mx-auto p-8 text-center">
+      <div className="max-w-7xl mx-auto">
         <Routes>
           <Route path="/" element={<Homepage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/reviews" element={<ReviewList />} />
           <Route path="/past-reviews" element={<PastReviewsPage />} />
+          
+          {/* New routes for Departments and Courses */}
+          <Route path="/departments" element={<DepartmentsPage />} />
+          <Route path="/departments/:id" element={<DepartmentDetail />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route path="/courses/:id" element={<CourseDetail />} />
         </Routes>
       </div>
     </Router>

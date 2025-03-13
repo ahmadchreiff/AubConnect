@@ -31,7 +31,9 @@ const startServer = async () => {
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/reviews", require("./routes/reviewRoutes")); // Add this line
+app.use("/api/reviews", require("./routes/reviewRoutes"));
+app.use("/api/departments", require("./routes/departmentRoutes")); // Add departments route
+app.use("/api/courses", require("./routes/courseRoutes")); // Add courses route
 
 // Start the application
 startServer();
