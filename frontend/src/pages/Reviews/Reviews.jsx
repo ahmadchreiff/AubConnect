@@ -10,6 +10,9 @@ import "boxicons/css/boxicons.min.css";
 
 const ReviewsPage = () => {
   const [reviews, setReviews] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [filteredCourses, setFilteredCourses] = useState([]);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,6 +20,8 @@ const ReviewsPage = () => {
   const [newReview, setNewReview] = useState({
     type: "course",
     title: "",
+    department: "",
+    course: "",
     rating: 0,
     reviewText: "",
     anonymous: false,
@@ -28,21 +33,32 @@ const ReviewsPage = () => {
   const [sortOption, setSortOption] = useState("newest");
   const navigate = useNavigate();
 
-  // Fetch reviews and set logged-in username
+  // Fetch reviews, departments, and courses on mount
   useEffect(() => {
-    const fetchReviews = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/reviews");
-        setReviews(response.data);
+        setIsLoading(true);
+        
+        // Fetch reviews
+        const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+        setReviews(reviewsRes.data);
+        
+        // Fetch departments
+        const departmentsRes = await axios.get("http://localhost:5001/api/departments");
+        setDepartments(departmentsRes.data);
+        
+        // Fetch all courses
+        const coursesRes = await axios.get("http://localhost:5001/api/courses");
+        setCourses(coursesRes.data);
       } catch (err) {
-        setError("Failed to fetch reviews.");
-        console.error("Error fetching reviews:", err);
+        setError("Failed to fetch initial data.");
+        console.error("Error fetching initial data:", err);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchReviews();
+    fetchInitialData();
 
     // Set the logged-in username
     const username = getUsernameFromToken();
@@ -50,6 +66,36 @@ const ReviewsPage = () => {
       setLoggedInUsername(username);
     }
   }, []);
+
+  // Filter courses when department selection changes
+  useEffect(() => {
+    if (newReview.department) {
+      const filtered = courses.filter(
+        course => {
+          // Add this console log to debug the structure
+          console.log("Course department:", course.department);
+          
+          // Check if department is an object with _id property
+          if (typeof course.department === 'object' && course.department !== null) {
+            return course.department._id === newReview.department;
+          } 
+          // Check if department is a string ID directly
+          else {
+            return course.department === newReview.department;
+          }
+        }
+      );
+      setFilteredCourses(filtered);
+      
+      // Reset course selection if the previously selected course isn't in this department
+      if (newReview.course && !filtered.find(c => c._id === newReview.course)) {
+        setNewReview(prev => ({ ...prev, course: "" }));
+      }
+    } else {
+      setFilteredCourses([]);
+      setNewReview(prev => ({ ...prev, course: "" }));
+    }
+  }, [newReview.department, courses]);
 
   // Function to get the username from the JWT token
   const getUsernameFromToken = () => {
@@ -129,6 +175,7 @@ const ReviewsPage = () => {
     }
   };
 
+  // Handle input changes for the review form
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setNewReview({
@@ -137,10 +184,12 @@ const ReviewsPage = () => {
     });
   };
 
+  // Handle rating changes
   const handleRatingChange = (rating) => {
     setNewReview({ ...newReview, rating });
   };
 
+  // Submit or update a review
   const submitReview = async () => {
     const username = getUsernameFromToken();
     if (!username) {
@@ -148,10 +197,23 @@ const ReviewsPage = () => {
       return;
     }
 
-    // Validate form
-    if (!newReview.title.trim()) {
-      setError("Please enter a title for your review.");
-      return;
+    // Validate form based on review type
+    if (newReview.type === "course") {
+      if (!newReview.department) {
+        setError("Please select a department.");
+        return;
+      }
+
+      if (!newReview.course) {
+        setError("Please select a course.");
+        return;
+      }
+    } else {
+      // Professor review validation
+      if (!newReview.title.trim()) {
+        setError("Please enter a professor's name.");
+        return;
+      }
     }
 
     if (newReview.rating === 0) {
@@ -170,26 +232,26 @@ const ReviewsPage = () => {
         username: newReview.anonymous ? "Anonymous" : username,
       };
 
+      let response;
+      
       if (editReviewId) {
         // Update the review
-        const response = await axios.put(
+        response = await axios.put(
           `http://localhost:5001/api/reviews/${editReviewId}`, 
           reviewData,
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
         );
-        console.log("Review updated:", response.data);
       } else {
         // Submit a new review
-        const response = await axios.post(
+        response = await axios.post(
           "http://localhost:5001/api/reviews", 
           reviewData,
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }
         );
-        console.log("Review submitted:", response.data);
       }
 
       // Fetch updated reviews
@@ -200,6 +262,8 @@ const ReviewsPage = () => {
       setNewReview({
         type: "course",
         title: "",
+        department: "",
+        course: "",
         rating: 0,
         reviewText: "",
         anonymous: false,
@@ -208,19 +272,22 @@ const ReviewsPage = () => {
       setIsModalOpen(false);
 
       setSuccess(editReviewId ? "Review updated successfully!" : "Review posted successfully!");
-      setTimeout(() => setSuccess(""), 3000); // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to submit review.");
       console.error("Error submitting review:", err);
     }
   };
 
+  // Handle editing a review
   const handleEditReview = (id) => {
     const reviewToEdit = reviews.find((review) => review._id === id);
     if (reviewToEdit) {
       setNewReview({
         type: reviewToEdit.type,
         title: reviewToEdit.title,
+        department: reviewToEdit.department?._id || "",
+        course: reviewToEdit.course?._id || "",
         rating: reviewToEdit.rating,
         reviewText: reviewToEdit.reviewText,
         anonymous: reviewToEdit.username === "Anonymous",
@@ -230,6 +297,7 @@ const ReviewsPage = () => {
     }
   };
 
+  // Handle deleting a review
   const handleDeleteReview = async (id) => {
     const isConfirmed = window.confirm("Are you sure you want to delete this review?");
     if (!isConfirmed) return;
@@ -547,6 +615,11 @@ const ReviewsPage = () => {
                           </span>
                         </div>
                         <h3 className="text-xl font-bold text-gray-800">{review.title}</h3>
+                        {review.department && review.course && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {review.department.code} Department
+                          </p>
+                        )}
                         <p className="text-sm text-gray-500">
                           by {review.username}
                         </p>
@@ -664,19 +737,65 @@ const ReviewsPage = () => {
                     </select>
                   </div>
                   
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {newReview.type === "course" ? "Course Code/Name" : "Professor Name"}
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={newReview.title}
-                      onChange={handleInputChange}
-                      placeholder={newReview.type === "course" ? "e.g., CMPS 200" : "e.g., Dr. John Smith"}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
-                    />
-                  </div>
+                  {newReview.type === "course" ? (
+                    <>
+                      {/* Department Selection */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Department</label>
+                        <select 
+                          name="department" 
+                          value={newReview.department} 
+                          onChange={handleInputChange}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+                        >
+                          <option value="">Select a department</option>
+                          {departments.map(dept => (
+                            <option key={dept._id} value={dept._id}>
+                              {dept.code} - {dept.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      {/* Course Selection */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Course
+                        </label>
+                        <select 
+                          name="course" 
+                          value={newReview.course} 
+                          onChange={handleInputChange}
+                          disabled={!newReview.department}
+                          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] disabled:bg-gray-100 disabled:text-gray-500"
+                        >
+                          <option value="">
+                            {newReview.department ? "Select a course" : "Select a department first"}
+                          </option>
+                          {filteredCourses.map(course => (
+                            <option key={course._id} value={course._id}>
+                              {course.courseNumber} - {course.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  ) : (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Professor Name
+                      </label>
+                      <input
+                        type="text"
+                        name="title"
+                        value={newReview.title}
+                        onChange={handleInputChange}
+                        placeholder="e.g., Dr. John Smith"
+                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+                      />
+                    </div>
+                  )}
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
