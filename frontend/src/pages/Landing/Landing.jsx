@@ -6,6 +6,7 @@ import postReview from "./images/posting.mp4";
 import filterVotes from "./images/filter.mp4";
 import searchByDepartment from "./images/searchByDepartment.mp4";
 import trendingCourses from "./images/trend.mp4";
+import professors from "./images/professor.mp4";
 
 const LandingPage = () => {
   const [expandedVideo, setExpandedVideo] = useState(null);
@@ -86,7 +87,7 @@ const LandingPage = () => {
             { id: "trending-courses", title: "Trending Courses", videoSrc: trendingCourses },
             { id: "post-review", title: "Posting a Review", videoSrc: postReview },
             { id: "filter-vote-reviews", title: "Filtering & Voting Reviews", videoSrc: filterVotes },
-            { id: "past-reviews", title: "Checking Your Past Reviews", videoSrc: "images/past-reviews.png" },
+            { id: "search-professor", title: "Searching by professor", videoSrc: professors },
           ].map(({ id, title, videoSrc }) => (
             <div
               className={`video-item ${expandedVideo === id ? "expanded" : ""}`}
