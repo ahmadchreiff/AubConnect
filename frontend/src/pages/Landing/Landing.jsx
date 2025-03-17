@@ -87,7 +87,7 @@ const LandingPage = () => {
             { id: "trending-courses", title: "Trending Courses", videoSrc: trendingCourses },
             { id: "post-review", title: "Posting a Review", videoSrc: postReview },
             { id: "filter-vote-reviews", title: "Filtering & Voting Reviews", videoSrc: filterVotes },
-            { id: "search-professor", title: "Searching by professor", videoSrc: professors },
+            { id: "search-professor", title: "Searching by Professor", videoSrc: professors },
           ].map(({ id, title, videoSrc }) => (
             <div
               className={`video-item ${expandedVideo === id ? "expanded" : ""}`}
