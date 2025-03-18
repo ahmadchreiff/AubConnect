@@ -4,6 +4,15 @@ const Department = require("../models/Department");
 const Professor = require("../models/Professor");
 const professorController = require("./professorController");
 
+// Add a list of inappropriate words (you can expand this list)
+const inappropriateWords = ["badword1", "badword2", "badword3"]; // Add your list of inappropriate words here
+
+// Function to check for inappropriate content
+const containsInappropriateContent = (text) => {
+  const lowerCaseText = text.toLowerCase();
+  return inappropriateWords.some(word => lowerCaseText.includes(word));
+};
+
 /**
  * Post a new review
  * @route POST /api/reviews
@@ -19,6 +28,15 @@ const postReview = async (req, res) => {
       course: courseId,
       professor: professorId
     } = req.body;
+
+    // Check for inappropriate content
+    if (containsInappropriateContent(reviewText)) {
+      return res.status(400).json({ 
+        message: "Review contains inappropriate content, unable to post", 
+        error: "INAPPROPRIATE_CONTENT" 
+      });
+    }
+
 
     // Create the review object with common fields
     const reviewData = {

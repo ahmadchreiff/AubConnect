@@ -194,95 +194,99 @@ const ReviewsPage = () => {
   };
 
   // Submit or update a review
-  const submitReview = async () => {
-    const username = getUsernameFromToken();
-    if (!username) {
-      setError("You must be logged in to post a review.");
+const submitReview = async () => {
+  const username = getUsernameFromToken();
+  if (!username) {
+    setError("You must be logged in to post a review.");
+    return;
+  }
+
+  // Validate form based on review type
+  if (newReview.type === "course") {
+    if (!newReview.department) {
+      setError("Please select a department.");
       return;
     }
 
-    // Validate form based on review type
-    if (newReview.type === "course") {
-      if (!newReview.department) {
-        setError("Please select a department.");
-        return;
-      }
+    if (!newReview.course) {
+      setError("Please select a course.");
+      return;
+    }
+  } else {
+    // Professor review validation
+    if (!newReview.professor) {
+      setError("Please select a professor.");
+      return;
+    }
+  }
 
-      if (!newReview.course) {
-        setError("Please select a course.");
-        return;
-      }
+  if (newReview.rating === 0) {
+    setError("Please select a rating.");
+    return;
+  }
+
+  if (!newReview.reviewText.trim()) {
+    setError("Please write your review.");
+    return;
+  }
+
+  try {
+    const reviewData = {
+      ...newReview,
+      username: newReview.anonymous ? "Anonymous" : username,
+    };
+
+    let response;
+    
+    if (editReviewId) {
+      // Update the review
+      response = await axios.put(
+        `http://localhost:5001/api/reviews/${editReviewId}`, 
+        reviewData,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
     } else {
-      // Professor review validation
-      if (!newReview.professor) {
-        setError("Please select a professor.");
-        return;
-      }
+      // Submit a new review
+      response = await axios.post(
+        "http://localhost:5001/api/reviews", 
+        reviewData,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
     }
 
-    if (newReview.rating === 0) {
-      setError("Please select a rating.");
-      return;
-    }
+    // Fetch updated reviews
+    const reviewsResponse = await axios.get("http://localhost:5001/api/reviews");
+    setReviews(reviewsResponse.data);
 
-    if (!newReview.reviewText.trim()) {
-      setError("Please write your review.");
-      return;
-    }
+    // Reset the form and close the modal
+    setNewReview({
+      type: "course",
+      title: "",
+      department: "",
+      course: "",
+      professor: "", 
+      rating: 0,
+      reviewText: "",
+      anonymous: false,
+    });
+    setEditReviewId(null);
+    setIsModalOpen(false);
 
-    try {
-      const reviewData = {
-        ...newReview,
-        username: newReview.anonymous ? "Anonymous" : username,
-      };
-
-      let response;
-      
-      if (editReviewId) {
-        // Update the review
-        response = await axios.put(
-          `http://localhost:5001/api/reviews/${editReviewId}`, 
-          reviewData,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          }
-        );
-      } else {
-        // Submit a new review
-        response = await axios.post(
-          "http://localhost:5001/api/reviews", 
-          reviewData,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          }
-        );
-      }
-
-      // Fetch updated reviews
-      const reviewsResponse = await axios.get("http://localhost:5001/api/reviews");
-      setReviews(reviewsResponse.data);
-
-      // Reset the form and close the modal
-      setNewReview({
-        type: "course",
-        title: "",
-        department: "",
-        course: "",
-        professor: "", 
-        rating: 0,
-        reviewText: "",
-        anonymous: false,
-      });
-      setEditReviewId(null);
-      setIsModalOpen(false);
-
-      setSuccess(editReviewId ? "Review updated successfully!" : "Review posted successfully!");
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
+    setSuccess(editReviewId ? "Review updated successfully!" : "Review posted successfully!");
+    setTimeout(() => setSuccess(""), 3000);
+  } catch (err) {
+    if (err.response?.data?.error === "INAPPROPRIATE_CONTENT") {
+      setError("Review contains inappropriate content, unable to post");
+    } else {
       setError(err.response?.data?.message || "Failed to submit review.");
-      console.error("Error submitting review:", err);
     }
-  };
+    console.error("Error submitting review:", err);
+  }
+};
 
   // Handle editing a review
   const handleEditReview = (id) => {
