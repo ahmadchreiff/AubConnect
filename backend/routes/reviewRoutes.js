@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 const reviewController = require("../controllers/reviewController");
 const auth = require('../middleware/auth');
+const Review = require("../models/Review"); // Add this import
 
 // Create a review
 router.post("/", reviewController.postReview);

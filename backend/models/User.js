@@ -10,6 +10,9 @@ const UserSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false }, // To track if the email is verified
   verificationCode: { type: String }, // Stores the verification code
   verificationCodeExpires: { type: Date }, // Stores the expiration time of the code
+}, 
+{ 
+  timestamps: true // Add this to automatically create createdAt and updatedAt fields
 });
 
 // Hash password before saving

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
 
 const UserProfile = () => {
   const { currentUser, isAuthenticated } = useAuth();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
-  const [userReviews, setUserReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
@@ -17,34 +17,9 @@ const UserProfile = () => {
     if (currentUser) {
       setName(currentUser.name);
       setUsername(currentUser.username);
+      setLoading(false);
     }
   }, [currentUser]);
-
-  useEffect(() => {
-    const fetchUserReviews = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const response = await axios.get('http://localhost:5001/api/users/reviews', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        setUserReviews(response.data.reviews);
-      } catch (error) {
-        console.error('Error fetching user reviews:', error);
-        setError('Failed to load your reviews. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isAuthenticated()) {
-      fetchUserReviews();
-    }
-  }, [isAuthenticated]);
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -93,164 +68,139 @@ const UserProfile = () => {
   }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Profile Card */}
-          <div className="md:col-span-1">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="bg-[#6D0B24] h-32 flex items-center justify-center">
-                <div className="h-20 w-20 rounded-full bg-white text-[#6D0B24] font-bold text-3xl flex items-center justify-center">
-                  {currentUser?.name?.charAt(0).toUpperCase() || 'A'}
-                </div>
-              </div>
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+          <p className="mt-2 text-gray-600">Manage your account settings and preferences</p>
+        </div>
 
-              <div className="px-6 py-6">
-                <h2 className="text-xl font-semibold text-gray-800 text-center mb-6">
-                  {currentUser?.name}
-                </h2>
-
-                {editMode ? (
-                  <form onSubmit={handleUpdateProfile} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Name</label>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#6D0B24] focus:border-[#6D0B24]"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Username</label>
-                      <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#6D0B24] focus:border-[#6D0B24]"
-                        required
-                      />
-                    </div>
-
-                    {error && (
-                      <div className="text-red-600 text-sm py-2">{error}</div>
-                    )}
-
-                    <div className="flex justify-end space-x-3 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setEditMode(false);
-                          setName(currentUser.name);
-                          setUsername(currentUser.username);
-                          setError('');
-                        }}
-                        className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#6D0B24] hover:bg-[#860033]"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Username</p>
-                      <p className="text-gray-800">{currentUser?.username}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <p className="text-gray-800">{currentUser?.email}</p>
-                    </div>
-
-                    {updateSuccess && (
-                      <div className="bg-green-50 text-green-800 rounded-md p-2 text-sm">
-                        Profile updated successfully!
-                      </div>
-                    )}
-
-                    <div className="pt-4">
-                      <button
-                        onClick={() => setEditMode(true)}
-                        className="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#6D0B24] hover:bg-[#860033]"
-                      >
-                        Edit Profile
-                      </button>
-                    </div>
-                  </div>
-                )}
+        {/* Profile Card */}
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="bg-gradient-to-r from-[#6D0B24] to-[#860033] h-40 flex items-center justify-center">
+              <div className="h-24 w-24 rounded-full bg-white text-[#6D0B24] font-bold text-4xl flex items-center justify-center shadow-md">
+                {currentUser?.name?.charAt(0).toUpperCase() || 'A'}
               </div>
             </div>
-          </div>
 
-          {/* User Reviews */}
-          <div className="md:col-span-2">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">My Reviews</h2>
+            <div className="px-8 py-8">
+              <h2 className="text-2xl font-semibold text-gray-800 text-center mb-8">
+                {currentUser?.name}
+              </h2>
 
-              {userReviews.length === 0 ? (
-                <div className="text-center py-6">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              {editMode ? (
+                <form onSubmit={handleUpdateProfile} className="space-y-6 max-w-md mx-auto">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-4 focus:outline-none focus:ring-[#6D0B24] focus:border-[#6D0B24]"
+                      required
                     />
-                  </svg>
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No reviews yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    You haven't written any reviews yet.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {userReviews.map((review) => (
-                    <div key={review._id} className="border-b border-gray-200 pb-6 last:border-b-0 last:pb-0">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          {review.course?.name || 'Unknown Course'}
-                        </h3>
-                        <div className="flex items-center">
-                          {[...Array(5)].map((_, i) => (
-                            <svg
-                              key={i}
-                              className={`h-5 w-5 ${
-                                i < review.rating ? 'text-yellow-400' : 'text-gray-300'
-                              }`}
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-500 mb-2">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </p>
-                      <p className="text-gray-700">{review.comment}</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Username</label>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-4 focus:outline-none focus:ring-[#6D0B24] focus:border-[#6D0B24]"
+                      required
+                    />
+                  </div>
+
+                  {error && (
+                    <div className="bg-red-50 text-red-700 px-4 py-3 rounded-md text-sm">
+                      {error}
                     </div>
-                  ))}
+                  )}
+
+                  <div className="flex justify-end space-x-4 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditMode(false);
+                        setName(currentUser.name);
+                        setUsername(currentUser.username);
+                        setError('');
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#6D0B24] hover:bg-[#860033] transition-colors"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="max-w-md mx-auto">
+                  <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                    <div className="space-y-4 divide-y divide-gray-200">
+                      <div className="pt-4 first:pt-0">
+                        <p className="text-sm font-medium text-gray-500">Full Name</p>
+                        <p className="mt-1 text-gray-800 font-medium">{currentUser?.name}</p>
+                      </div>
+                      <div className="pt-4">
+                        <p className="text-sm font-medium text-gray-500">Username</p>
+                        <p className="mt-1 text-gray-800 font-medium">{currentUser?.username}</p>
+                      </div>
+                      <div className="pt-4">
+                        <p className="text-sm font-medium text-gray-500">Email Address</p>
+                        <p className="mt-1 text-gray-800 font-medium">{currentUser?.email}</p>
+                      </div>
+                      <div className="pt-4">
+                        <p className="text-sm font-medium text-gray-500">Member Since</p>
+                        <p className="mt-1 text-gray-800 font-medium">
+                          {currentUser?.createdAt 
+                            ? new Date(currentUser.createdAt).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })
+                            : new Date().toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {updateSuccess && (
+                    <div className="bg-green-50 text-green-800 rounded-md p-4 mb-6 flex items-center">
+                      <svg className="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Profile updated successfully!
+                    </div>
+                  )}
+
+                  <div>
+                    <button
+                      onClick={() => setEditMode(true)}
+                      className="w-full px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#6D0B24] hover:bg-[#860033] transition-colors"
+                    >
+                      Edit Profile
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
