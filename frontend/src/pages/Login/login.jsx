@@ -11,7 +11,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAdmin } = useAuth();
 
   // Mount animation
   useEffect(() => {
@@ -39,7 +39,14 @@ const Login = () => {
       
       // Show success animation before redirecting
       setTimeout(() => {
-        navigate(response.redirectUrl || "/");
+        // Handle redirect based on user role and redirectUrl
+        if (response.user.role === 'admin') {
+          // Admin users go to admin dashboard
+          navigate('/admin/dashboard');
+        } else {
+          // Regular users go to homepage - handle both "/homepage" and "/" cases
+          navigate('/');
+        }
       }, 1000);
       
     } catch (err) {

@@ -67,8 +67,13 @@ export const AuthProvider = ({ children }) => {
       // Update current user
       setCurrentUser(user);
       
+      // Log the login success
+      console.log('Login successful:', user.role);
+      
+      // Return the complete response data
       return response.data;
     } catch (err) {
+      console.error('Login error:', err);
       throw err;
     }
   };
@@ -108,6 +113,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Check if user is an admin
+  const isAdmin = () => {
+    if (!currentUser) return false;
+    return currentUser.role === 'admin';
+  };
+
   // Value to be provided by the context
   const value = {
     currentUser,
@@ -116,7 +127,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     getUserInfo,
-    isAuthenticated
+    isAuthenticated,
+    isAdmin
   };
 
   return (

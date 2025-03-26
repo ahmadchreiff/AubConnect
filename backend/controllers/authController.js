@@ -89,6 +89,48 @@ const verifyCode = async (req, res) => {
 };
 
 
+// // Login
+// const login = async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     // Check if user exists
+//     const user = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(400).json({ message: 'Invalid credentials - User not found', error: 'USER_NOT_FOUND' });
+//     }
+
+//     // Compare passwords
+//     const isMatch = await user.comparePassword(password);
+//     if (!isMatch) {
+//       return res.status(400).json({ message: 'Invalid credentials - Incorrect password', error: 'INCORRECT_PASSWORD' });
+//     }
+
+//     // Generate JWT with user's username included
+//     const payload = { 
+//       userId: user._id,
+//       username: user.username, // Include the username in the token
+//     };
+//     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+//     // Return success response with user data and redirect URL
+//     res.status(200).json({ 
+//       message: 'Login successful', 
+//       token, 
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         username: user.username,
+//         createdAt: user.createdAt
+//       },
+//       redirectUrl: "/homepage" 
+//     });
+//   } catch (err) {
+//     console.error('Error during login:', err);
+//     res.status(500).json({ message: 'Server error occurred', error: err.message });
+//   }
+// };
 // Login
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -106,10 +148,19 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials - Incorrect password', error: 'INCORRECT_PASSWORD' });
     }
 
-    // Generate JWT with user's username included
+    // Check if user is banned or suspended
+    if (user.status !== 'active') {
+      return res.status(403).json({ 
+        message: 'Your account has been suspended or banned', 
+        error: 'ACCOUNT_INACTIVE' 
+      });
+    }
+
+    // Generate JWT with user's username and role included
     const payload = { 
       userId: user._id,
-      username: user.username, // Include the username in the token
+      username: user.username,
+      role: user.role
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
@@ -122,9 +173,11 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         username: user.username,
+        role: user.role,
+        status: user.status,
         createdAt: user.createdAt
       },
-      redirectUrl: "/homepage" 
+      redirectUrl: user.role === 'admin' ? "/admin/dashboard" : "/homepage"
     });
   } catch (err) {
     console.error('Error during login:', err);
