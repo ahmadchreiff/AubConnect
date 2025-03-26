@@ -12,7 +12,8 @@ const getUserProfile = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        username: user.username
+        username: user.username,
+        createdAt: user.createdAt
       }
     });
   } catch (err) {
@@ -21,7 +22,7 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// Get user reviews
+
 // Get user reviews
 const getUserReviews = async (req, res) => {
   try {
@@ -77,7 +78,8 @@ const checkAuth = async (req, res) => {
       id: req.user._id,
       name: req.user.name,
       email: req.user.email,
-      username: req.user.username
+      username: req.user.username,
+      createdAt: req.user.createdAt
     }
   });
 };
