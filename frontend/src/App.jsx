@@ -15,6 +15,7 @@ import ProfessorDetail from "./pages/Professors/ProfessorDetail";
 import UserProfile from "./pages/Profile/UserProfile";
 import MyReviews from "./pages/Reviews/MyReviews";
 import SearchResults from './pages/Search/SearchResults';
+import LandingPage from './pages/Landing/Landing';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <div className="max-w-7xl mx-auto">
           <Routes>
             {/* Public routes */}
+            <Route path="/" element ={<LandingPage/>}/>
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             
@@ -48,4 +50,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App;    

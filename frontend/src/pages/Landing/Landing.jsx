@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./style.css";
 import openingImage from "./images/openingImgae.jpeg";
 import searchByCourse from "./images/course.mp4";
@@ -9,25 +10,35 @@ import trendingCourses from "./images/trend.mp4";
 import professors from "./images/professor.mp4";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   const [expandedVideo, setExpandedVideo] = useState(null);
-  const [expandedFAQ, setExpandedFAQ] = useState(null); // Track which FAQ is expanded
-  const [showSignUp, setShowSignUp] = useState(true); // Track which section to show
-  const ctaRef = useRef(null); // Ref for the CTA section
+  const [expandedFAQ, setExpandedFAQ] = useState(null);
+  const [showSignUp, setShowSignUp] = useState(true);
+  const ctaRef = useRef(null);
+
+  // Navigation handlers
+  const handleSignUpClick = () => {
+    navigate("/signup");
+  };
+
+  const handleSignInClick = () => {
+    navigate("/login");
+  };
 
   const handleVideoClick = (videoId) => {
     setExpandedVideo(expandedVideo === videoId ? null : videoId);
   };
 
   const handleFAQClick = (faqId) => {
-    setExpandedFAQ(expandedFAQ === faqId ? null : faqId); // Toggle FAQ expansion
+    setExpandedFAQ(expandedFAQ === faqId ? null : faqId);
   };
 
   const toggleSection = () => {
-    setShowSignUp(!showSignUp); // Toggle between Sign Up and Sign In
+    setShowSignUp(!showSignUp);
   };
 
   const scrollToCTA = () => {
-    ctaRef.current.scrollIntoView({ behavior: "smooth" }); // Smooth scroll to CTA
+    ctaRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -52,11 +63,11 @@ const LandingPage = () => {
         <div className="feature-list">
           <div className="feature">
             <h3> Search by Department</h3>
-            <p>Find courses within your department, so you don’t end up in the wrong class</p>
+            <p>Find courses within your department, so you don't end up in the wrong class</p>
           </div>
           <div className="feature">
             <h3> Trending Courses</h3>
-            <p>See what’s popular among students and what courses are in demand</p>
+            <p>See what's popular among students and what courses are in demand</p>
           </div>
           <div className="feature">
             <h3> Star Rating System</h3>
@@ -103,7 +114,7 @@ const LandingPage = () => {
                       className="expanded-video"
                       autoPlay
                       loop
-                      muted // Required for autoplay in most browsers
+                      muted
                     />
                   ) : (
                     <img src={videoSrc} alt={title} className="expanded-video" />
@@ -179,16 +190,26 @@ const LandingPage = () => {
         {showSignUp ? (
           <>
             <h2>Start your university journey with confidence. Sign up today and take the first step toward success</h2>
-            <button className="cta-button">Sign Up</button>
-            <p onClick={toggleSection} style={{ cursor: "pointer", color: "#970339", textDecoration: "underline" }}>
+            <button className="cta-button" onClick={handleSignUpClick}>
+              Sign Up
+            </button>
+            <p 
+              onClick={toggleSection} 
+              style={{ cursor: "pointer", color: "#970339", textDecoration: "underline" }}
+            >
               Already have an account?
             </p>
           </>
         ) : (
           <>
             <h2>Welcome back! Your insights and experiences help shape the AUBConnect community</h2>
-            <button className="cta-button">Sign In</button>
-            <p onClick={toggleSection} style={{ cursor: "pointer", color: "#970339", textDecoration: "underline" }}>
+            <button className="cta-button" onClick={handleSignInClick}>
+              Sign In
+            </button>
+            <p 
+              onClick={toggleSection} 
+              style={{ cursor: "pointer", color: "#970339", textDecoration: "underline" }}
+            >
               Don't have an account yet?
             </p>
           </>

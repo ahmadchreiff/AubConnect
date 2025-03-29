@@ -142,11 +142,10 @@ const Signup = () => {
       <div className="relative overflow-y-auto">
         {/* Background Image with Overlay */}
         <div className="fixed inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#6D0B24]/90 to-[#45051A]/80 mix-blend-multiply"></div>
-          <div className="absolute inset-0 bg-[url('/campus-background.jpg')] bg-cover bg-center opacity-40 animate-slow-pan"></div>
+          <div className="absolute inset-0 bg bg-cover bg-center opacity-40 animate-slow-pan"></div>
         </div>
         
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-center pt-4 pb-16">
+        <div className=" absolute inset-0 bg-gradient-to-br from-[#6D0B24]/90 to-[#45051A]/80 mix-blend-multiply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-center pt-4 pb-16">
           <div 
             className={`w-full max-w-md transition-all duration-1000 transform ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
