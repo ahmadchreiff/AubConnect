@@ -4,7 +4,7 @@ import {
   XAxis, YAxis, Tooltip, Legend, CartesianGrid
 } from "recharts";
 import "./Stat-Style.css";
-import { Link, useNavigate } from "react-router-dom";
+
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 

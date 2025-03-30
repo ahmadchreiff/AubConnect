@@ -17,6 +17,7 @@ import MyReviews from "./pages/Reviews/MyReviews";
 import SearchResults from './pages/Search/SearchResults';
 import LandingPage from './pages/Landing/Landing';
 import StatPage from './pages/stats/statistics';
+import AboutUs from './pages/AboutUs/AboutUs'
 
 const App = () => {
   return (
@@ -44,6 +45,8 @@ const App = () => {
               <Route path="/my-reviews" element={<MyReviews />} />
               <Route path="/search" element={<SearchResults />} />
               <Route path="/Statistics" element={<StatPage />} />
+              <Route path="/about" element={<AboutUs />} />
+              
             </Route>
           </Routes>
         </div>
