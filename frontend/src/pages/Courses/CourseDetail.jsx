@@ -115,6 +115,13 @@ const CourseDetail = () => {
                     <div className="text-sm text-gray-500">
                       {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
                     </div>
+                    <Link 
+  to="/Statistics"  // change done HERE!!
+  className="text-gray-500 text-xs underline hover:text-gray-700 m-0 p-0"
+>
+  more statistics
+</Link>
+
                     <Link
                       to={`/reviews/new?type=course&id=${course._id}`}
                       className="mt-3 bg-[#860033] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6a0026] transition-all duration-200"
