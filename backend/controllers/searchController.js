@@ -11,84 +11,81 @@ const searchCourses = async (req, res) => {
   try {
     const { query } = req.query;
     
-    if (!query || query.trim() === '') {
-      return res.status(400).json({ message: 'Search query is required' });
+    if (!query?.trim()) {
+      return res.status(400).json({ message: 'Search query required' });
     }
 
-    const cleanQuery = query.trim();
-    
-    // Check if the query looks like a course code (e.g., "CMPS 201" or "CMPS201")
-    const courseCodeRegex = /^([a-zA-Z]+)\s*(\d+)/;
-    const courseCodeMatch = cleanQuery.match(courseCodeRegex);
-    
-    let results = { courses: [], departments: [], professors: [] };
-    
-    if (courseCodeMatch) {
-      // If it matches a course code pattern, split into department code and course number
-      const deptCode = courseCodeMatch[1].toUpperCase();
-      const courseNum = courseCodeMatch[2];
+    const searchTerm = query.trim().toUpperCase();
+    const results = { courses: [], departments: [] };
+
+    // 1. Handle department search
+    results.departments = await Department.find({
+      $or: [
+        { code: searchTerm },
+        { name: new RegExp(searchTerm, 'i') }
+      ]
+    });
+
+    // 2. Handle course search
+    if (searchTerm.includes(' ')) {
+      // Handle "DEPT NUMBER" format (e.g., "ECON 101")
+      const [deptPart, numberPart] = searchTerm.split(' ');
       
-      // First find the department
-      const department = await Department.findOne({ code: deptCode });
-      
-      if (department) {
-        // Then find courses in that department with matching course number
-        const courses = await Course.find({
-          department: department._id,
-          courseNumber: { $regex: courseNum }
-        }).populate('department', 'name code');
-        
-        results.courses = courses;
-        results.departments = [department];
-        
-        // Find professors who teach in this department
-        const professors = await Professor.find({
-          departments: department._id
-        }).populate('departments', 'name code');
-        
-        results.professors = professors;
-      }
-    }
-    
-    // If no course code match or no results found, perform a general search
-    if (results.courses.length === 0 && results.departments.length === 0 && results.professors.length === 0) {
-      const searchRegex = new RegExp(cleanQuery, 'i');
-      
-      // Search for courses by name, number, or description
-      const courses = await Course.find({
-        $or: [
-          { name: searchRegex },
-          { courseNumber: searchRegex },
-          { description: searchRegex }
-        ]
-      }).populate('department', 'name code');
-      
-      // Search for departments by name or code
-      const departments = await Department.find({
-        $or: [
-          { name: searchRegex },
-          { code: searchRegex }
-        ]
-      });
-      
-      // Search for professors by name, title, or bio
-      const professors = await Professor.find({
-        $or: [
-          { name: searchRegex },
-          { title: searchRegex },
-          { bio: searchRegex }
-        ]
-      }).populate('departments', 'name code');
+      const courses = await Course.aggregate([
+        {
+          $lookup: {
+            from: 'departments',
+            localField: 'department',
+            foreignField: '_id',
+            as: 'dept'
+          }
+        },
+        {
+          $unwind: '$dept'
+        },
+        {
+          $match: {
+            $and: [
+              { 'dept.code': deptPart },
+              { courseNumber: numberPart }
+            ]
+          }
+        }
+      ]);
       
       results.courses = courses;
-      results.departments = departments;
-      results.professors = professors;
+    } else {
+      // Handle single term searches (department code or course number)
+      const courses = await Course.aggregate([
+        {
+          $lookup: {
+            from: 'departments',
+            localField: 'department',
+            foreignField: '_id',
+            as: 'dept'
+          }
+        },
+        {
+          $unwind: '$dept'
+        },
+        {
+          $match: {
+            $or: [
+              { 'dept.code': searchTerm },
+              { courseNumber: searchTerm },
+              { name: new RegExp(searchTerm, 'i') }
+            ]
+          }
+        }
+      ]);
+      
+      results.courses = courses;
     }
-    
-    res.status(200).json({ results });
+
+    res.json({ results });
   } catch (err) {
     console.error('Search error:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    res.status(500).json({ message: 'Search failed', error: err.message });
   }
 };
 
@@ -104,8 +101,8 @@ const getSearchSuggestions = async (req, res) => {
       return res.json({ suggestions: [] });
     }
 
-    const cleanQuery = query.trim();
-    const searchRegex = new RegExp(cleanQuery, 'i');
+    const cleanQuery = query.trim().toUpperCase();
+    const searchRegex = new RegExp(cleanQuery.replace(/\s+/g, '\\s*'), 'i');
     
     // Get department suggestions
     const departments = await Department.find({ 
@@ -115,13 +112,44 @@ const getSearchSuggestions = async (req, res) => {
       ]
     }).limit(5);
     
-    // Get course suggestions
-    const courses = await Course.find({
-      $or: [
-        { name: searchRegex },
-        { courseNumber: searchRegex }
-      ]
-    }).populate('department', 'code').limit(8);
+    // Get course suggestions - UPDATED TO HANDLE DEPARTMENT+NUMBER FORMAT
+    let courses = [];
+    
+    if (cleanQuery.includes(' ')) {
+      // Handle "DEPT NUMBER" format (e.g., "ECON 101")
+      const [deptPart, numberPart] = cleanQuery.split(' ');
+      
+      courses = await Course.aggregate([
+        {
+          $lookup: {
+            from: 'departments',
+            localField: 'department',
+            foreignField: '_id',
+            as: 'dept'
+          }
+        },
+        {
+          $unwind: '$dept'
+        },
+        {
+          $match: {
+            $and: [
+              { 'dept.code': new RegExp(deptPart, 'i') },
+              { courseNumber: new RegExp(numberPart, 'i') }
+            ]
+          }
+        },
+        { $limit: 8 }
+      ]);
+    } else {
+      // Handle single term searches
+      courses = await Course.find({
+        $or: [
+          { name: searchRegex },
+          { courseNumber: searchRegex }
+        ]
+      }).populate('department', 'code').limit(8);
+    }
     
     // Get professor suggestions
     const professors = await Professor.find({
@@ -131,7 +159,7 @@ const getSearchSuggestions = async (req, res) => {
       ]
     }).populate('departments', 'code').limit(8);
     
-    // Format the suggestions
+    // Format the suggestions - UPDATED TO HANDLE AGGREGATION RESULTS
     const suggestions = [
       ...departments.map(dept => ({
         id: dept._id,
@@ -140,15 +168,13 @@ const getSearchSuggestions = async (req, res) => {
         type: 'department'
       })),
       ...courses.map(course => ({
-        id: course._id,
-        text: `${course.department.code} ${course.courseNumber}`,
+        id: course._id || course.id, // Handle both aggregate and regular query results
+        text: `${course.dept?.code || course.department?.code} ${course.courseNumber}`,
         subtext: course.name,
         type: 'course'
       })),
       ...professors.map(professor => {
-        // Format department affiliations
         const deptAffiliations = professor.departments.map(dept => dept.code).join(', ');
-        
         return {
           id: professor._id,
           text: professor.name,

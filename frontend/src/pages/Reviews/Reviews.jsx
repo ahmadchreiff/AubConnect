@@ -360,21 +360,43 @@ const submitReview = async () => {
     
     // Apply search query
     if (searchQuery.trim() !== "") {
-      filtered = filtered.filter(review => 
-        review.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        review.reviewText.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        review.username.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(review => {
+        // Check title and review text as before
+        if (review.title.toLowerCase().includes(query) || 
+            review.reviewText.toLowerCase().includes(query) ||
+            review.username.toLowerCase().includes(query)) {
+          return true;
+        }
+        
+        // Additional checks for course information
+        if (review.type === "course") {
+          // Check course name if available
+          if (review.course?.name?.toLowerCase().includes(query)) {
+            return true;
+          }
+          // Check course number if available
+          if (review.course?.courseNumber?.toLowerCase().includes(query)) {
+            return true;
+          }
+          // Check department code if available
+          if (review.department?.code?.toLowerCase().includes(query)) {
+            return true;
+          }
+        }
+        
+        return false;
+      });
     }
     
-    // Apply type filter
+    // Rest of your filtering and sorting logic remains the same
     if (filter === "courses") {
       filtered = filtered.filter(review => review.type === "course");
     } else if (filter === "professors") {
       filtered = filtered.filter(review => review.type === "professor");
     }
     
-    // Sort reviews
+    // Sorting logic remains the same
     if (sortOption === "highest") {
       filtered.sort((a, b) => b.rating - a.rating);
     } else if (sortOption === "lowest") {
@@ -385,7 +407,6 @@ const submitReview = async () => {
         ((a.upvotes?.length || 0) - (a.downvotes?.length || 0))
       );
     } else {
-      // newest (default)
       filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
     
