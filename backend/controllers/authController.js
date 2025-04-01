@@ -1,7 +1,12 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const { sendVerificationEmail } = require('../services/emailService');
 const crypto = require('crypto');
+const emailService = require('../services/emailService');
+
+const isPasswordResetRequest = (req) => {
+  return req.get('X-Request-Type') === 'password-reset' || 
+         req.originalUrl.includes('forgot-password');
+};
 
 // Generate a random 6-digit verification code
 const generateVerificationCode = () => {
@@ -13,6 +18,9 @@ const unverifiedUsers = {};
 
 // Send verification code
 const sendVerificationCode = async (req, res) => {
+  if (isPasswordResetRequest(req)) {
+    return requestPasswordReset(req, res); // Handle as password reset
+  }
   const { name, username, email, password } = req.body;
 
   try {
@@ -176,9 +184,149 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-module.exports = { 
-  sendVerificationCode, 
-  verifyCode, 
+// Reset Pass
+const passwordResetRequests = {};
+
+const sendPasswordResetCode = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // 1. Generate 6-digit code (same as verification)
+    const resetCode = crypto.randomInt(100000, 999999).toString();
+    
+    // 2. Store in temporary object (same as verification)
+    passwordResetRequests[email] = {
+      resetCode,
+      expires: Date.now() + 600000 // 10 minutes
+    };
+
+    // 3. Send email (same pattern as verification)
+    await emailService.sendPasswordResetCode(email, resetCode);
+
+    // 4. Return success (same structure as verification)
+    return res.status(200).json({ 
+      message: "Password reset code sent",
+      debugCode: process.env.NODE_ENV === 'development' ? resetCode : undefined
+    });
+
+  } catch (err) {
+    console.error("Password reset error:", err);
+    return res.status(200).json({ 
+      message: "If this email exists, a reset code has been sent"
+    });
+  }
+};
+
+const verifyResetCode = async (req, res) => {
+  const { email, code } = req.body;
+
+  console.log(`Verification attempt - Email: ${email}, Code: ${code}`); // Debug log
+
+  try {
+    // 1. Find the reset request
+    const request = passwordResetRequests[email];
+    
+    console.log('Stored request:', request); // Debug log
+
+    if (!request) {
+      console.log('No request found for email:', email);
+      return res.status(400).json({ 
+        success: false,
+        error: 'NO_REQUEST_FOUND',
+        message: 'No password reset request found. Please request a new code.'
+      });
+    }
+
+    // 2. Check expiration
+    if (request.expires < Date.now()) {
+      console.log('Expired code - Current time:', Date.now(), 'Expires:', request.expires);
+      delete passwordResetRequests[email];
+      return res.status(400).json({ 
+        success: false,
+        error: 'EXPIRED_CODE',
+        message: 'Verification code has expired. Please request a new one.'
+      });
+    }
+
+    // 3. Verify code (case-sensitive exact match)
+    const sanitizedCode = code.toString().trim();
+    console.log('Comparing codes - Input:', sanitizedCode, 'Stored:', request.resetCode);
+    
+    if (request.resetCode !== sanitizedCode) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'INVALID_CODE',
+        message: 'Invalid verification code. Please check the code and try again.'
+      });
+    }
+
+    // 4. Generate token
+    const resetToken = jwt.sign(
+      { email, purpose: 'password_reset' },
+      process.env.JWT_SECRET,
+      { expiresIn: '15m' }
+    );
+
+    console.log('Code verification successful for email:', email);
+    return res.status(200).json({
+      success: true,
+      message: 'Verification successful',
+      token: resetToken
+    });
+
+  } catch (err) {
+    console.error('Verification error:', err);
+    return res.status(500).json({
+      success: false,
+      error: 'SERVER_ERROR',
+      message: 'An error occurred during verification.'
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    // 1. Verify token (same as auth middleware)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    if (decoded.purpose !== 'password_reset') {
+      return res.status(401).json({ 
+        message: 'Invalid token', 
+        error: 'INVALID_TOKEN' 
+      });
+    }
+
+    // 2. Update password (standard mongoose update)
+    const user = await User.findOne({ email: decoded.email });
+    user.password = newPassword;
+    await user.save();
+
+    // 3. Clean up
+    delete passwordResetRequests[decoded.email];
+
+    return res.status(200).json({ 
+      message: 'Password reset successful' 
+    });
+
+  } catch (err) {
+    console.error("Reset error:", err);
+    return res.status(500).json({ 
+      message: 'Failed to reset password',
+      error: err.name === 'TokenExpiredError' ? 'TOKEN_EXPIRED' : 'SERVER_ERROR'
+    });
+  }
+};
+
+// Update exports
+module.exports = {
+  sendVerificationCode,
+  verifyCode,
   login,
-  getCurrentUser
+  getCurrentUser,
+  sendPasswordResetCode,
+  verifyResetCode,
+  resetPassword
+
 };

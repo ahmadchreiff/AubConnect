@@ -175,9 +175,12 @@ const Login = () => {
                         Remember me
                       </label>
                     </div>
-                    <a href="#" className="text-sm font-medium text-[#6D0B24] hover:text-[#990F34] transition-colors">
+                    <Link 
+                      to="/forgot-password" 
+                      className="text-sm font-medium text-[#6D0B24] hover:text-[#990F34] transition-colors"
+                    >
                       Forgot password?
-                    </a>
+                    </Link>
                   </div>
                   
                   {/* Login Button */}

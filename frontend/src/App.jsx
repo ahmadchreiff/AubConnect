@@ -15,6 +15,7 @@ import ProfessorDetail from "./pages/Professors/ProfessorDetail";
 import UserProfile from "./pages/Profile/UserProfile";
 import MyReviews from "./pages/Reviews/MyReviews";
 import SearchResults from './pages/Search/SearchResults';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
             {/* Public routes */}
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} /> 
             
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
