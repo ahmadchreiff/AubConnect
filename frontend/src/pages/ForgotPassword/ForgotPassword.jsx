@@ -83,8 +83,8 @@ const ForgotPassword = () => {
     setLoading(true);
     setError('');
     
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+    if (!isPasswordValid()) {
+      setError('Please meet all password requirements');
       setLoading(false);
       return;
     }
@@ -116,6 +116,16 @@ const ForgotPassword = () => {
     } finally {
       setLoading(false);
     }
+  };
+  const isPasswordValid = () => {
+    return (
+      newPassword.length >= 8 &&
+      /[a-z]/.test(newPassword) &&
+      /[A-Z]/.test(newPassword) &&
+      /[0-9]/.test(newPassword) &&
+      /[!@#$%^&*]/.test(newPassword) &&
+      newPassword === confirmPassword
+    );
   };
   return (
     <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center p-4">
@@ -193,41 +203,62 @@ const ForgotPassword = () => {
             </form>
           )}
 
-          {step === 3 && (
-            <form onSubmit={handleResetPassword}>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">New Password</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#6D0B24]/20 focus:border-[#6D0B24]"
-                  placeholder="Enter new password"
-                  required
-                  minLength="6"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">Confirm Password</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#6D0B24]/20 focus:border-[#6D0B24]"
-                  placeholder="Confirm new password"
-                  required
-                  minLength="6"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#6D0B24] text-white py-2 rounded hover:bg-[#990F34] disabled:opacity-70"
-              >
-                {loading ? 'Resetting...' : 'Reset Password'}
-              </button>
-            </form>
-          )}
+{step === 3 && (
+  <form onSubmit={handleResetPassword}>
+    <div className="mb-4">
+      <label className="block text-gray-700 mb-2">New Password</label>
+      <input
+        type="password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#6D0B24]/20 focus:border-[#6D0B24]"
+        placeholder="Enter new password"
+        required
+      />
+      {/* Password Requirements */}
+      <div className="mt-2 text-sm text-gray-600">
+        <p className="font-medium">Password must contain:</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li className={newPassword.length >= 8 ? 'text-green-500' : 'text-gray-500'}>
+            At least 8 characters
+          </li>
+          <li className={/[a-z]/.test(newPassword) ? 'text-green-500' : 'text-gray-500'}>
+            At least 1 lowercase letter
+          </li>
+          <li className={/[A-Z]/.test(newPassword) ? 'text-green-500' : 'text-gray-500'}>
+            At least 1 uppercase letter
+          </li>
+          <li className={/[0-9]/.test(newPassword) ? 'text-green-500' : 'text-gray-500'}>
+            At least 1 number
+          </li>
+          <li className={/[!@#$%^&*]/.test(newPassword) ? 'text-green-500' : 'text-gray-500'}>
+            At least 1 special symbol (!@#$%^&*)
+          </li>
+        </ul>
+      </div>
+    </div>
+    
+    <div className="mb-4">
+      <label className="block text-gray-700 mb-2">Confirm Password</label>
+      <input
+        type="password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#6D0B24]/20 focus:border-[#6D0B24]"
+        placeholder="Confirm new password"
+        required
+      />
+    </div>
+    
+    <button
+      type="submit"
+      disabled={loading || !isPasswordValid()}
+      className="w-full bg-[#6D0B24] text-white py-2 rounded hover:bg-[#990F34] disabled:opacity-70"
+    >
+      {loading ? 'Resetting...' : 'Reset Password'}
+    </button>
+  </form>
+)}
 
           <div className="mt-4 text-center">
             <Link to="/login" className="text-[#6D0B24] hover:underline">
