@@ -277,3 +277,56 @@ h3 {
     padding: 10px;
   }
 }
+
+
+
+/* Error Message */
+.error-message {
+  color: #ff0000;
+  padding: 40px;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+/* Rating Circle */
+.rating-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin: 10px 0;
+}
+
+/* Review Cards */
+.review-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.review-username {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Dashboard Layout */
+.statistics-dashboard {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-content {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+

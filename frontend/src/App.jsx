@@ -16,7 +16,7 @@ import UserProfile from "./pages/Profile/UserProfile";
 import MyReviews from "./pages/Reviews/MyReviews";
 import SearchResults from './pages/Search/SearchResults';
 import LandingPage from './pages/Landing/Landing';
-import StatPage from './pages/stats/statistics';
+import StatPage from './pages/stats/stat';
 import AboutUs from './pages/AboutUs/AboutUs'
 
 const App = () => {
@@ -26,13 +26,12 @@ const App = () => {
         <div className="max-w-7xl mx-auto">
           <Routes>
             {/* Public routes */}
-            <Route path="/" element ={<LandingPage/>}/>
+            <Route path="/" element={<LandingPage/>}/>
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             
             {/* Protected routes */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Homepage />} />
               <Route path="/homepage" element={<Homepage />} />          
               <Route path="/reviews" element={<ReviewList />} />          
               <Route path="/departments" element={<DepartmentsPage />} />
@@ -44,9 +43,18 @@ const App = () => {
               <Route path="/profile" element={<UserProfile />} />
               <Route path="/my-reviews" element={<MyReviews />} />
               <Route path="/search" element={<SearchResults />} />
-              <Route path="/Statistics" element={<StatPage />} />
-              <Route path="/about" element={<AboutUs />} />
               
+              {/* Updated Stat routes with type prop */}
+              <Route 
+                path="/courses/:id/stat" 
+                element={<StatPage type="course" />} 
+              />
+              <Route 
+                path="/professors/:id/stat" 
+                element={<StatPage type="professor" />} 
+              />
+              
+              <Route path="/about" element={<AboutUs />} />
             </Route>
           </Routes>
         </div>
@@ -55,4 +63,4 @@ const App = () => {
   );
 };
 
-export default App;    
+export default App;

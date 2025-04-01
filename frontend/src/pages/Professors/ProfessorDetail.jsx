@@ -395,7 +395,7 @@ const ProfessorDetail = () => {
               <div className="flex justify-end">
 
   <Link //change is done HERE!!
-    to="/Statistics"
+    to= {`/professors/${id}/stat`}
     className="text-gray-500 text-xs underline hover:text-gray-700 m-2 pr-4"
   >
     more statistics

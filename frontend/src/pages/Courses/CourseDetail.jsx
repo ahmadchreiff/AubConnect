@@ -116,7 +116,7 @@ const CourseDetail = () => {
                       {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
                     </div>
                     <Link 
-  to="/Statistics"  // change done HERE!!
+  to={`/courses/${id}/stat`}  // change done HERE!!
   className="text-gray-500 text-xs underline hover:text-gray-700 m-0 p-0"
 >
   more statistics
