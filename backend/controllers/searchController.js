@@ -101,90 +101,81 @@ const getSearchSuggestions = async (req, res) => {
       return res.json({ suggestions: [] });
     }
 
-    const cleanQuery = query.trim().toUpperCase();
-    const searchRegex = new RegExp(cleanQuery.replace(/\s+/g, '\\s*'), 'i');
-    
-    // Get department suggestions
-    const departments = await Department.find({ 
+    const searchTerm = query.trim().toUpperCase();
+    const results = { departments: [], courses: [], professors: [] };
+
+    // 1. Always search for departments
+    results.departments = await Department.find({
       $or: [
-        { name: searchRegex },
-        { code: searchRegex }
+        { code: searchTerm },
+        { name: new RegExp(searchTerm, 'i') }
       ]
-    }).limit(5);
-    
-    // Get course suggestions - UPDATED TO HANDLE DEPARTMENT+NUMBER FORMAT
-    let courses = [];
-    
-    if (cleanQuery.includes(' ')) {
-      // Handle "DEPT NUMBER" format (e.g., "ECON 101")
-      const [deptPart, numberPart] = cleanQuery.split(' ');
+    }).limit(3);
+
+    // 2. Handle course searches
+    if (searchTerm.includes(' ')) {
+      // Case 1: "DEPT 123" or "DEPT 1" format
+      const [deptPart, numberPart] = searchTerm.split(' ');
       
-      courses = await Course.aggregate([
-        {
-          $lookup: {
-            from: 'departments',
-            localField: 'department',
-            foreignField: '_id',
-            as: 'dept'
-          }
-        },
-        {
-          $unwind: '$dept'
-        },
-        {
-          $match: {
-            $and: [
-              { 'dept.code': new RegExp(deptPart, 'i') },
-              { courseNumber: new RegExp(numberPart, 'i') }
-            ]
-          }
-        },
-        { $limit: 8 }
-      ]);
+      // Find department by code (case insensitive)
+      const dept = await Department.findOne({ 
+        code: { $regex: `^${deptPart}$`, $options: 'i' } 
+      });
+      
+      if (dept) {
+        // Find courses matching department and number prefix
+        results.courses = await Course.find({
+          department: dept._id,
+          courseNumber: { $regex: `^${numberPart}` }
+        })
+        .populate('department', 'code')
+        .limit(8);
+      }
     } else {
-      // Handle single term searches
-      courses = await Course.find({
-        $or: [
-          { name: searchRegex },
-          { courseNumber: searchRegex }
-        ]
-      }).populate('department', 'code').limit(8);
+      // Case 2: Search by department code only
+      const dept = await Department.findOne({ 
+        code: { $regex: `^${searchTerm}$`, $options: 'i' } 
+      });
+      
+      if (dept) {
+        results.courses = await Course.find({ department: dept._id })
+          .populate('department', 'code')
+          .limit(8);
+      }
+      
+      // Case 3: General course search (name or number)
+      if (results.courses.length === 0) {
+        results.courses = await Course.find({
+          $or: [
+            { name: new RegExp(searchTerm, 'i') },
+            { courseNumber: new RegExp(searchTerm, 'i') }
+          ]
+        })
+        .populate('department', 'code')
+        .limit(8);
+      }
     }
-    
-    // Get professor suggestions
-    const professors = await Professor.find({
-      $or: [
-        { name: searchRegex },
-        { title: searchRegex }
-      ]
-    }).populate('departments', 'code').limit(8);
-    
-    // Format the suggestions - UPDATED TO HANDLE AGGREGATION RESULTS
+
+    // 3. Format the suggestions
     const suggestions = [
-      ...departments.map(dept => ({
-        id: dept._id,
-        text: dept.code,
-        subtext: dept.name,
+      ...results.departments.map(d => ({
+        id: d._id,
+        text: d.code,
+        subtext: d.name,
         type: 'department'
       })),
-      ...courses.map(course => ({
-        id: course._id || course.id, // Handle both aggregate and regular query results
-        text: `${course.dept?.code || course.department?.code} ${course.courseNumber}`,
-        subtext: course.name,
+      ...results.courses.map(c => ({
+        id: c._id,
+        text: `${c.department?.code || 'DEPT'} ${c.courseNumber}`,
+        subtext: c.name,
         type: 'course'
-      })),
-      ...professors.map(professor => {
-        const deptAffiliations = professor.departments.map(dept => dept.code).join(', ');
-        return {
-          id: professor._id,
-          text: professor.name,
-          subtext: `${professor.title}${deptAffiliations ? ` (${deptAffiliations})` : ''}`,
-          type: 'professor'
-        };
-      })
+      }))
     ];
+
+    // Only return non-empty results
+    const filteredSuggestions = suggestions.filter(s => s.text !== 'DEPT');
     
-    res.json({ suggestions });
+    res.json({ suggestions: filteredSuggestions });
   } catch (err) {
     console.error('Search suggestions error:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
