@@ -25,7 +25,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           {/* Logo and brand */}
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
+            <Link to="/homepage" className="flex-shrink-0 flex items-center">
               <div className="h-10 w-10 mr-2">
                 <svg viewBox="0 0 100 100" className="h-full w-full fill-current text-[#860033]">
                   <path d="M50,15 C35,15 25,25 25,40 C25,50 30,55 40,65 C45,70 50,85 50,85 C50,85 55,70 60,65 C70,55 75,50 75,40 C75,25 65,15 50,15 Z"></path>

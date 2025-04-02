@@ -1,0 +1,30 @@
+.element {
+margin-left:30px;
+margin-right:30px;
+margin-top: 10px;
+margin-bottom: 10px;;
+
+}
+
+.element h1{
+    font-size: 30px;
+    padding-bottom:20px;
+    font-weight: bold;
+}
+
+.element h2{
+    font-weight: bold;
+    font-size: 20px;
+    padding-bottom:5px;
+    color: rgb(64, 64, 64);
+}
+
+
+.element p {
+    font-size: 15px;
+    padding-bottom: 40px;
+    color: rgb(102, 102, 102);
+    text-align: justify;
+    text-justify: inter-word;
+    line-height: 1.6;
+    hyphens: auto; }

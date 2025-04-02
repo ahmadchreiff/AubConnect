@@ -22,6 +22,9 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import UserManagement from './pages/Admin/UserManagement';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import './App.css';
+import LandingPage from './pages/Landing/Landing';
+import StatPage from './pages/stats/stat';
+import AboutUs from './pages/AboutUs/AboutUs';
 
 function App() {
   return (
@@ -32,26 +35,27 @@ function App() {
           <main className="flex-grow">
             <Routes>
               {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
 
-              {/* Redirect "/homepage" to root path */}
-              <Route path="/homepage" element={<Navigate to="/" replace />} />
-
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<Home />} />
+                <Route path="/homepage" element={<Home />} />
                 <Route path="/professors" element={<ProfessorsPage />} />
                 <Route path="/professors/:id" element={<ProfessorDetail />} />
+                <Route path="/professors/:id/stat" element={<StatPage type="professor" />} />
                 <Route path="/courses" element={<CoursesPage />} />
                 <Route path="/courses/:id" element={<CourseDetail />} />
+                <Route path="/courses/:id/stat" element={<StatPage type="course" />} />
                 <Route path="/departments" element={<DepartmentsPage />} />
                 <Route path="/departments/:id" element={<DepartmentDetail />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/reviews" element={<Reviews />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/my-reviews" element={<MyReviews />} />
+                <Route path="/about" element={<AboutUs />} />
               </Route>
 
               {/* Admin Routes */}
@@ -61,7 +65,7 @@ function App() {
               </Route>
 
               {/* Catch-all route */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
           {/* <Footer /> */}

@@ -392,6 +392,15 @@ const ProfessorDetail = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
               <div className="border-b border-gray-200 p-6">
+              <div className="flex justify-end">
+
+  <Link //change is done HERE!!
+    to= {`/professors/${id}/stat`}
+    className="text-gray-500 text-xs underline hover:text-gray-700 m-2 pr-4"
+  >
+    more statistics
+  </Link>
+</div>
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-bold text-gray-900">
                     Reviews
@@ -404,7 +413,7 @@ const ProfessorDetail = () => {
                     {showReviewForm ? 'Cancel' : 'Write a Review'}
                   </button>
                 </div>
-                
+                                   
                 {/* Review Form */}
                 {showReviewForm && (
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg">
