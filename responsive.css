@@ -1,0 +1,55 @@
+/* Responsive Styles for the Application */
+
+/* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-bar {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .reviews-container {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive grid */
+    }
+
+    .review-card {
+        width: 100%; /* Full width for review cards */
+    }
+
+    .services {
+        flex-direction: column; /* Stack service cards */
+        align-items: center; /* Center align */
+    }
+
+    .service-card {
+        width: 90%; /* Full width for service cards */
+        margin-bottom: 20px; /* Space between cards */
+    }
+}
