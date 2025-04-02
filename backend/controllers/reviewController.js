@@ -1,4 +1,16 @@
 const Review = require("../models/Review");
+const User = require("../models/User"); // Assuming User model is needed
+
+// Fetch reported reviews
+exports.getReportedReviews = async (req, res) => {
+  try {
+    const reportedReviews = await Review.find({ status: "reported" }); // Assuming status field exists
+    res.json(reportedReviews);
+  } catch (err) {
+    console.error("Error fetching reported reviews:", err);
+    res.status(500).json({ message: "Failed to fetch reported reviews." });
+  }
+};
 const Course = require("../models/Course");
 const Department = require("../models/Department");
 const Professor = require("../models/Professor");
