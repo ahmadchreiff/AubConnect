@@ -24,7 +24,6 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import './App.css';
 import LandingPage from './pages/Landing/Landing';
 import StatPage from './pages/stats/stat';
-import AboutUs from './pages/AboutUs/AboutUs';
 
 function App() {
   return (
@@ -55,7 +54,6 @@ function App() {
                 <Route path="/reviews" element={<Reviews />} />
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/my-reviews" element={<MyReviews />} />
-                <Route path="/about" element={<AboutUs />} />
               </Route>
 
               {/* Admin Routes */}

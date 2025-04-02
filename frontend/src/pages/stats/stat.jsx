@@ -3,7 +3,6 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, Tooltip, Legend, CartesianGrid
 } from "recharts";
-import "./Stat-Style.css";
 import { useParams } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
@@ -44,12 +43,8 @@ const Stat = ({ type = "course" }) => {
       typeof rating === 'string' ? parseFloat(rating) : Number(rating)
     ));
     
-    // Color based on rating
-    const color = 
-      '#860033';
-    
     return (
-      <div className="rating-circle" style={{ backgroundColor: color }}>
+      <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm my-2.5" style={{ backgroundColor: '#860033' }}>
         {numericRating.toFixed(1)}
       </div>
     );
@@ -151,43 +146,42 @@ const Stat = ({ type = "course" }) => {
   const COLORS = ["rgba(0, 0, 0, 0.573)", "#860033d7"];
 
   if (loading) {
-    return <div className="loading-text">Loading reviews...</div>;
+    return <div className="text-center p-10">Loading reviews...</div>;
   }
 
   if (error) {
-    return <div className="error-message">Error: {error}</div>;
+    return <div className="text-red-600 p-10 text-center text-lg">Error: {error}</div>;
   }
 
   return (
-    <div className="statistics-dashboard">
+    <div className="text-gray-700 max-w-screen-xl font-sans bg-gray-50 overflow-x-hidden min-h-screen flex flex-col">
       <Navbar/>
-      <div className="dashboard-content">
-        <div className="dashboard-header">
-          <h1>{type === "course" ? "Course" : "Professor"} Review Statistics</h1>
-          <p className="subtitle">Comprehensive analysis of student feedback</p>
+      <div className="flex-1 p-5 max-w-screen-xl mx-auto w-full">
+        <div className="text-center mb-8">
+          <h1 className="text-[#860033] font-bold text-5xl mb-2">{type === "course" ? "Course" : "Professor"} Review Statistics</h1>
+          <p className="text-gray-600">Comprehensive analysis of student feedback</p>
         </div>
         
         {/* Rating Overview */}
-        <div className="stats-grid">
-          <div className="stat-card highlight">
-            <h3>Average Rating</h3>
-            <p className="section-description">Overall rating based on all reviews</p>
-            <div className="big-number">{data.averageRating.toFixed(1)}</div>
-            
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+          <div className="bg-white rounded-lg shadow-md p-5 text-center border-l-4 border-[#860033] transition-transform">
+            <h3 className="font-bold">Average Rating</h3>
+            <p className="text-gray-600 text-sm">Overall rating based on all reviews</p>
+            <div className="text-4xl font-bold text-gray-800 my-3">{data.averageRating.toFixed(1)}</div>
           </div>
 
-          <div className="stat-card">
-            <h3>Total Reviews</h3>
-            <p className="section-description">Number of reviews submitted</p>
-            <div className="big-number">{data.totalReviews}</div>
+          <div className="bg-white rounded-lg shadow-md p-5 text-center border-l-4 border-[#860033] transition-transform">
+            <h3 className="font-bold">Total Reviews</h3>
+            <p className="text-gray-600 text-sm">Number of reviews submitted</p>
+            <div className="text-4xl font-bold text-gray-800 my-3">{data.totalReviews}</div>
           </div>
         </div>
 
         {/* Rating Distribution */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h2>Rating Distribution</h2>
-            <p className="section-description">Breakdown of star ratings given by students</p>
+        <div className="bg-white rounded-lg shadow-md p-5 mb-8 w-full md:w-4/5 mx-auto transition-transform">
+          <div>
+            <h2 className="font-bold text-[#860033] font-serif text-xl">Rating Distribution</h2>
+            <p className="text-gray-600 text-sm mt-0">Breakdown of star ratings given by students</p>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.ratingDistribution}>
@@ -206,10 +200,10 @@ const Stat = ({ type = "course" }) => {
         </div>
 
         {/* Upvotes vs Downvotes */}
-        <div className="chart-card">
-          <div className="chart-header">
-            <h2>Review Helpfulness</h2>
-            <p className="section-description">Community votes on review usefulness</p>
+        <div className="bg-white rounded-lg shadow-md p-5 mb-8 w-full md:w-4/5 mx-auto transition-transform">
+          <div>
+            <h2 className="font-bold text-[#860033] font-serif text-xl">Review Helpfulness</h2>
+            <p className="text-gray-600 text-sm mt-0">Community votes on review usefulness</p>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -231,33 +225,33 @@ const Stat = ({ type = "course" }) => {
         </div>
 
         {/* Top Reviews Section */}
-        <div className="reviews-section">
-          <div className="section-header">
-            <h2>Community Highlights</h2>
-            <p className="section-description">{data.totalReviews} Notable reviews from students</p>
+        <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+          <div className="mb-5">
+            <h2 className="font-bold text-[#860033] font-serif text-xl">Community Highlights</h2>
+            <p className="text-gray-600 text-sm mt-0">{data.totalReviews} Notable reviews from students</p>
           </div>
           
-          <div className="reviews-row">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {data.topReviews.mostUpvoted && (
-              <div className="review-highlight">
-                <div className="review-header">
-                  <div className="review-meta">
+              <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-[#860033] transition-all">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-2.5">
                     <RatingCircle rating={data.topReviews.mostUpvoted.rating} />
-                    <span className="review-username">
+                    <span className="text-gray-600 text-sm">
                       By {data.topReviews.mostUpvoted.username}
                     </span>
                   </div>
-                  <div className="vote-count">
-                    <span className="up-icon">↑</span>
+                  <div className="flex items-center bg-gray-100 py-1 px-2.5 rounded-full font-semibold text-sm">
+                    <span className="text-green-600 text-lg mr-1">↑</span>
                     <span>{data.topReviews.mostUpvoted.upvotesCount} upvotes</span>
                   </div>
                 </div>
-                <blockquote className="review-content">
+                <blockquote className="text-gray-600 text-base leading-relaxed m-0 p-0">
                   "{data.topReviews.mostUpvoted.text}"
                 </blockquote>
-                <div className="review-footer">
-                  <span className="highlight-tag">MOST UPVOTED</span>
-                  <span className="review-date">
+                <div className="flex justify-between items-center mt-4">
+                  <span className="text-white bg-[#860033] py-1 px-2.5 rounded-full text-xs font-semibold uppercase tracking-wider">MOST UPVOTED</span>
+                  <span className="text-gray-500 text-xs">
                     {new Date(data.topReviews.mostUpvoted.date).toLocaleDateString()}
                   </span>
                 </div>
@@ -265,25 +259,25 @@ const Stat = ({ type = "course" }) => {
             )}
 
             {data.topReviews.leastUpvoted && (
-              <div className="review-highlight">
-                <div className="review-header">
-                  <div className="review-meta">
+              <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-[#860033] transition-all">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-2.5">
                     <RatingCircle rating={data.topReviews.leastUpvoted.rating} />
-                    <span className="review-username">
+                    <span className="text-gray-600 text-sm">
                       By {data.topReviews.leastUpvoted.username}
                     </span>
                   </div>
-                  <div className="vote-count">
-                    <span className="up-icon">↑</span>
+                  <div className="flex items-center bg-gray-100 py-1 px-2.5 rounded-full font-semibold text-sm">
+                    <span className="text-green-600 text-lg mr-1">↑</span>
                     <span>{data.topReviews.leastUpvoted.upvotesCount} upvotes</span>
                   </div>
                 </div>
-                <blockquote className="review-content">
+                <blockquote className="text-gray-600 text-base leading-relaxed m-0 p-0">
                   "{data.topReviews.leastUpvoted.text}"
                 </blockquote>
-                <div className="review-footer">
-                  <span className="lowlight-tag">LEAST UPVOTED</span>
-                  <span className="review-date">
+                <div className="flex justify-between items-center mt-4">
+                  <span className="text-white bg-[#860033] py-1 px-2.5 rounded-full text-xs font-semibold uppercase tracking-wider">LEAST UPVOTED</span>
+                  <span className="text-gray-500 text-xs">
                     {new Date(data.topReviews.leastUpvoted.date).toLocaleDateString()}
                   </span>
                 </div>
@@ -291,27 +285,27 @@ const Stat = ({ type = "course" }) => {
             )}
           </div>
 
-          <div className="reviews-row">
+          <div className="mt-5">
             {data.topReviews.mostRecent && (
-              <div className="review-highlight recent">
-                <div className="review-header">
-                  <div className="review-meta">
+              <div className="bg-white p-5 rounded-lg shadow-md border-l-4 border-[#860033] transition-all col-span-full">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-2.5">
                     <RatingCircle rating={data.topReviews.mostRecent.rating} />
-                    <span className="review-username">
+                    <span className="text-gray-600 text-sm">
                       By {data.topReviews.mostRecent.username}
                     </span>
                   </div>
-                  <div className="vote-count">
-                    <span className="up-icon">↑</span>
+                  <div className="flex items-center bg-gray-100 py-1 px-2.5 rounded-full font-semibold text-sm">
+                    <span className="text-green-600 text-lg mr-1">↑</span>
                     <span>{data.topReviews.mostRecent.upvotesCount} upvotes</span>
                   </div>
                 </div>
-                <blockquote className="review-content">
+                <blockquote className="text-gray-600 text-base leading-relaxed m-0 p-0">
                   "{data.topReviews.mostRecent.text}"
                 </blockquote>
-                <div className="review-footer">
-                  <span className="recent-tag">MOST RECENT</span>
-                  <span className="review-date">
+                <div className="flex justify-between items-center mt-4">
+                  <span className="text-white bg-[#860033] py-1 px-2.5 rounded-full text-xs font-semibold uppercase tracking-wider">MOST RECENT</span>
+                  <span className="text-gray-500 text-xs">
                     {new Date(data.topReviews.mostRecent.date).toLocaleDateString()}
                   </span>
                 </div>

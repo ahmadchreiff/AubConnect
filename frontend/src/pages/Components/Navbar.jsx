@@ -10,10 +10,10 @@ const Navbar = () => {
 
   // Helper function to determine if a link is active
   const isActive = (path) => {
-    if (path === '/' && location.pathname === '/') {
+    if (path === '/homepage' && (location.pathname === '/homepage' || location.pathname === '/')) {
       return true;
     }
-    if (path !== '/' && location.pathname.startsWith(path)) {
+    if (path !== '/homepage' && location.pathname.startsWith(path)) {
       return true;
     }
     return false;
@@ -38,6 +38,12 @@ const Navbar = () => {
           {/* Navigation */}
           <div className="flex items-center gap-3">
             <Link 
+              to="/homepage" 
+              className={`${isActive('/homepage') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium flex items-center`}
+            >
+              <i className='bx bx-home-alt mr-1'></i> Home
+            </Link>
+            <Link 
               to="/departments" 
               className={`${isActive('/departments') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
             >
@@ -60,12 +66,6 @@ const Navbar = () => {
               className={`${isActive('/reviews') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
             >
               Reviews
-            </Link>
-            <Link 
-              to="/about" 
-              className={`${isActive('/about') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
-            >
-              About
             </Link>
             
             {isAuthenticated() ? (

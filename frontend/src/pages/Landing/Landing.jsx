@@ -448,7 +448,7 @@ const LandingPage = () => {
         <div className="container mx-auto text-center">
           <h3 className="text-xl font-bold mb-2">AUBConnect</h3>
           <p className="text-sm mb-4">Your go-to platform for honest course and professor reviews.</p>
-          <p className="text-xs">For AUB students only. All reviews are anonymous.</p>
+          <p className="text-xs">For AUB students only.</p>
           <p className="text-center text-sm text-gray-300 mt-4">&copy; 2025 AUBConnect. All rights reserved.</p>
         </div>
       </footer>
