@@ -20,6 +20,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import UserManagement from './pages/Admin/UserManagement';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import './App.css';
 
 function App() {
@@ -33,10 +34,11 @@ function App() {
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+
               {/* Redirect "/homepage" to root path */}
               <Route path="/homepage" element={<Navigate to="/" replace />} />
-              
+
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<Home />} />
@@ -51,13 +53,13 @@ function App() {
                 <Route path="/profile" element={<UserProfile />} />
                 <Route path="/my-reviews" element={<MyReviews />} />
               </Route>
-              
+
               {/* Admin Routes */}
               <Route element={<AdminRoute />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/users" element={<UserManagement />} />
               </Route>
-              
+
               {/* Catch-all route */}
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>

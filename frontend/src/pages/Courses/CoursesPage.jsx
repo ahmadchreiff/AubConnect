@@ -50,19 +50,29 @@ const CoursesPage = () => {
 
   // Filter courses based on search query and selected filters
   const filteredCourses = courses.filter((course) => {
-    // First check if the course satisfies the search query
-    const matchesSearch = 
-      course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.courseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (course.department.code && course.department.code.toLowerCase().includes(searchQuery.toLowerCase()));
+    const searchLower = searchQuery.trim().toLowerCase();
     
-    // Then check if it satisfies the department filter
+    // 1. First check for exact department+number match (e.g., "ECON 101")
+    if (searchLower.includes(' ')) {
+      const [deptPart, numberPart] = searchLower.split(' ');
+      const matchesExact = 
+        course.department.code.toLowerCase() === deptPart && 
+        course.courseNumber.toLowerCase() === numberPart;
+      if (matchesExact) return true;
+    }
+  
+    // 2. Then check for partial matches in different fields
+    const matchesPartial =
+      course.name.toLowerCase().includes(searchLower) ||
+      course.courseNumber.toLowerCase().includes(searchLower) ||
+      course.department.code.toLowerCase().includes(searchLower) ||
+      `${course.department.code.toLowerCase()} ${course.courseNumber.toLowerCase()}`.includes(searchLower);
+  
+    // 3. Apply filters
     const matchesDepartment = selectedDepartment === "" || course.department._id === selectedDepartment;
-    
-    // Then check if it satisfies the course level filter
     const matchesLevel = selectedLevel === "" || course.courseNumber.startsWith(selectedLevel);
-    
-    return matchesSearch && matchesDepartment && matchesLevel;
+  
+    return matchesPartial && matchesDepartment && matchesLevel;
   });
 
   // Get available course levels
