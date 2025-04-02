@@ -125,6 +125,28 @@ export const AuthProvider = ({ children }) => {
     return currentUser.role === 'admin';
   };
 
+  // Add this function to your AuthContext.jsx
+const checkPageAccess = (pathname) => {
+  // If no user is logged in, they can only access public pages
+  if (!currentUser) {
+    const publicPaths = ['/', '/login', '/signup', '/forgot-password'];
+    return publicPaths.includes(pathname);
+  }
+  
+  // If user is admin, they can only access admin pages
+  if (currentUser.role === 'admin') {
+    return pathname.startsWith('/admin');
+  }
+  
+  // Regular users can't access admin pages
+  if (pathname.startsWith('/admin')) {
+    return false;
+  }
+  
+  // Regular users can access all other pages
+  return true;
+};
+
   // Value to be provided by the context
   const value = {
     currentUser,
@@ -135,7 +157,8 @@ export const AuthProvider = ({ children }) => {
     getUserInfo,
     isAuthenticated,
     isAdmin,
-    shouldRedirectAdmin
+    shouldRedirectAdmin,
+    checkPageAccess // Add this new function
   };
 
   return (
