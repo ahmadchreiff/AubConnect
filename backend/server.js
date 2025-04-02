@@ -2,8 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-
+const userRoutes = require('./routes/userRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 5001; // Ensure the port matches the frontend request
@@ -31,7 +33,12 @@ const startServer = async () => {
 
 // Routes
 app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/reviews", require("./routes/reviewRoutes")); // Add this line
+app.use("/api/reviews", require("./routes/reviewRoutes"));
+app.use("/api/departments", require("./routes/departmentRoutes")); 
+app.use("/api/courses", require("./routes/courseRoutes"));
+app.use('/api/users', userRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/professors', require('./routes/professorRoutes')); // Add professors route
 
 // Start the application
 startServer();

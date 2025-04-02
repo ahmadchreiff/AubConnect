@@ -1,15 +1,17 @@
 const nodemailer = require("nodemailer");
 
-// Create a transporter for sending emails
 const transporter = nodemailer.createTransport({
-  service: "gmail", // Use Gmail as the email service
-  host: "smtp.gmail.com", // Gmail's SMTP server
-  port: 465, // Port for secure SMTP
-  secure: true, // Use SSL
+  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail address
-    pass: process.env.EMAIL_PASSWORD, // Your App Password (not your regular Gmail password)
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
   },
+  tls: {
+    rejectUnauthorized: false
+  }
 });
 
 // Function to send a verification email
@@ -31,4 +33,18 @@ const sendVerificationEmail = async (email, verificationCode) => {
   }
 };
 
-module.exports = { sendVerificationEmail };
+const sendPasswordResetCode = async (email, resetCode) => {
+  const mailOptions = {
+    from: `AUBConnect <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Password Reset Code",
+    html: `Your reset code is: <strong>${resetCode}</strong>`
+  };
+  
+  await transporter.sendMail(mailOptions);
+};
+
+module.exports = { 
+  sendVerificationEmail, 
+  sendPasswordResetCode 
+};

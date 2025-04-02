@@ -89,7 +89,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// New routes for upvoting and downvoting
+// Upvote a review
 router.post("/:id/upvote", async (req, res) => {
   try {
     const { id } = req.params;
@@ -102,7 +102,9 @@ router.post("/:id/upvote", async (req, res) => {
 
     // Check if the user has already upvoted
     if (review.upvotes.includes(username)) {
-      return res.status(400).json({ message: "You have already upvoted this review." });
+      return res.status(400).json({ 
+        message: "You have already upvoted this review." 
+      });
     }
 
     // Remove user from downvotes if they previously downvoted
@@ -114,12 +116,19 @@ router.post("/:id/upvote", async (req, res) => {
     review.upvotes.push(username);
     await review.save();
 
-    res.status(200).json({ message: "Review upvoted successfully!", review });
+    res.status(200).json({ 
+      message: "Review upvoted successfully!", 
+      review 
+    });
   } catch (err) {
-    res.status(500).json({ message: "Failed to upvote review.", error: err.message });
+    res.status(500).json({ 
+      message: "Failed to upvote review.", 
+      error: err.message 
+    });
   }
 });
 
+// Downvote a review
 router.post("/:id/downvote", async (req, res) => {
   try {
     const { id } = req.params;
@@ -132,7 +141,9 @@ router.post("/:id/downvote", async (req, res) => {
 
     // Check if the user has already downvoted
     if (review.downvotes.includes(username)) {
-      return res.status(400).json({ message: "You have already downvoted this review." });
+      return res.status(400).json({ 
+        message: "You have already downvoted this review." 
+      });
     }
 
     // Remove user from upvotes if they previously upvoted
@@ -144,9 +155,15 @@ router.post("/:id/downvote", async (req, res) => {
     review.downvotes.push(username);
     await review.save();
 
-    res.status(200).json({ message: "Review downvoted successfully!", review });
+    res.status(200).json({ 
+      message: "Review downvoted successfully!", 
+      review 
+    });
   } catch (err) {
-    res.status(500).json({ message: "Failed to downvote review.", error: err.message });
+    res.status(500).json({ 
+      message: "Failed to downvote review.", 
+      error: err.message 
+    });
   }
 });
 
