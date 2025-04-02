@@ -45,7 +45,7 @@ const Login = () => {
           navigate('/admin/dashboard');
         } else {
           // Regular users go to homepage - handle both "/homepage" and "/" cases
-          navigate('/');
+          navigate('/homepage');
         }
       }, 1000);
       
