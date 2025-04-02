@@ -22,33 +22,34 @@ const Login = () => {
     setPasswordVisible(!passwordVisible);
   };
 
+  // Update the handleSubmit function in your login.jsx file
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate AUB email
     if (!email.endsWith('@mail.aub.edu') && !email.endsWith('@aub.edu.lb')) {
       setError("Please use a valid AUB email address (@mail.aub.edu or @aub.edu.lb)");
       return;
     }
-    
+
     setIsLoading(true);
 
     try {
       const response = await login(email, password);
       console.log("Login successful:", response);
-      
+
       // Show success animation before redirecting
       setTimeout(() => {
-        // Handle redirect based on user role and redirectUrl
+        // Handle redirect based on user role
         if (response.user.role === 'admin') {
           // Admin users go to admin dashboard
           navigate('/admin/dashboard');
         } else {
-          // Regular users go to homepage - handle both "/homepage" and "/" cases
+          // Regular users go to homepage
           navigate('/homepage');
         }
       }, 1000);
-      
+
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");
       console.error("Login error:", err);
@@ -78,7 +79,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Main Content */}
       <div className="relative overflow-hidden">
         {/* Background Image with Overlay */}
@@ -86,12 +87,11 @@ const Login = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-[#6D0B24]/90 to-[#45051A]/80 mix-blend-multiply"></div>
           <div className="absolute inset-0 bg-[url('/campus-background.jpg')] bg-cover bg-center opacity-40 animate-slow-pan"></div>
         </div>
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-[calc(100vh-4rem)] flex items-center justify-center">
-          <div 
-            className={`w-full max-w-md transition-all duration-1000 transform ${
-              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-            }`}
+          <div
+            className={`w-full max-w-md transition-all duration-1000 transform ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+              }`}
           >
             {/* Login Card */}
             <div className="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
@@ -108,7 +108,7 @@ const Login = () => {
                 <h2 className="text-white text-center text-2xl font-serif font-bold">Welcome to AUB Portal</h2>
                 <p className="text-white/80 text-center mt-1 text-sm">Sign in with your AUB credentials</p>
               </div>
-              
+
               {/* Card Body */}
               <div className="p-6">
                 {/* Error message */}
@@ -120,7 +120,7 @@ const Login = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Email Field */}
                   <div className="space-y-1">
@@ -142,7 +142,7 @@ const Login = () => {
                     </div>
                     <p className="text-xs text-gray-500 mt-1">Only AUB email addresses are accepted</p>
                   </div>
-                  
+
                   {/* Password Field */}
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-700 block">
@@ -169,37 +169,36 @@ const Login = () => {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Remember Me & Forgot Password */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
-                      <input 
-                        type="checkbox" 
-                        id="remember" 
+                      <input
+                        type="checkbox"
+                        id="remember"
                         className="h-4 w-4 text-[#6D0B24] border-gray-300 rounded focus:ring-[#6D0B24]"
                       />
                       <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
                         Remember me
                       </label>
                     </div>
-                    <Link 
-                      to="/forgot-password" 
+                    <Link
+                      to="/forgot-password"
                       className="text-sm font-medium text-[#6D0B24] hover:text-[#990F34] transition-colors"
                     >
                       Forgot password?
                     </Link>
                   </div>
-                  
+
                   {/* Login Button */}
                   <div className="pt-2">
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none transition-all duration-300 relative overflow-hidden ${
-                        isLoading
+                      className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none transition-all duration-300 relative overflow-hidden ${isLoading
                           ? "bg-[#6D0B24]/70 cursor-not-allowed"
                           : "bg-[#6D0B24] hover:bg-[#990F34]"
-                      }`}
+                        }`}
                     >
                       <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent transform -translate-x-full animate-shimmer"></span>
                       <span className="relative flex items-center">
@@ -217,7 +216,7 @@ const Login = () => {
                   </div>
                 </form>
               </div>
-              
+
               {/* Card Footer */}
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
                 <div className="flex flex-col space-y-4">
@@ -232,7 +231,7 @@ const Login = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Copyright */}
             <div className="mt-6 text-center text-gray-500 text-xs">
               <p>© {new Date().getFullYear()} American University of Beirut. All rights reserved.</p>

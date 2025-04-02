@@ -172,9 +172,133 @@ const updateUserRole = async (req, res) => {
   }
 };
 
+// Get all reviews with pagination and filtering
+const getAllReviews = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const status = req.query.status;
+    const search = req.query.search || '';
+    
+    // Create filter query
+    let filterQuery = {};
+    
+    // Add status filter if provided
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      filterQuery.status = status;
+    }
+    
+    // Add search filter if provided
+    if (search) {
+      filterQuery.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { reviewText: { $regex: search, $options: 'i' } },
+        { username: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Get reviews with pagination
+    const reviews = await Review.find(filterQuery)
+      .populate('course', 'code name')
+      .populate('professor', 'name department')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    
+    // Get total count for pagination
+    const total = await Review.countDocuments(filterQuery);
+    
+    res.status(200).json({
+      reviews,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    console.error('Error getting all reviews:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Approve a review
+const approveReview = async (req, res) => {
+  try {
+    const reviewId = req.params.reviewId;
+    
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found', error: 'REVIEW_NOT_FOUND' });
+    }
+    
+    review.status = 'approved';
+    await review.save();
+    
+    res.status(200).json({ 
+      message: 'Review approved successfully',
+      review
+    });
+  } catch (err) {
+    console.error('Error approving review:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Reject a review
+const rejectReview = async (req, res) => {
+  try {
+    const reviewId = req.params.reviewId;
+    
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found', error: 'REVIEW_NOT_FOUND' });
+    }
+    
+    review.status = 'rejected';
+    await review.save();
+    
+    res.status(200).json({ 
+      message: 'Review rejected successfully',
+      review
+    });
+  } catch (err) {
+    console.error('Error rejecting review:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// Delete a review
+const deleteReview = async (req, res) => {
+  try {
+    const reviewId = req.params.reviewId;
+    
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found', error: 'REVIEW_NOT_FOUND' });
+    }
+    
+    await Review.findByIdAndDelete(reviewId);
+    
+    res.status(200).json({ 
+      message: 'Review deleted successfully',
+      reviewId
+    });
+  } catch (err) {
+    console.error('Error deleting review:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
 module.exports = {
   getPlatformStats,
   getAllUsers,
   updateUserStatus,
-  updateUserRole
+  updateUserRole,
+  getAllReviews,  // Add these new functions
+  approveReview,
+  rejectReview,
+  deleteReview
 };

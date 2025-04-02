@@ -18,8 +18,10 @@ import MyReviews from './pages/Reviews/MyReviews';
 import Reviews from './pages/Reviews/Reviews';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import UserRoute from './components/UserRoute'; // Import the new component
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import UserManagement from './pages/Admin/UserManagement';
+import ReviewManagement from './pages/Admin/ReviewManagement';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import './App.css';
 import LandingPage from './pages/Landing/Landing';
@@ -34,14 +36,22 @@ function App() {
           <main className="flex-grow">
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route element={<UserRoute />}>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+              </Route>
 
               {/* Protected Routes */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/homepage" element={<Home />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/my-reviews" element={<MyReviews />} />
+              </Route>
+
+              {/* User Routes - Accessible to non-admin users */}
+              <Route element={<UserRoute />}>
                 <Route path="/professors" element={<ProfessorsPage />} />
                 <Route path="/professors/:id" element={<ProfessorDetail />} />
                 <Route path="/professors/:id/stat" element={<StatPage type="professor" />} />
@@ -52,14 +62,14 @@ function App() {
                 <Route path="/departments/:id" element={<DepartmentDetail />} />
                 <Route path="/search" element={<SearchResults />} />
                 <Route path="/reviews" element={<Reviews />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/my-reviews" element={<MyReviews />} />
               </Route>
 
               {/* Admin Routes */}
               <Route element={<AdminRoute />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/users" element={<UserManagement />} />
+                <Route path="/admin/reviews" element={<ReviewManagement />} />
+
               </Route>
 
               {/* Catch-all route */}

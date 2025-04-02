@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = () => {
+const UserRoute = () => {
   const { isAuthenticated, isAdmin, loading } = useAuth();
   const location = useLocation();
   
@@ -15,20 +15,13 @@ const ProtectedRoute = () => {
     );
   }
   
-  // Redirect to login if not authenticated
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+  // If admin user, redirect to admin dashboard
+  if (isAuthenticated() && isAdmin()) {
+    return <Navigate to="/admin/dashboard" replace />;
   }
   
-  // Redirect admins to admin dashboard
-  if (isAdmin()) {
-    // Check if not already in admin area
-    if (!location.pathname.startsWith('/admin')) {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
-  }
-  
+  // Allow access to non-admin users (whether authenticated or not)
   return <Outlet />;
 };
 
-export default ProtectedRoute;
+export default UserRoute;

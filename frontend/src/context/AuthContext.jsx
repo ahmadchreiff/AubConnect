@@ -119,6 +119,12 @@ export const AuthProvider = ({ children }) => {
     return currentUser.role === 'admin';
   };
 
+  // Check if admin should be redirected to admin dashboard
+  const shouldRedirectAdmin = () => {
+    if (!currentUser) return false;
+    return currentUser.role === 'admin';
+  };
+
   // Value to be provided by the context
   const value = {
     currentUser,
@@ -128,7 +134,8 @@ export const AuthProvider = ({ children }) => {
     logout,
     getUserInfo,
     isAuthenticated,
-    isAdmin
+    isAdmin,
+    shouldRedirectAdmin
   };
 
   return (

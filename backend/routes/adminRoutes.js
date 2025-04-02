@@ -6,7 +6,11 @@ const {
   getPlatformStats,
   getAllUsers,
   updateUserStatus,
-  updateUserRole
+  updateUserRole,
+  getAllReviews,  // Add these new functions
+  approveReview,
+  rejectReview,
+  deleteReview
 } = require('../controllers/adminController');
 
 // All routes in this file require authentication and admin privileges
@@ -24,5 +28,17 @@ router.put('/users/status', updateUserStatus);
 
 // Update user role
 router.put('/users/role', updateUserRole);
+
+// Get all reviews with pagination, filtering, and search
+router.get('/reviews', getAllReviews);
+
+// Approve a review
+router.patch('/reviews/:reviewId/approve', approveReview);
+
+// Reject a review
+router.patch('/reviews/:reviewId/reject', rejectReview);
+
+// Delete a review
+router.delete('/reviews/:reviewId', deleteReview);
 
 module.exports = router;
