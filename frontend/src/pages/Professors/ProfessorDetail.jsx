@@ -523,7 +523,7 @@ const ProfessorDetail = () => {
                               </div>
                             </div>
                             <div>
-                              <p className="text-sm text-gray-600">{review.username}</p>
+                              <p className="text-sm text-gray-600">{review.displayName}</p>
                               <p className="text-xs text-gray-500">{formatDate(review.createdAt)}</p>
                             </div>
                           </div>
