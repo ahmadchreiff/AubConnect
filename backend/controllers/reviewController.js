@@ -33,6 +33,7 @@ const postReview = async (req, res) => {
       rating, 
       reviewText, 
       username, 
+      anonymous, // Changed to accept the anonymous flag instead of anonymous username
       department: departmentId, 
       course: courseId,
       professor: professorId
@@ -46,13 +47,14 @@ const postReview = async (req, res) => {
       });
     }
 
-
     // Create the review object with common fields
     const reviewData = {
       type,
       rating,
       reviewText,
-      username
+      username,
+      isAnonymous: anonymous || false,
+      displayName: anonymous ? "Anonymous" : username // Set display name based on anonymity flag
     };
 
     // Handle course reviews
@@ -241,6 +243,7 @@ const updateReview = async (req, res) => {
       rating, 
       reviewText, 
       username,
+      anonymous, // Changed to accept the anonymous flag instead of anonymous username
       department: departmentId, 
       course: courseId,
       professor: professorId
@@ -252,7 +255,7 @@ const updateReview = async (req, res) => {
       return res.status(404).json({ message: "Review not found." });
     }
 
-    // Verify ownership
+    // Verify ownership using actual username, not display name
     if (review.username !== username) {
       return res.status(403).json({ 
         message: "You are not authorized to edit this review." 
@@ -263,7 +266,9 @@ const updateReview = async (req, res) => {
     const updateData = {
       type,
       rating,
-      reviewText
+      reviewText,
+      isAnonymous: anonymous || false,
+      displayName: anonymous ? "Anonymous" : username // Update display name based on anonymity flag
     };
 
     // Handle course review updates
@@ -373,6 +378,7 @@ const getReviewsByUser = async (req, res) => {
     // Get username from authenticated user
     const username = req.user.username;
     
+    // Now search by actual username field, not by displayed name
     const reviews = await Review.find({ username })
       .populate('department', 'name code')
       .populate('course', 'name courseNumber')
@@ -401,6 +407,7 @@ const deleteReview = async (req, res) => {
       return res.status(404).json({ message: "Review not found." });
     }
 
+    // Verify using actual username field, not displayed name
     if (review.username !== username) {
       return res.status(403).json({ 
         message: "You are not authorized to delete this review." 

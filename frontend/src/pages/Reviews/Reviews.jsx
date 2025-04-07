@@ -24,7 +24,7 @@ const ReviewsPage = () => {
     title: "",
     department: "",
     course: "",
-    professor: "", 
+    professor: "",
     rating: 0,
     reviewText: "",
     anonymous: false,
@@ -37,47 +37,47 @@ const ReviewsPage = () => {
   const navigate = useNavigate();
 
   // Fetch reviews, departments, courses, and professors on mount
-useEffect(() => {
-  const fetchInitialData = async () => {
-    try {
-      setIsLoading(true);
-      
-      // Fetch reviews
-      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
-      
-      // Client-side safety filter to remove rejected reviews
-      const filteredReviews = reviewsRes.data.filter(review => 
-        review.status !== 'rejected'
-      );
-      setReviews(filteredReviews);
-      
-      // Fetch departments
-      const departmentsRes = await axios.get("http://localhost:5001/api/departments");
-      setDepartments(departmentsRes.data);
-      
-      // Fetch all courses
-      const coursesRes = await axios.get("http://localhost:5001/api/courses");
-      setCourses(coursesRes.data);
-      
-      // Fetch all professors
-      const professorsRes = await axios.get("http://localhost:5001/api/professors");
-      setProfessors(professorsRes.data);
-    } catch (err) {
-      setError("Failed to fetch initial data.");
-      console.error("Error fetching initial data:", err);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Fetch reviews
+        const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+
+        // Client-side safety filter to remove rejected reviews
+        const filteredReviews = reviewsRes.data.filter(review =>
+          review.status !== 'rejected'
+        );
+        setReviews(filteredReviews);
+
+        // Fetch departments
+        const departmentsRes = await axios.get("http://localhost:5001/api/departments");
+        setDepartments(departmentsRes.data);
+
+        // Fetch all courses
+        const coursesRes = await axios.get("http://localhost:5001/api/courses");
+        setCourses(coursesRes.data);
+
+        // Fetch all professors
+        const professorsRes = await axios.get("http://localhost:5001/api/professors");
+        setProfessors(professorsRes.data);
+      } catch (err) {
+        setError("Failed to fetch initial data.");
+        console.error("Error fetching initial data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInitialData();
+
+    // Set the logged-in username
+    const username = getUsernameFromToken();
+    if (username) {
+      setLoggedInUsername(username);
     }
-  };
-
-  fetchInitialData();
-
-  // Set the logged-in username
-  const username = getUsernameFromToken();
-  if (username) {
-    setLoggedInUsername(username);
-  }
-}, []);
+  }, []);
 
   // Filter courses when department selection changes
   useEffect(() => {
@@ -87,7 +87,7 @@ useEffect(() => {
           // Check if department is an object with _id property
           if (typeof course.department === 'object' && course.department !== null) {
             return course.department._id === newReview.department;
-          } 
+          }
           // Check if department is a string ID directly
           else {
             return course.department === newReview.department;
@@ -95,7 +95,7 @@ useEffect(() => {
         }
       );
       setFilteredCourses(filtered);
-      
+
       // Reset course selection if the previously selected course isn't in this department
       if (newReview.course && !filtered.find(c => c._id === newReview.course)) {
         setNewReview(prev => ({ ...prev, course: "" }));
@@ -144,7 +144,7 @@ useEffect(() => {
           review._id === id ? response.data.review : review
         )
       );
-      
+
       setSuccess("Review upvoted!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
@@ -175,7 +175,7 @@ useEffect(() => {
           review._id === id ? response.data.review : review
         )
       );
-      
+
       setSuccess("Review downvoted!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
@@ -199,104 +199,108 @@ useEffect(() => {
   };
 
   // Submit or update a review
-const submitReview = async () => {
-  const username = getUsernameFromToken();
-  if (!username) {
-    setError("You must be logged in to post a review.");
-    return;
-  }
+  // This is only the modified section of the submitReview function from Reviews.jsx
+  // Replace this section in the component
 
-  // Validate form based on review type
-  if (newReview.type === "course") {
-    if (!newReview.department) {
-      setError("Please select a department.");
+  const submitReview = async () => {
+    const username = getUsernameFromToken();
+    if (!username) {
+      setError("You must be logged in to post a review.");
       return;
     }
 
-    if (!newReview.course) {
-      setError("Please select a course.");
-      return;
-    }
-  } else {
-    // Professor review validation
-    if (!newReview.professor) {
-      setError("Please select a professor.");
-      return;
-    }
-  }
+    // Validate form based on review type
+    if (newReview.type === "course") {
+      if (!newReview.department) {
+        setError("Please select a department.");
+        return;
+      }
 
-  if (newReview.rating === 0) {
-    setError("Please select a rating.");
-    return;
-  }
-
-  if (!newReview.reviewText.trim()) {
-    setError("Please write your review.");
-    return;
-  }
-
-  try {
-    const reviewData = {
-      ...newReview,
-      username: newReview.anonymous ? "Anonymous" : username,
-    };
-
-    let response;
-    
-    if (editReviewId) {
-      // Update the review
-      response = await axios.put(
-        `http://localhost:5001/api/reviews/${editReviewId}`, 
-        reviewData,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      if (!newReview.course) {
+        setError("Please select a course.");
+        return;
+      }
     } else {
-      // Submit a new review
-      response = await axios.post(
-        "http://localhost:5001/api/reviews", 
-        reviewData,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
+      // Professor review validation
+      if (!newReview.professor) {
+        setError("Please select a professor.");
+        return;
+      }
+    }
+
+    if (newReview.rating === 0) {
+      setError("Please select a rating.");
+      return;
+    }
+
+    if (!newReview.reviewText.trim()) {
+      setError("Please write your review.");
+      return;
+    }
+
+    try {
+      const reviewData = {
+        ...newReview,
+        username, // Always use actual username for ownership
+        anonymous: newReview.anonymous // Pass anonymous flag instead of changing username
+      };
+
+      let response;
+
+      if (editReviewId) {
+        // Update the review
+        response = await axios.put(
+          `http://localhost:5001/api/reviews/${editReviewId}`,
+          reviewData,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
+      } else {
+        // Submit a new review
+        response = await axios.post(
+          "http://localhost:5001/api/reviews",
+          reviewData,
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
+      }
+
+      // Fetch updated reviews
+      const reviewsResponse = await axios.get("http://localhost:5001/api/reviews");
+
+      // Filter out rejected reviews
+      const filteredReviews = reviewsResponse.data.filter(review =>
+        review.status !== 'rejected'
       );
+      setReviews(filteredReviews);
+
+      // Reset the form and close the modal
+      setNewReview({
+        type: "course",
+        title: "",
+        department: "",
+        course: "",
+        professor: "",
+        rating: 0,
+        reviewText: "",
+        anonymous: false,
+      });
+      setEditReviewId(null);
+      setIsModalOpen(false);
+
+      setSuccess(editReviewId ? "Review updated successfully!" : "Review posted successfully!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      if (err.response?.data?.error === "INAPPROPRIATE_CONTENT") {
+        setError("Review contains inappropriate content, unable to post");
+      } else {
+        setError(err.response?.data?.message || "Failed to submit review.");
+      }
+      console.error("Error submitting review:", err);
     }
-
-    // Fetch updated reviews
-    const reviewsResponse = await axios.get("http://localhost:5001/api/reviews");
-    
-    // Filter out rejected reviews
-    const filteredReviews = reviewsResponse.data.filter(review => 
-      review.status !== 'rejected'
-    );
-    setReviews(filteredReviews);
-
-    // Reset the form and close the modal
-    setNewReview({
-      type: "course",
-      title: "",
-      department: "",
-      course: "",
-      professor: "", 
-      rating: 0,
-      reviewText: "",
-      anonymous: false,
-    });
-    setEditReviewId(null);
-    setIsModalOpen(false);
-
-    setSuccess(editReviewId ? "Review updated successfully!" : "Review posted successfully!");
-    setTimeout(() => setSuccess(""), 3000);
-  } catch (err) {
-    if (err.response?.data?.error === "INAPPROPRIATE_CONTENT") {
-      setError("Review contains inappropriate content, unable to post");
-    } else {
-      setError(err.response?.data?.message || "Failed to submit review.");
-    }
-    console.error("Error submitting review:", err);
-  }
-};
+  };
 
   // Handle editing a review
   const handleEditReview = (id) => {
@@ -310,7 +314,7 @@ const submitReview = async () => {
         professor: reviewToEdit.professor?._id || "", 
         rating: reviewToEdit.rating,
         reviewText: reviewToEdit.reviewText,
-        anonymous: reviewToEdit.username === "Anonymous",
+        anonymous: reviewToEdit.isAnonymous || false // Updated to use isAnonymous flag
       });
       setEditReviewId(id);
       setIsModalOpen(true);
@@ -346,17 +350,17 @@ const submitReview = async () => {
   // Calculate statistics for more meaningful metrics
   const calculateStats = () => {
     if (reviews.length === 0) return { courseCount: 0, professorCount: 0, highestRated: { title: 'N/A', rating: 0 } };
-    
+
     const courseReviews = reviews.filter(review => review.type === 'course');
     const professorReviews = reviews.filter(review => review.type === 'professor');
-    
+
     // Find highest rated item
     const highestRated = [...reviews].sort((a, b) => b.rating - a.rating)[0] || { title: 'N/A', rating: 0 };
-    
+
     // Get unique courses/professors (only count unique titles)
     const uniqueCourses = new Set(courseReviews.map(review => review.title));
     const uniqueProfessors = new Set(professorReviews.map(review => review.title));
-    
+
     return {
       courseCount: uniqueCourses.size,
       professorCount: uniqueProfessors.size,
@@ -367,18 +371,18 @@ const submitReview = async () => {
   // Filter and search reviews
   const filteredReviews = () => {
     let filtered = [...reviews];
-    
+
     // Apply search query
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(review => {
         // Check title and review text as before
-        if (review.title.toLowerCase().includes(query) || 
-            review.reviewText.toLowerCase().includes(query) ||
-            review.username.toLowerCase().includes(query)) {
+        if (review.title.toLowerCase().includes(query) ||
+          review.reviewText.toLowerCase().includes(query) ||
+          review.username.toLowerCase().includes(query)) {
           return true;
         }
-        
+
         // Additional checks for course information
         if (review.type === "course") {
           // Check course name if available
@@ -394,32 +398,32 @@ const submitReview = async () => {
             return true;
           }
         }
-        
+
         return false;
       });
     }
-    
+
     // Rest of your filtering and sorting logic remains the same
     if (filter === "courses") {
       filtered = filtered.filter(review => review.type === "course");
     } else if (filter === "professors") {
       filtered = filtered.filter(review => review.type === "professor");
     }
-    
+
     // Sorting logic remains the same
     if (sortOption === "highest") {
       filtered.sort((a, b) => b.rating - a.rating);
     } else if (sortOption === "lowest") {
       filtered.sort((a, b) => a.rating - b.rating);
     } else if (sortOption === "mostHelpful") {
-      filtered.sort((a, b) => 
-        ((b.upvotes?.length || 0) - (b.downvotes?.length || 0)) - 
+      filtered.sort((a, b) =>
+        ((b.upvotes?.length || 0) - (b.downvotes?.length || 0)) -
         ((a.upvotes?.length || 0) - (a.downvotes?.length || 0))
       );
     } else {
       filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
-    
+
     return filtered;
   };
 
@@ -432,10 +436,10 @@ const submitReview = async () => {
   // Format date for display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
 
@@ -453,7 +457,7 @@ const submitReview = async () => {
               <p className="text-lg opacity-90">
                 See what students are saying about courses and professors at AUB
               </p>
-              
+
               <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
                 <div className="flex items-center">
                   <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
@@ -464,7 +468,7 @@ const submitReview = async () => {
                     <p className="text-sm text-white/80">Courses</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center">
                   <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
                     <i className="bx bx-user text-lg"></i>
@@ -474,7 +478,7 @@ const submitReview = async () => {
                     <p className="text-sm text-white/80">Professors</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center">
                   <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
                     <i className="bx bx-message-square-detail text-lg"></i>
@@ -486,7 +490,7 @@ const submitReview = async () => {
                 </div>
               </div>
             </div>
-            
+
             <div>
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -529,7 +533,7 @@ const submitReview = async () => {
       <div className="fixed top-5 right-5 z-50">
         <AnimatePresence>
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -537,7 +541,7 @@ const submitReview = async () => {
             >
               <i className="bx bx-error-circle mr-2 text-xl"></i>
               {error}
-              <button 
+              <button
                 onClick={() => setError("")}
                 className="ml-3 text-white/80 hover:text-white"
               >
@@ -546,7 +550,7 @@ const submitReview = async () => {
             </motion.div>
           )}
           {success && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -554,7 +558,7 @@ const submitReview = async () => {
             >
               <i className="bx bx-check-circle mr-2 text-xl"></i>
               {success}
-              <button 
+              <button
                 onClick={() => setSuccess("")}
                 className="ml-3 text-white/80 hover:text-white"
               >
@@ -570,19 +574,19 @@ const submitReview = async () => {
         {/* Filters and Sorting */}
         <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white rounded-lg shadow-sm p-4 mb-6">
           <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
-            <button 
+            <button
               className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'all' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => setFilter('all')}
             >
               All Reviews
             </button>
-            <button 
+            <button
               className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'courses' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => setFilter('courses')}
             >
               Courses
             </button>
-            <button 
+            <button
               className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'professors' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => setFilter('professors')}
             >
@@ -591,8 +595,8 @@ const submitReview = async () => {
           </div>
           <div className="flex items-center">
             <label className="mr-2 text-gray-600 whitespace-nowrap">Sort by:</label>
-            <select 
-              value={sortOption} 
+            <select
+              value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
             >
@@ -616,11 +620,11 @@ const submitReview = async () => {
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews found</h3>
             <p className="text-gray-500 mb-4">
-              {searchQuery ? "Try adjusting your search or filter criteria." : 
+              {searchQuery ? "Try adjusting your search or filter criteria." :
                 "Be the first to share your experience!"}
             </p>
             {searchQuery && (
-              <button 
+              <button
                 onClick={() => setSearchQuery("")}
                 className="text-[#860033] font-medium hover:underline"
               >
@@ -631,6 +635,9 @@ const submitReview = async () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             <AnimatePresence>
+            // This is the modification for the review cards in the Reviews.jsx component
+              // Look for this section in the returned reviews map function and update it
+
               {filteredReviews().map((review, index) => (
                 <motion.div
                   key={review._id}
@@ -644,11 +651,10 @@ const submitReview = async () => {
                     <div className="flex justify-between items-start mb-3">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                            review.type === "course" 
-                              ? "bg-pink-100 text-[#860033]" 
+                          <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${review.type === "course"
+                              ? "bg-pink-100 text-[#860033]"
                               : "bg-amber-100 text-amber-800"
-                          }`}>
+                            }`}>
                             {review.type === "course" ? "Course" : "Professor"}
                           </span>
                           <span className="text-xs text-gray-500">
@@ -662,61 +668,60 @@ const submitReview = async () => {
                           </p>
                         )}
                         <p className="text-sm text-gray-500">
-                          by {review.username}
+                          by {review.displayName || review.username}
                         </p>
                       </div>
                       <div className={`${getRatingColor(review.rating)} text-xl font-bold rounded-lg h-12 w-12 flex items-center justify-center`}>
                         {review.rating.toFixed(1)}
                       </div>
                     </div>
-                    
+
                     <div className="flex mb-4">
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <i 
+                        <i
                           key={star}
                           className={`bx ${star <= review.rating ? 'bxs-star text-[#ffd700]' : 'bx-star text-gray-300'} text-xl`}
                         ></i>
                       ))}
                     </div>
-                    
+
                     <p className="text-gray-700 mb-5 line-clamp-4">{review.reviewText}</p>
-                    
+
                     <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
                       <div className="flex space-x-3">
-                        <button 
-                          onClick={() => handleUpvote(review._id)} 
-                          className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
-                            review.upvotes?.includes(loggedInUsername)
+                        <button
+                          onClick={() => handleUpvote(review._id)}
+                          className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.upvotes?.includes(loggedInUsername)
                               ? "bg-[#860033]/10 text-[#860033]"
                               : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
-                          }`}
+                            }`}
                         >
                           <i className={`bx ${review.upvotes?.includes(loggedInUsername) ? 'bxs-like' : 'bx-like'}`}></i>
                           <span>{review.upvotes?.length || 0}</span>
                         </button>
-                        <button 
-                          onClick={() => handleDownvote(review._id)} 
-                          className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${
-                            review.downvotes?.includes(loggedInUsername)
+                        <button
+                          onClick={() => handleDownvote(review._id)}
+                          className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.downvotes?.includes(loggedInUsername)
                               ? "bg-red-100 text-red-600"
                               : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
-                          }`}
+                            }`}
                         >
                           <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'}`}></i>
                           <span>{review.downvotes?.length || 0}</span>
                         </button>
                       </div>
-                      
+
+                      {/* Updated to check username against actual username, not display name */}
                       {review.username === loggedInUsername && (
                         <div className="flex space-x-2">
-                          <button 
-                            onClick={() => handleEditReview(review._id)} 
+                          <button
+                            onClick={() => handleEditReview(review._id)}
                             className="text-sm text-[#860033] hover:text-[#6a0026] transition-colors flex items-center"
                           >
                             <i className="bx bx-edit mr-1"></i> Edit
                           </button>
-                          <button 
-                            onClick={() => handleDeleteReview(review._id)} 
+                          <button
+                            onClick={() => handleDeleteReview(review._id)}
                             className="text-sm text-red-600 hover:text-red-800 transition-colors flex items-center"
                           >
                             <i className="bx bx-trash mr-1"></i> Delete
@@ -753,23 +758,23 @@ const submitReview = async () => {
                 <h2 className="text-xl font-bold">
                   {editReviewId ? "Edit Your Review" : "Share Your Experience"}
                 </h2>
-                <button 
+                <button
                   onClick={() => setIsModalOpen(false)}
                   className="text-white/80 hover:text-white transition-colors"
                 >
                   <i className="bx bx-x text-2xl"></i>
                 </button>
               </div>
-              
+
               <div className="p-6">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Review Type
                     </label>
-                    <select 
-                      name="type" 
-                      value={newReview.type} 
+                    <select
+                      name="type"
+                      value={newReview.type}
                       onChange={handleInputChange}
                       className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
                     >
@@ -777,16 +782,16 @@ const submitReview = async () => {
                       <option value="professor">Professor</option>
                     </select>
                   </div>
-                  
+
                   {newReview.type === "course" ? (
                     <>
                       {/* Department Selection */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Department</label>
-                        <select 
-                          name="department" 
-                          value={newReview.department} 
+                        <select
+                          name="department"
+                          value={newReview.department}
                           onChange={handleInputChange}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
                         >
@@ -798,15 +803,15 @@ const submitReview = async () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       {/* Course Selection */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Course
                         </label>
-                        <select 
-                          name="course" 
-                          value={newReview.course} 
+                        <select
+                          name="course"
+                          value={newReview.course}
                           onChange={handleInputChange}
                           disabled={!newReview.department}
                           className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] disabled:bg-gray-100 disabled:text-gray-500"
@@ -827,14 +832,14 @@ const submitReview = async () => {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Professor
                       </label>
-                      <SearchableProfessorDropdown 
+                      <SearchableProfessorDropdown
                         professors={professors}
                         selectedProfessor={newReview.professor}
                         onChange={handleInputChange}
                       />
                     </div>
                   )}
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Rating
@@ -857,7 +862,7 @@ const submitReview = async () => {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Your Review
@@ -874,7 +879,7 @@ const submitReview = async () => {
                       Be constructive and respectful in your review to help others make informed decisions.
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -889,9 +894,9 @@ const submitReview = async () => {
                     </label>
                   </div>
                 </div>
-                
+
                 <div className="mt-6 flex justify-end space-x-3">
-                  <button 
+                  <button
                     onClick={() => setIsModalOpen(false)}
                     className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] transition-all duration-200"
                   >

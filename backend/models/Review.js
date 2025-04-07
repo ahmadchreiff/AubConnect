@@ -38,9 +38,20 @@ const reviewSchema = new mongoose.Schema({
     type: String, 
     required: true 
   },
+  // Username is the actual user who wrote the review (for ownership)
   username: { 
     type: String, 
     required: true 
+  },
+  // New field to track if review should be displayed anonymously
+  isAnonymous: {
+    type: Boolean,
+    default: false
+  },
+  // Display name is either the username or "Anonymous" depending on isAnonymous flag
+  displayName: {
+    type: String,
+    required: true
   },
   upvotes: { 
     type: [String], 

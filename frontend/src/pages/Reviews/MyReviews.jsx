@@ -51,6 +51,18 @@ const MyReviews = () => {
     return null;
   };
 
+  // Function to render a badge for anonymous reviews
+  const renderAnonymousBadge = (review) => {
+    if (review.isAnonymous) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 ml-2">
+          Anonymous
+        </span>
+      );
+    }
+    return null;
+  };
+
   // Filter reviews based on selected type
   const filteredReviews = () => {
     if (filter === 'all') return reviews;
@@ -247,6 +259,7 @@ const MyReviews = () => {
                         </Link>
                       )}
                       {renderStatusBadge(review)}
+                      {renderAnonymousBadge(review)}
                     </div>
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
