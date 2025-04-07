@@ -1,13 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const AdminDashboard = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth(); // Make sure you're getting the logout function
+  const navigate = useNavigate(); // Add this for navigation after logout
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Add this function to handle sign out
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (err) {
+      console.error('Error signing out:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -47,9 +58,34 @@ const AdminDashboard = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#6D0B24] mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">
-          Welcome back, {currentUser.name}. Here's an overview of your platform.
-        </p>
+        <div className="flex justify-between items-center">
+          <p className="text-gray-600">
+            Welcome back, {currentUser.name}. Here's an overview of your platform.
+          </p>
+          <button
+            onClick={handleSignOut}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded transition flex items-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-1"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V8.5a1 1 0 00-1-1h-2a1 1 0 100 2h1v5.5H4V5h5.5v1a1 1 0 102 0V4a1 1 0 00-1-1H3z"
+                clipRule="evenodd"
+              />
+              <path
+                d="M14.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L15.586 6H8a1 1 0 110-2h7.586l-1.293-1.293a1 1 0 010-1.414z"
+                fillRule="evenodd"
+                clipRule="evenodd"
+              />
+            </svg>
+            Sign Out
+          </button>
+        </div>
       </div>
 
       {/* Stats Overview Cards */}
