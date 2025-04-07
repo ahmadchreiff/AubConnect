@@ -242,9 +242,11 @@ const deleteProfessor = async (req, res) => {
  */
 const updateProfessorRating = async (professorId) => {
   try {
+    // Only include approved reviews in rating calculation
     const reviews = await Review.find({ 
       professor: professorId, 
-      type: "professor" 
+      type: "professor",
+      status: "approved" // Only consider approved reviews
     });
     
     if (reviews.length > 0) {
@@ -255,11 +257,16 @@ const updateProfessorRating = async (professorId) => {
         professorId,
         { avgRating: parseFloat(avgRating.toFixed(1)) }
       );
+      
+      console.log(`Updated professor ${professorId} rating to ${avgRating.toFixed(1)} based on ${reviews.length} reviews`);
     } else {
+      // If no approved reviews exist, set rating to 0
       await Professor.findByIdAndUpdate(
         professorId,
         { avgRating: 0 }
       );
+      
+      console.log(`Reset professor ${professorId} rating to 0 (no approved reviews)`);
     }
   } catch (err) {
     console.error("Failed to update professor rating:", err);

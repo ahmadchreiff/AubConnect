@@ -8,7 +8,7 @@ import Footer from '../Components/Footer';
 const ProfessorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated } = useAuth();
   
   const [professor, setProfessor] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -78,7 +78,7 @@ const ProfessorDetail = () => {
       
       const reviewData = {
         ...reviewForm,
-        username: user.username
+        username: currentUser.username
       };
       
       const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews`, reviewData, {
@@ -128,7 +128,7 @@ const ProfessorDetail = () => {
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}/upvote`,
-        { username: user.username },
+        { username: currentUser.username },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       
@@ -150,7 +150,7 @@ const ProfessorDetail = () => {
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}/downvote`,
-        { username: user.username },
+        { username: currentUser.username },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       
@@ -176,7 +176,7 @@ const ProfessorDetail = () => {
       await axios.delete(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}`,
         { 
-          data: { username: user.username },
+          data: { username: currentUser.username },
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
         }
       );
@@ -531,7 +531,7 @@ const ProfessorDetail = () => {
                         </div>
                         
                         {/* User actions */}
-                        {isAuthenticated() && user.username === review.username && (
+                        {isAuthenticated() && currentUser.username === review.username && (
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleDeleteReview(review._id)}
@@ -550,7 +550,7 @@ const ProfessorDetail = () => {
                         <button
                           onClick={() => handleUpvote(review._id)}
                           className={`flex items-center space-x-1 text-sm ${
-                            isAuthenticated() && review.upvotes?.includes(user.username)
+                            isAuthenticated() && review.upvotes?.includes(currentUser.username)
                               ? 'text-[#860033] font-medium'
                               : 'text-gray-500 hover:text-[#860033]'
                           }`}
@@ -569,7 +569,7 @@ const ProfessorDetail = () => {
                         <button
                           onClick={() => handleDownvote(review._id)}
                           className={`flex items-center space-x-1 text-sm ${
-                            isAuthenticated() && review.downvotes?.includes(user.username)
+                            isAuthenticated() && review.downvotes?.includes(currentUser.username)
                               ? 'text-red-600 font-medium'
                               : 'text-gray-500 hover:text-red-600'
                           }`}
