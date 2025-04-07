@@ -8,7 +8,7 @@ const MyReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [filter, setFilter] = useState('all'); // 'all', 'courses', or 'professors'
+  const [filter, setFilter] = useState('all'); // 'all', 'courses', 'professors', or 'rejected'
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -39,21 +39,38 @@ const MyReviews = () => {
     }
   }, [isAuthenticated]);
 
+  // Function to render a badge for rejected reviews
+  const renderStatusBadge = (review) => {
+    if (review.status === 'rejected') {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 ml-2">
+          Rejected
+        </span>
+      );
+    }
+    return null;
+  };
+
   // Filter reviews based on selected type
   const filteredReviews = () => {
     if (filter === 'all') return reviews;
-    return reviews.filter(review => review.type === filter);
+    if (filter === 'courses') return reviews.filter(review => review.type === 'course');
+    if (filter === 'professors') return reviews.filter(review => review.type === 'professor');
+    if (filter === 'rejected') return reviews.filter(review => review.status === 'rejected');
+    return reviews;
   };
 
   // Get counts for filter tabs
   const getCounts = () => {
     const courseCount = reviews.filter(review => review.type === 'course').length;
     const professorCount = reviews.filter(review => review.type === 'professor').length;
+    const rejectedCount = reviews.filter(review => review.status === 'rejected').length;
     
     return {
       all: reviews.length,
       courses: courseCount,
-      professors: professorCount
+      professors: professorCount,
+      rejected: rejectedCount
     };
   };
 
@@ -102,31 +119,41 @@ const MyReviews = () => {
 
           {/* Filter tabs */}
           {reviews.length > 0 && (
-            <div className="flex border-b border-gray-200 p-4">
+            <div className="flex border-b border-gray-200 p-4 flex-wrap">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-4 py-2 mr-2 rounded-lg ${filter === 'all' 
+                className={`px-4 py-2 mr-2 mb-2 rounded-lg ${filter === 'all' 
                   ? 'bg-[#6D0B24] text-white' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 All Reviews ({counts.all})
               </button>
               <button
-                onClick={() => setFilter('course')}
-                className={`px-4 py-2 mr-2 rounded-lg ${filter === 'course' 
+                onClick={() => setFilter('courses')}
+                className={`px-4 py-2 mr-2 mb-2 rounded-lg ${filter === 'courses' 
                   ? 'bg-[#6D0B24] text-white' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 Course Reviews ({counts.courses})
               </button>
               <button
-                onClick={() => setFilter('professor')}
-                className={`px-4 py-2 rounded-lg ${filter === 'professor' 
+                onClick={() => setFilter('professors')}
+                className={`px-4 py-2 mr-2 mb-2 rounded-lg ${filter === 'professors' 
                   ? 'bg-[#6D0B24] text-white' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
               >
                 Professor Reviews ({counts.professors})
               </button>
+              {counts.rejected > 0 && (
+                <button
+                  onClick={() => setFilter('rejected')}
+                  className={`px-4 py-2 mb-2 rounded-lg ${filter === 'rejected' 
+                    ? 'bg-[#6D0B24] text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                >
+                  Rejected Reviews ({counts.rejected})
+                </button>
+              )}
             </div>
           )}
 
@@ -190,7 +217,7 @@ const MyReviews = () => {
             </div>
           ) : filteredReviews().length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">No {filter === 'course' ? 'course' : 'professor'} reviews found.</p>
+              <p className="text-gray-500">No {filter === 'courses' ? 'course' : filter === 'professors' ? 'professor' : filter === 'rejected' ? 'rejected' : ''} reviews found.</p>
               <button 
                 onClick={() => setFilter('all')}
                 className="mt-2 text-[#6D0B24] hover:underline"
@@ -203,21 +230,24 @@ const MyReviews = () => {
               {filteredReviews().map((review) => (
                 <li key={review._id} className="px-6 py-5">
                   <div className="flex items-center justify-between">
-                    {review.type === 'course' ? (
-                      <Link
-                        to={`/courses/${review.course?._id}`}
-                        className="text-lg font-medium text-[#6D0B24] hover:underline"
-                      >
-                        {review.title || 'Unknown Course'}
-                      </Link>
-                    ) : (
-                      <Link
-                        to={`/professors/${review.professor?._id}`}
-                        className="text-lg font-medium text-[#6D0B24] hover:underline"
-                      >
-                        {review.title || 'Unknown Professor'}
-                      </Link>
-                    )}
+                    <div className="flex items-center">
+                      {review.type === 'course' ? (
+                        <Link
+                          to={`/courses/${review.course?._id}`}
+                          className="text-lg font-medium text-[#6D0B24] hover:underline"
+                        >
+                          {review.title || 'Unknown Course'}
+                        </Link>
+                      ) : (
+                        <Link
+                          to={`/professors/${review.professor?._id}`}
+                          className="text-lg font-medium text-[#6D0B24] hover:underline"
+                        >
+                          {review.title || 'Unknown Professor'}
+                        </Link>
+                      )}
+                      {renderStatusBadge(review)}
+                    </div>
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <svg
@@ -233,6 +263,13 @@ const MyReviews = () => {
                       ))}
                     </div>
                   </div>
+                  
+                  {/* Add this notice for rejected reviews */}
+                  {review.status === 'rejected' && (
+                    <div className="mt-2 p-2 bg-red-50 border-l-4 border-red-400 text-sm text-red-700">
+                      <p>This review has been rejected by an administrator and is not visible to other users.</p>
+                    </div>
+                  )}
                   
                   <div className="flex items-center mt-1">
                     <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${

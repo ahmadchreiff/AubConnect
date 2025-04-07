@@ -138,7 +138,8 @@ const postReview = async (req, res) => {
  */
 const getAllReviews = async (req, res) => {
   try {
-    const reviews = await Review.find()
+    // Modified to only return approved reviews
+    const reviews = await Review.find({ status: { $ne: 'rejected' } })
       .populate('department', 'name code')
       .populate('course', 'name courseNumber')
       .populate('professor', 'name title');
@@ -160,7 +161,11 @@ const getReviewsByDepartment = async (req, res) => {
   try {
     const { departmentId } = req.params;
     
-    const reviews = await Review.find({ department: departmentId })
+    // Modified to only return approved reviews
+    const reviews = await Review.find({ 
+      department: departmentId,
+      status: { $ne: 'rejected' }
+    })
       .populate('department', 'name code')
       .populate('course', 'name courseNumber');
     
@@ -181,7 +186,12 @@ const getReviewsByCourse = async (req, res) => {
   try {
     const { courseId } = req.params;
     
-    const reviews = await Review.find({ course: courseId, type: "course" })
+    // Modified to only return approved reviews
+    const reviews = await Review.find({ 
+      course: courseId, 
+      type: "course",
+      status: { $ne: 'rejected' }
+    })
       .populate('department', 'name code')
       .populate('course', 'name courseNumber');
     
@@ -202,7 +212,12 @@ const getReviewsByProfessor = async (req, res) => {
   try {
     const { professorId } = req.params;
     
-    const reviews = await Review.find({ professor: professorId, type: "professor" })
+    // Modified to only return approved reviews
+    const reviews = await Review.find({ 
+      professor: professorId, 
+      type: "professor",
+      status: { $ne: 'rejected' }
+    })
       .populate('professor', 'name title');
     
     res.status(200).json(reviews);

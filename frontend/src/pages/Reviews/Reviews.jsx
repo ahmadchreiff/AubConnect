@@ -37,42 +37,47 @@ const ReviewsPage = () => {
   const navigate = useNavigate();
 
   // Fetch reviews, departments, courses, and professors on mount
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        setIsLoading(true);
-        
-        // Fetch reviews
-        const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
-        setReviews(reviewsRes.data);
-        
-        // Fetch departments
-        const departmentsRes = await axios.get("http://localhost:5001/api/departments");
-        setDepartments(departmentsRes.data);
-        
-        // Fetch all courses
-        const coursesRes = await axios.get("http://localhost:5001/api/courses");
-        setCourses(coursesRes.data);
-        
-        // Fetch all professors
-        const professorsRes = await axios.get("http://localhost:5001/api/professors");
-        setProfessors(professorsRes.data);
-      } catch (err) {
-        setError("Failed to fetch initial data.");
-        console.error("Error fetching initial data:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInitialData();
-
-    // Set the logged-in username
-    const username = getUsernameFromToken();
-    if (username) {
-      setLoggedInUsername(username);
+useEffect(() => {
+  const fetchInitialData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch reviews
+      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+      
+      // Client-side safety filter to remove rejected reviews
+      const filteredReviews = reviewsRes.data.filter(review => 
+        review.status !== 'rejected'
+      );
+      setReviews(filteredReviews);
+      
+      // Fetch departments
+      const departmentsRes = await axios.get("http://localhost:5001/api/departments");
+      setDepartments(departmentsRes.data);
+      
+      // Fetch all courses
+      const coursesRes = await axios.get("http://localhost:5001/api/courses");
+      setCourses(coursesRes.data);
+      
+      // Fetch all professors
+      const professorsRes = await axios.get("http://localhost:5001/api/professors");
+      setProfessors(professorsRes.data);
+    } catch (err) {
+      setError("Failed to fetch initial data.");
+      console.error("Error fetching initial data:", err);
+    } finally {
+      setIsLoading(false);
     }
-  }, []);
+  };
+
+  fetchInitialData();
+
+  // Set the logged-in username
+  const username = getUsernameFromToken();
+  if (username) {
+    setLoggedInUsername(username);
+  }
+}, []);
 
   // Filter courses when department selection changes
   useEffect(() => {
@@ -260,7 +265,12 @@ const submitReview = async () => {
 
     // Fetch updated reviews
     const reviewsResponse = await axios.get("http://localhost:5001/api/reviews");
-    setReviews(reviewsResponse.data);
+    
+    // Filter out rejected reviews
+    const filteredReviews = reviewsResponse.data.filter(review => 
+      review.status !== 'rejected'
+    );
+    setReviews(filteredReviews);
 
     // Reset the form and close the modal
     setNewReview({

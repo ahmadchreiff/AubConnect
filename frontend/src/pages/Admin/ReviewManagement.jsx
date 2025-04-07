@@ -37,19 +37,6 @@ const ReviewManagement = () => {
     }
   };
 
-  const approveReview = async (reviewId) => {
-    try {
-      await axios.patch(`http://localhost:5001/api/admin/reviews/${reviewId}/approve`);
-      // Update the review in the list
-      setReviews(reviews.map(review => 
-        review._id === reviewId ? { ...review, status: 'approved' } : review
-      ));
-    } catch (err) {
-      console.error('Error approving review:', err);
-      setError('Failed to approve review');
-    }
-  };
-
   const rejectReview = async (reviewId) => {
     try {
       await axios.patch(`http://localhost:5001/api/admin/reviews/${reviewId}/reject`);
@@ -60,6 +47,19 @@ const ReviewManagement = () => {
     } catch (err) {
       console.error('Error rejecting review:', err);
       setError('Failed to reject review');
+    }
+  };
+
+  const approveReview = async (reviewId) => {
+    try {
+      await axios.patch(`http://localhost:5001/api/admin/reviews/${reviewId}/approve`);
+      // Update the review in the list
+      setReviews(reviews.map(review => 
+        review._id === reviewId ? { ...review, status: 'approved' } : review
+      ));
+    } catch (err) {
+      console.error('Error approving review:', err);
+      setError('Failed to approve review');
     }
   };
 
@@ -127,7 +127,6 @@ const ReviewManagement = () => {
                 className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#6D0B24] focus:border-[#6D0B24] sm:text-sm rounded-md"
               >
                 <option value="all">All Reviews</option>
-                <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
               </select>
@@ -215,17 +214,11 @@ const ReviewManagement = () => {
                       {new Date(review.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {review.status === 'approved' && (
+                      {review.status === 'approved' || !review.status || review.status === '' ? (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                           Approved
                         </span>
-                      )}
-                      {review.status === 'pending' && (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                          Pending
-                        </span>
-                      )}
-                      {review.status === 'rejected' && (
+                      ) : (
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                           Rejected
                         </span>
@@ -233,7 +226,7 @@ const ReviewManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <div className="flex space-x-2">
-                        {review.status !== 'approved' && (
+                        {review.status === 'rejected' && (
                           <button
                             onClick={() => approveReview(review._id)}
                             className="text-green-600 hover:text-green-900"
@@ -244,7 +237,7 @@ const ReviewManagement = () => {
                             </svg>
                           </button>
                         )}
-                        {review.status !== 'rejected' && (
+                        {(review.status === 'approved' || !review.status || review.status === '') && (
                           <button
                             onClick={() => rejectReview(review._id)}
                             className="text-red-600 hover:text-red-900"
