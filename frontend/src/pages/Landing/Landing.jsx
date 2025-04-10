@@ -244,14 +244,14 @@ const LandingPage = () => {
               </h3>
               <p className="text-sm text-gray-300">For AUB students, by AUB students</p>
             </div>
-            <div className="flex space-x-4">
+            {/* <div className="flex space-x-4">
               <button className="px-4 py-2 bg-white text-[#860033] hover:bg-gray-100 rounded-lg font-medium text-sm transition-colors" onClick={handleSignInClick}>
                 <i className="bx bx-log-in mr-1"></i> Log In
               </button>
               <button className="px-4 py-2 bg-[#860033] hover:bg-[#6a0026] text-white rounded-lg font-medium text-sm transition-colors" onClick={handleSignUpClick}>
                 <i className="bx bx-user-plus mr-1"></i> Sign Up
               </button>
-            </div>
+            </div> */}
           </div>
           <div className="border-t border-gray-700 mt-6 pt-6 text-center">
             <p className="text-sm text-gray-400">&copy; 2025 AUBConnect. All rights reserved.</p>
