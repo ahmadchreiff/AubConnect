@@ -30,6 +30,7 @@ const getUserReviews = async (req, res) => {
     const reviews = await Review.find({ username: req.user.username })
       .populate('course', 'name courseNumber')
       .populate('department', 'name code')
+      .populate('professor', 'name title') // Add this line to populate the professor field
       .sort({ createdAt: -1 });
     
     res.status(200).json({ reviews });
