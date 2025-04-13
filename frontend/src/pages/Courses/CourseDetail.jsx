@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import "boxicons/css/boxicons.min.css";
@@ -10,6 +12,8 @@ const CourseDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [loggedInUsername, setLoggedInUsername] = useState("");
 
   useEffect(() => {
     const fetchCourseAndReviews = async () => {
@@ -34,6 +38,12 @@ const CourseDetail = () => {
         const reviewsData = await reviewsResponse.json();
         setReviews(reviewsData);
         setLoading(false);
+
+        // Set the logged-in username
+        const username = getUsernameFromToken();
+        if (username) {
+          setLoggedInUsername(username);
+        }
       } catch (error) {
         console.error("Error:", error);
         setError(error.message);
@@ -44,6 +54,86 @@ const CourseDetail = () => {
     fetchCourseAndReviews();
   }, [id]);
 
+  // Function to get the username from the JWT token
+  const getUsernameFromToken = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return null;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.username;
+    } catch (err) {
+      setError("Invalid token. Please log in again.");
+      return null;
+    }
+  };
+
+  // Handle upvote
+  const handleUpvote = async (reviewId) => {
+    try {
+      const username = getUsernameFromToken();
+      if (!username) {
+        setError("You must be logged in to upvote reviews.");
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:5001/api/reviews/${reviewId}/upvote`,
+        { username },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      // Update the reviews state with the updated review
+      setReviews((prevReviews) =>
+        prevReviews.map((review) =>
+          review._id === reviewId ? response.data.review : review
+        )
+      );
+
+      setSuccess(response.data.message);
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to process vote.");
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
+  // Handle downvote
+  const handleDownvote = async (reviewId) => {
+    try {
+      const username = getUsernameFromToken();
+      if (!username) {
+        setError("You must be logged in to downvote reviews.");
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:5001/api/reviews/${reviewId}/downvote`,
+        { username },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      // Update the reviews state with the updated review
+      setReviews((prevReviews) =>
+        prevReviews.map((review) =>
+          review._id === reviewId ? response.data.review : review
+        )
+      );
+
+      setSuccess(response.data.message);
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to process vote.");
+      setTimeout(() => setError(null), 3000);
+    }
+  };
+
   // Calculate average rating
   const averageRating = reviews.length 
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
@@ -53,6 +143,18 @@ const CourseDetail = () => {
     <div className="min-h-screen flex flex-col">
       {/* Unified Navbar */}
       <Navbar />
+
+      {/* Notification Messages */}
+      {error && (
+        <div className="fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="fixed top-20 right-4 bg-green-500 text-white px-4 py-2 rounded shadow-lg z-50">
+          {success}
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="flex-grow py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -116,11 +218,11 @@ const CourseDetail = () => {
                       {reviews.length} {reviews.length === 1 ? "review" : "reviews"}
                     </div>
                     <Link 
-  to={`/courses/${id}/stat`}  // change done HERE!!
-  className="text-gray-500 text-xs underline hover:text-gray-700 m-0 p-0"
->
-  more statistics
-</Link>
+                      to={`/courses/${id}/stat`}
+                      className="text-gray-500 text-xs underline hover:text-gray-700 m-0 p-0"
+                    >
+                      more statistics
+                    </Link>
 
                     <Link
                       to={`/reviews/new?type=course&id=${course._id}`}
@@ -202,7 +304,7 @@ const CourseDetail = () => {
                             </div>
                             <div className="ml-3">
                               <div className="text-sm text-gray-500">Posted by</div>
-                              <div className="font-medium">{review.username}</div>
+                              <div className="font-medium">{review.displayName || review.username}</div>
                             </div>
                           </div>
                           <div className="text-sm text-gray-500">
@@ -211,13 +313,27 @@ const CourseDetail = () => {
                         </div>
                         <p className="text-gray-700">{review.reviewText}</p>
                         <div className="mt-4 flex items-center text-sm text-gray-500">
-                          <button className="flex items-center hover:text-[#860033]">
-                            <i className="bx bx-like mr-1"></i>
-                            <span>{review.upvotes.length}</span>
+                          <button 
+                            onClick={() => handleUpvote(review._id)}
+                            className={`flex items-center mr-4 px-2 py-1 rounded-full transition-colors ${
+                              review.upvotes?.includes(loggedInUsername)
+                                ? "bg-[#860033]/10 text-[#860033]"
+                                : "hover:bg-pink-50 hover:text-[#860033]"
+                            }`}
+                          >
+                            <i className={`bx ${review.upvotes?.includes(loggedInUsername) ? 'bxs-like' : 'bx-like'} mr-1`}></i>
+                            <span>{review.upvotes?.length || 0}</span>
                           </button>
-                          <button className="flex items-center ml-4 hover:text-[#860033]">
-                            <i className="bx bx-dislike mr-1"></i>
-                            <span>{review.downvotes.length}</span>
+                          <button 
+                            onClick={() => handleDownvote(review._id)}
+                            className={`flex items-center px-2 py-1 rounded-full transition-colors ${
+                              review.downvotes?.includes(loggedInUsername)
+                                ? "bg-red-100 text-red-600"
+                                : "hover:bg-red-50 hover:text-red-600"
+                            }`}
+                          >
+                            <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'} mr-1`}></i>
+                            <span>{review.downvotes?.length || 0}</span>
                           </button>
                         </div>
                       </div>

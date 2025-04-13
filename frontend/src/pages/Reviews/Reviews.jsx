@@ -127,7 +127,7 @@ const ReviewsPage = () => {
     try {
       const username = getUsernameFromToken();
       if (!username) {
-        setError("You must be logged in to upvote reviews.");
+        setError("You must be logged in to vote on reviews.");
         return;
       }
 
@@ -145,11 +145,12 @@ const ReviewsPage = () => {
         )
       );
 
-      setSuccess("Review upvoted!");
+      setSuccess(response.data.message);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to upvote review.");
-      console.error("Error upvoting review:", err);
+      setError(err.response?.data?.message || "Failed to process vote.");
+      console.error("Error processing vote:", err);
+      setTimeout(() => setError(""), 3000);
     }
   };
 
@@ -158,7 +159,7 @@ const ReviewsPage = () => {
     try {
       const username = getUsernameFromToken();
       if (!username) {
-        setError("You must be logged in to downvote reviews.");
+        setError("You must be logged in to vote on reviews.");
         return;
       }
 
@@ -176,11 +177,12 @@ const ReviewsPage = () => {
         )
       );
 
-      setSuccess("Review downvoted!");
+      setSuccess(response.data.message);
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to downvote review.");
-      console.error("Error downvoting review:", err);
+      setError(err.response?.data?.message || "Failed to process vote.");
+      console.error("Error processing vote:", err);
+      setTimeout(() => setError(""), 3000);
     }
   };
 
@@ -311,7 +313,7 @@ const ReviewsPage = () => {
         title: reviewToEdit.title,
         department: reviewToEdit.department?._id || "",
         course: reviewToEdit.course?._id || "",
-        professor: reviewToEdit.professor?._id || "", 
+        professor: reviewToEdit.professor?._id || "",
         rating: reviewToEdit.rating,
         reviewText: reviewToEdit.reviewText,
         anonymous: reviewToEdit.isAnonymous || false // Updated to use isAnonymous flag
@@ -652,8 +654,8 @@ const ReviewsPage = () => {
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${review.type === "course"
-                              ? "bg-pink-100 text-[#860033]"
-                              : "bg-amber-100 text-amber-800"
+                            ? "bg-pink-100 text-[#860033]"
+                            : "bg-amber-100 text-amber-800"
                             }`}>
                             {review.type === "course" ? "Course" : "Professor"}
                           </span>
@@ -692,8 +694,8 @@ const ReviewsPage = () => {
                         <button
                           onClick={() => handleUpvote(review._id)}
                           className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.upvotes?.includes(loggedInUsername)
-                              ? "bg-[#860033]/10 text-[#860033]"
-                              : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
+                            ? "bg-[#860033]/10 text-[#860033]"
+                            : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
                             }`}
                         >
                           <i className={`bx ${review.upvotes?.includes(loggedInUsername) ? 'bxs-like' : 'bx-like'}`}></i>
@@ -702,8 +704,8 @@ const ReviewsPage = () => {
                         <button
                           onClick={() => handleDownvote(review._id)}
                           className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.downvotes?.includes(loggedInUsername)
-                              ? "bg-red-100 text-red-600"
-                              : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
+                            ? "bg-red-100 text-red-600"
+                            : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
                             }`}
                         >
                           <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'}`}></i>
