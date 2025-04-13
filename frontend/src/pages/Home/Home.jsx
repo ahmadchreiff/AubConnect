@@ -76,10 +76,11 @@ const HomePage = () => {
       navigate(`/courses/${suggestion.id}`);
     } else if (suggestion.type === 'department') {
       navigate(`/departments/${suggestion.id}`);
+    } else if (suggestion.type === 'professor') {
+      navigate(`/professors/${suggestion.id}`);
     }
     setShowSuggestions(false);
   };
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Navbar */}

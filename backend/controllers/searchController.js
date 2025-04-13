@@ -156,7 +156,16 @@ const getSearchSuggestions = async (req, res) => {
       }
     }
 
-    // 3. Format the suggestions
+    // 3. Search for professors
+    results.professors = await Professor.find({
+      $or: [
+        { name: new RegExp(searchTerm, 'i') },
+        { title: new RegExp(searchTerm, 'i') }
+      ]
+    })
+    .limit(5);
+
+    // 4. Format the suggestions
     const suggestions = [
       ...results.departments.map(d => ({
         id: d._id,
@@ -169,6 +178,12 @@ const getSearchSuggestions = async (req, res) => {
         text: `${c.department?.code || 'DEPT'} ${c.courseNumber}`,
         subtext: c.name,
         type: 'course'
+      })),
+      ...results.professors.map(p => ({
+        id: p._id,
+        text: p.name,
+        subtext: p.title || 'Professor',
+        type: 'professor'
       }))
     ];
 
