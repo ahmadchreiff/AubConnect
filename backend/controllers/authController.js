@@ -44,7 +44,8 @@ const sendVerificationCode = async (req, res) => {
     };
 
     // Send the verification code via email
-    await sendVerificationEmail(email, verificationCode);
+    // await sendVerificationEmail(email, verificationCode);
+    await emailService.sendVerificationEmail(email, verificationCode);
 
     res.status(200).json({ message: 'Verification code sent successfully' });
   } catch (err) {

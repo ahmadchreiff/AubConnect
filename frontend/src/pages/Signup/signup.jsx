@@ -440,7 +440,7 @@ const Signup = () => {
       )}
       
       {/* Add these styles to your global CSS or a style tag */}
-      <style jsx>{`
+      <style>{`
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(100%); }
