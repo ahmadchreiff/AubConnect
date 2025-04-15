@@ -27,7 +27,6 @@ router.put("/:id", reviewController.updateReview);
 
 // Delete a review
 router.delete("/:id", reviewController.deleteReview);
-
 // Upvote a review
 router.post("/:id/upvote", async (req, res) => {
   try {
@@ -37,6 +36,13 @@ router.post("/:id/upvote", async (req, res) => {
     const review = await Review.findById(id);
     if (!review) {
       return res.status(404).json({ message: "Review not found." });
+    }
+
+    // Check if user is trying to vote on their own review
+    if (review.username === username) {
+      return res.status(403).json({
+        message: "You cannot vote on your own reviews."
+      });
     }
 
     // Check if the user has already upvoted - toggle logic
@@ -81,6 +87,13 @@ router.post("/:id/downvote", async (req, res) => {
     const review = await Review.findById(id);
     if (!review) {
       return res.status(404).json({ message: "Review not found." });
+    }
+
+    // Check if user is trying to vote on their own review
+    if (review.username === username) {
+      return res.status(403).json({
+        message: "You cannot vote on your own reviews."
+      });
     }
 
     // Check if the user has already downvoted - toggle logic

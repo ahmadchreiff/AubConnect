@@ -196,6 +196,15 @@ const ReviewsPage = () => {
         return;
       }
 
+      // Find the review being upvoted
+      const reviewToUpvote = reviews.find(review => review._id === id);
+
+      // Check if the current user is the author of the review
+      if (reviewToUpvote.username === username) {
+        setError("You cannot vote on your own reviews.");
+        return;
+      }
+
       const response = await axios.post(
         `http://localhost:5001/api/reviews/${id}/upvote`,
         { username },
@@ -225,6 +234,15 @@ const ReviewsPage = () => {
       const username = getUsernameFromToken();
       if (!username) {
         setError("You must be logged in to vote on reviews.");
+        return;
+      }
+
+      // Find the review being downvoted
+      const reviewToDownvote = reviews.find(review => review._id === id);
+
+      // Check if the current user is the author of the review
+      if (reviewToDownvote.username === username) {
+        setError("You cannot vote on your own reviews.");
         return;
       }
 
@@ -370,9 +388,17 @@ const ReviewsPage = () => {
   };
 
   // Handle editing a review
+
   const handleEditReview = (id) => {
     const reviewToEdit = reviews.find((review) => review._id === id);
     if (reviewToEdit) {
+      // Check if the review has received any feedback
+      if ((reviewToEdit.upvotes && reviewToEdit.upvotes.length > 0) ||
+        (reviewToEdit.downvotes && reviewToEdit.downvotes.length > 0)) {
+        setError("Reviews that have received feedback cannot be edited.");
+        return;
+      }
+
       setNewReview({
         type: reviewToEdit.type,
         title: reviewToEdit.title,
@@ -381,7 +407,7 @@ const ReviewsPage = () => {
         professor: reviewToEdit.professor?._id || "",
         rating: reviewToEdit.rating,
         reviewText: reviewToEdit.reviewText,
-        anonymous: reviewToEdit.isAnonymous || false // Updated to use isAnonymous flag
+        anonymous: reviewToEdit.isAnonymous || false
       });
       setEditReviewId(id);
       setIsModalOpen(true);
@@ -758,9 +784,12 @@ const ReviewsPage = () => {
                       <div className="flex space-x-3">
                         <button
                           onClick={() => handleUpvote(review._id)}
+                          disabled={review.username === loggedInUsername}
                           className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.upvotes?.includes(loggedInUsername)
-                            ? "bg-[#860033]/10 text-[#860033]"
-                            : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
+                              ? "bg-[#860033]/10 text-[#860033]"
+                              : review.username === loggedInUsername
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
                             }`}
                         >
                           <i className={`bx ${review.upvotes?.includes(loggedInUsername) ? 'bxs-like' : 'bx-like'}`}></i>
@@ -768,9 +797,12 @@ const ReviewsPage = () => {
                         </button>
                         <button
                           onClick={() => handleDownvote(review._id)}
+                          disabled={review.username === loggedInUsername}
                           className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.downvotes?.includes(loggedInUsername)
-                            ? "bg-red-100 text-red-600"
-                            : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
+                              ? "bg-red-100 text-red-600"
+                              : review.username === loggedInUsername
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
                             }`}
                         >
                           <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'}`}></i>
@@ -781,12 +813,15 @@ const ReviewsPage = () => {
                       {/* Updated to check username against actual username, not display name */}
                       {review.username === loggedInUsername && (
                         <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEditReview(review._id)}
-                            className="text-sm text-[#860033] hover:text-[#6a0026] transition-colors flex items-center"
-                          >
-                            <i className="bx bx-edit mr-1"></i> Edit
-                          </button>
+                          {/* Only show Edit button if review has no feedback */}
+                          {(!review.upvotes?.length && !review.downvotes?.length) && (
+                            <button
+                              onClick={() => handleEditReview(review._id)}
+                              className="text-sm text-[#860033] hover:text-[#6a0026] transition-colors flex items-center"
+                            >
+                              <i className="bx bx-edit mr-1"></i> Edit
+                            </button>
+                          )}
                           <button
                             onClick={() => handleDeleteReview(review._id)}
                             className="text-sm text-red-600 hover:text-red-800 transition-colors flex items-center"

@@ -262,6 +262,13 @@ const updateReview = async (req, res) => {
       });
     }
 
+    // NEW CODE: Check if the review has received any feedback (upvotes or downvotes)
+    if ((review.upvotes && review.upvotes.length > 0) || (review.downvotes && review.downvotes.length > 0)) {
+      return res.status(403).json({ 
+        message: "Reviews that have received feedback cannot be edited." 
+      });
+    }
+    
     // Update data object
     const updateData = {
       type,
