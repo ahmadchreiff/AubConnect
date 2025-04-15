@@ -9,37 +9,37 @@ const ProfessorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser, isAuthenticated } = useAuth();
-  
+
   const [professor, setProfessor] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState('');
-  
+
   const [reviewForm, setReviewForm] = useState({
     rating: 1,
     reviewText: '',
     type: 'professor',
     professor: id
   });
-  
+
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
-  
+
   useEffect(() => {
     const fetchProfessorData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch professor details
         const professorRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/professors/${id}`);
         setProfessor(professorRes.data);
-        
+
         // Fetch professor reviews
         const reviewsRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/professor/${id}`);
         setReviews(reviewsRes.data);
-        
+
         setLoading(false);
       } catch (err) {
         console.error('Error fetching professor data:', err);
@@ -47,10 +47,10 @@ const ProfessorDetail = () => {
         setLoading(false);
       }
     };
-    
+
     fetchProfessorData();
   }, [id]);
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setReviewForm({
@@ -58,36 +58,36 @@ const ProfessorDetail = () => {
       [name]: name === 'rating' ? parseInt(value) : value
     });
   };
-  
+
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    
+
     if (!isAuthenticated()) {
       navigate('/login', { state: { from: `/professors/${id}` } });
       return;
     }
-    
+
     if (!reviewForm.reviewText.trim()) {
       setSubmitError('Please write your review before submitting.');
       return;
     }
-    
+
     try {
       setSubmitLoading(true);
       setSubmitError(null);
-      
+
       const reviewData = {
         ...reviewForm,
         username: currentUser.username
       };
-      
+
       const res = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews`, reviewData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      
+
       // Add the new review to the reviews list
       setReviews([res.data.review, ...reviews]);
-      
+
       // Reset the form
       setReviewForm({
         rating: 5,
@@ -95,14 +95,14 @@ const ProfessorDetail = () => {
         type: 'professor',
         professor: id
       });
-      
+
       setShowReviewForm(false);
       setSuccess('Review submitted successfully!');
-      
+
       // Refresh professor data to get updated rating
       const professorRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/professors/${id}`);
       setProfessor(professorRes.data);
-      
+
       setTimeout(() => setSuccess(''), 5000);
     } catch (err) {
       console.error('Error submitting review:', err);
@@ -111,7 +111,7 @@ const ProfessorDetail = () => {
       setSubmitLoading(false);
     }
   };
-  
+
   const handleRatingChange = (rating) => {
     setReviewForm({
       ...reviewForm,
@@ -124,15 +124,15 @@ const ProfessorDetail = () => {
       navigate('/login', { state: { from: `/professors/${id}` } });
       return;
     }
-    
+
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}/upvote`,
         { username: currentUser.username },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-      
-      setReviews(reviews.map(review => 
+
+      setReviews(reviews.map(review =>
         review._id === reviewId ? res.data.review : review
       ));
     } catch (err) {
@@ -140,21 +140,21 @@ const ProfessorDetail = () => {
       setError(err.response?.data?.message || 'Failed to upvote review.');
     }
   };
-  
+
   const handleDownvote = async (reviewId) => {
     if (!isAuthenticated()) {
       navigate('/login', { state: { from: `/professors/${id}` } });
       return;
     }
-    
+
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}/downvote`,
         { username: currentUser.username },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-      
-      setReviews(reviews.map(review => 
+
+      setReviews(reviews.map(review =>
         review._id === reviewId ? res.data.review : review
       ));
     } catch (err) {
@@ -162,39 +162,39 @@ const ProfessorDetail = () => {
       setError(err.response?.data?.message || 'Failed to downvote review.');
     }
   };
-  
+
   const handleDeleteReview = async (reviewId) => {
     if (!isAuthenticated()) {
       return;
     }
-    
+
     if (!window.confirm('Are you sure you want to delete this review?')) {
       return;
     }
-    
+
     try {
       await axios.delete(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}`,
-        { 
+        {
           data: { username: currentUser.username },
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }
       );
-      
+
       setReviews(reviews.filter(review => review._id !== reviewId));
       setSuccess('Review deleted successfully!');
-      
+
       // Refresh professor data to get updated rating
       const professorRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/professors/${id}`);
       setProfessor(professorRes.data);
-      
+
       setTimeout(() => setSuccess(''), 5000);
     } catch (err) {
       console.error('Error deleting review:', err);
       setError(err.response?.data?.message || 'Failed to delete review.');
     }
   };
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -206,7 +206,7 @@ const ProfessorDetail = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -220,7 +220,7 @@ const ProfessorDetail = () => {
       </div>
     );
   }
-  
+
   if (!professor) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -234,35 +234,35 @@ const ProfessorDetail = () => {
       </div>
     );
   }
-  
+
   // Helper function to format rating
   const getRatingColor = (rating) => {
     if (rating >= 4) return "bg-green-100 text-green-700";
     if (rating >= 3) return "bg-yellow-100 text-yellow-700";
     return "bg-red-100 text-red-700";
   };
-  
+
   // Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       {success && (
         <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center">
           <svg className="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
           {success}
-          <button 
+          <button
             onClick={() => setSuccess('')}
             className="ml-3 text-white/80 hover:text-white"
           >
@@ -272,7 +272,7 @@ const ProfessorDetail = () => {
           </button>
         </div>
       )}
-      
+
       <div className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Professor Info */}
@@ -293,7 +293,7 @@ const ProfessorDetail = () => {
                 </div>
                 <p className="mt-1 text-white/90">{professor.title}</p>
               </div>
-              
+
               <div className="p-6">
                 {/* Department Affiliations */}
                 {professor.departments && professor.departments.length > 0 && (
@@ -301,7 +301,7 @@ const ProfessorDetail = () => {
                     <h2 className="text-sm font-medium text-gray-500 uppercase mb-2">Departments</h2>
                     <div className="flex flex-wrap gap-2">
                       {professor.departments.map(dept => (
-                        <Link 
+                        <Link
                           key={typeof dept === 'object' ? dept._id : dept}
                           to={`/departments/${typeof dept === 'object' ? dept._id : dept}`}
                           className="inline-block px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full transition-colors"
@@ -312,7 +312,7 @@ const ProfessorDetail = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {/* Contact Information */}
                 {professor.email && (
                   <div className="mb-4">
@@ -328,7 +328,7 @@ const ProfessorDetail = () => {
                     </p>
                   </div>
                 )}
-                
+
                 {/* Office Information */}
                 {(professor.office || professor.officeHours) && (
                   <div className="mb-4">
@@ -341,7 +341,7 @@ const ProfessorDetail = () => {
                         {professor.office}
                       </p>
                     )}
-                    
+
                     {professor.officeHours && (
                       <p className="flex items-center text-gray-600">
                         <svg className="h-5 w-5 text-gray-400 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -352,7 +352,7 @@ const ProfessorDetail = () => {
                     )}
                   </div>
                 )}
-                
+
                 {/* Biography */}
                 {professor.bio && (
                   <div className="mb-4">
@@ -360,7 +360,7 @@ const ProfessorDetail = () => {
                     <p className="text-gray-600">{professor.bio}</p>
                   </div>
                 )}
-                
+
                 {/* Courses */}
                 {professor.courses && professor.courses.length > 0 && (
                   <div>
@@ -368,15 +368,15 @@ const ProfessorDetail = () => {
                     <ul className="space-y-2">
                       {professor.courses.map(course => (
                         <li key={typeof course === 'object' ? course._id : course}>
-                          <Link 
+                          <Link
                             to={`/courses/${typeof course === 'object' ? course._id : course}`}
                             className="flex items-center text-[#860033] hover:underline"
                           >
                             <svg className="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                               <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
                             </svg>
-                            {typeof course === 'object' 
-                              ? `${course.courseNumber}: ${course.name}` 
+                            {typeof course === 'object'
+                              ? `${course.courseNumber}: ${course.name}`
                               : course}
                           </Link>
                         </li>
@@ -387,7 +387,7 @@ const ProfessorDetail = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Reviews Section */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
@@ -399,18 +399,17 @@ const ProfessorDetail = () => {
                     {reviews.length > 0 && <span className="ml-2 text-gray-500">({reviews.length})</span>}
                   </h2>
                   <button
-                    onClick={() => setShowReviewForm(!showReviewForm)}
+                    onClick={() => navigate(`/reviews?type=professor&id=${id}&name=${encodeURIComponent(professor.name)}`)}
                     className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#860033] hover:bg-[#6a0026] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#860033]"
                   >
-                    {showReviewForm ? 'Cancel' : 'Write a Review'}
+                    Write a Review
                   </button>
                 </div>
-                                   
-                {/* Review Form */}
+
                 {showReviewForm && (
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Share Your Experience</h3>
-                    
+
                     {submitError && (
                       <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4">
                         <div className="flex">
@@ -425,7 +424,7 @@ const ProfessorDetail = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     <form onSubmit={handleSubmitReview}>
                       <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1">Rating</label>
@@ -449,7 +448,7 @@ const ProfessorDetail = () => {
                           ))}
                         </div>
                       </div>
-                      
+
                       <div className="mb-4">
                         <label htmlFor="reviewText" className="block text-sm font-medium text-gray-700 mb-1">
                           Your Review
@@ -464,7 +463,7 @@ const ProfessorDetail = () => {
                           className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-[#860033] focus:border-[#860033]"
                         />
                       </div>
-                      
+
                       <div className="flex justify-end">
                         <button
                           type="submit"
@@ -488,7 +487,7 @@ const ProfessorDetail = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Reviews List */}
               {reviews.length === 0 ? (
                 <div className="text-center py-12">
@@ -529,7 +528,7 @@ const ProfessorDetail = () => {
                           </div>
                           <div className="mt-4 text-gray-700">{review.reviewText}</div>
                         </div>
-                        
+
                         {/* User actions */}
                         {isAuthenticated() && currentUser.username === review.username && (
                           <div className="flex space-x-2">
@@ -544,16 +543,15 @@ const ProfessorDetail = () => {
                           </div>
                         )}
                       </div>
-                      
+
                       {/* Upvotes and downvotes */}
                       <div className="mt-4 flex items-center space-x-4">
                         <button
                           onClick={() => handleUpvote(review._id)}
-                          className={`flex items-center space-x-1 text-sm ${
-                            isAuthenticated() && review.upvotes?.includes(currentUser.username)
+                          className={`flex items-center space-x-1 text-sm ${isAuthenticated() && review.upvotes?.includes(currentUser.username)
                               ? 'text-[#860033] font-medium'
                               : 'text-gray-500 hover:text-[#860033]'
-                          }`}
+                            }`}
                         >
                           <svg
                             className="h-5 w-5"
@@ -565,14 +563,13 @@ const ProfessorDetail = () => {
                           </svg>
                           <span>Helpful ({review.upvotes?.length || 0})</span>
                         </button>
-                        
+
                         <button
                           onClick={() => handleDownvote(review._id)}
-                          className={`flex items-center space-x-1 text-sm ${
-                            isAuthenticated() && review.downvotes?.includes(currentUser.username)
+                          className={`flex items-center space-x-1 text-sm ${isAuthenticated() && review.downvotes?.includes(currentUser.username)
                               ? 'text-red-600 font-medium'
                               : 'text-gray-500 hover:text-red-600'
-                          }`}
+                            }`}
                         >
                           <svg
                             className="h-5 w-5"
@@ -593,7 +590,7 @@ const ProfessorDetail = () => {
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );

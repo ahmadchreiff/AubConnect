@@ -3,13 +3,25 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { ClipLoader } from "react-spinners";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import SearchableProfessorDropdown from "../../components/SearchableProfessorDropdown";
 import "boxicons/css/boxicons.min.css";
 
+
 const ReviewsPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Parse URL query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const reviewType = queryParams.get('type'); // 'professor' or 'course'
+  const entityId = queryParams.get('id'); // professor or course ID
+  const entityName = queryParams.get('name'); // professor name or course name
+  const departmentId = queryParams.get('department'); // Only for courses
+  const courseNumber = queryParams.get('courseNumber'); // Only for courses
+
   const [reviews, setReviews] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -34,7 +46,60 @@ const ReviewsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [sortOption, setSortOption] = useState("newest");
-  const navigate = useNavigate();
+  // Handle auto-opening the form with prefilled data from URL params
+  useEffect(() => {
+    // Check if we have query parameters to prefill the form
+    if (reviewType && entityId) {
+      // First check if the user is logged in
+      const username = getUsernameFromToken();
+      if (!username) {
+        setError("You must be logged in to post a review.");
+        return;
+      }
+
+      // Prefill the form based on the redirect source
+      const reviewData = {
+        type: reviewType,
+        title: entityName || "",
+        department: reviewType === "course" ? departmentId || "" : "",
+        course: reviewType === "course" ? entityId : "",
+        professor: reviewType === "professor" ? entityId : "",
+        rating: 0,
+        reviewText: "",
+        anonymous: false,
+      };
+
+      setNewReview(reviewData);
+
+      // Auto-open the modal
+      setIsModalOpen(true);
+
+      // Clear the URL parameters after processing them
+      // This prevents the form from reopening if the user refreshes the page
+      navigate('/reviews', { replace: true });
+    }
+  }, [reviewType, entityId, entityName, departmentId, courseNumber, navigate, location.pathname, location.search]);
+
+  // Update course or professor title when selection changes
+  useEffect(() => {
+    // Update title when course changes
+    if (newReview.type === "course" && newReview.course) {
+      const selectedCourse = courses.find(course => course._id === newReview.course);
+      if (selectedCourse) {
+        const deptCode = departments.find(d => d._id === newReview.department)?.code || '';
+        const title = `${deptCode} ${selectedCourse.courseNumber}: ${selectedCourse.name}`;
+        setNewReview(prev => ({ ...prev, title }));
+      }
+    }
+    // Update title when professor changes
+    else if (newReview.type === "professor" && newReview.professor) {
+      const selectedProfessor = professors.find(prof => prof._id === newReview.professor);
+      if (selectedProfessor) {
+        setNewReview(prev => ({ ...prev, title: selectedProfessor.name }));
+      }
+    }
+  }, [newReview.course, newReview.professor, newReview.department, newReview.type, courses, professors, departments]);
+
 
   // Fetch reviews, departments, courses, and professors on mount
   useEffect(() => {

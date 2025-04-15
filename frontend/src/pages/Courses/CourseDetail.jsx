@@ -6,7 +6,8 @@ import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import "boxicons/css/boxicons.min.css";
 import { useAuth } from "../../context/AuthContext"; // Add this import
-// import { Link, useParams, useNavigate } from "react-router-dom";
+
+
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const CourseDetail = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loggedInUsername, setLoggedInUsername] = useState("");
+  const navigate = useNavigate();
 
   // Add these states for the review form
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -322,10 +324,10 @@ const CourseDetail = () => {
                     </Link>
 
                     <button
-                      onClick={() => setShowReviewForm(!showReviewForm)}
+                      onClick={() => navigate(`/reviews?type=course&id=${id}&name=${encodeURIComponent(course.name)}&department=${course.department._id}&courseNumber=${encodeURIComponent(course.courseNumber)}`)}
                       className="mt-3 bg-[#860033] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#6a0026] transition-all duration-200"
                     >
-                      {showReviewForm ? 'Cancel' : 'Write a Review'}
+                      Write a Review
                     </button>
                   </div>
                 </div>
@@ -497,8 +499,8 @@ const CourseDetail = () => {
                           <button
                             onClick={() => handleUpvote(review._id)}
                             className={`flex items-center mr-4 px-2 py-1 rounded-full transition-colors ${review.upvotes?.includes(loggedInUsername)
-                                ? "bg-[#860033]/10 text-[#860033]"
-                                : "hover:bg-pink-50 hover:text-[#860033]"
+                              ? "bg-[#860033]/10 text-[#860033]"
+                              : "hover:bg-pink-50 hover:text-[#860033]"
                               }`}
                           >
                             <i className={`bx ${review.upvotes?.includes(loggedInUsername) ? 'bxs-like' : 'bx-like'} mr-1`}></i>
@@ -507,8 +509,8 @@ const CourseDetail = () => {
                           <button
                             onClick={() => handleDownvote(review._id)}
                             className={`flex items-center px-2 py-1 rounded-full transition-colors ${review.downvotes?.includes(loggedInUsername)
-                                ? "bg-red-100 text-red-600"
-                                : "hover:bg-red-50 hover:text-red-600"
+                              ? "bg-red-100 text-red-600"
+                              : "hover:bg-red-50 hover:text-red-600"
                               }`}
                           >
                             <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'} mr-1`}></i>
