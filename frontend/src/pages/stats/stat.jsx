@@ -114,7 +114,7 @@ const Stat = ({ type = "course" }) => {
         text: review.reviewText || "No review text",
         upvotesCount: review.upvotes?.length || 0,
         date: review.createdAt,
-        username: review.username || "Anonymous",
+        username: review.isAnonymous ? "Anonymous" : (review.username || "Anonymous"),
         rating: review.rating || 0
       };
     };
