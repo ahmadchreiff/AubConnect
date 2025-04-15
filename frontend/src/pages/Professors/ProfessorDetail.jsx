@@ -17,7 +17,7 @@ const ProfessorDetail = () => {
   const [success, setSuccess] = useState('');
   
   const [reviewForm, setReviewForm] = useState({
-    rating: 5,
+    rating: 1,
     reviewText: '',
     type: 'professor',
     professor: id

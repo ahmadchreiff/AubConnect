@@ -21,7 +21,7 @@ const HomePage = () => {
         setSuggestions([]);
         return;
       }
-      
+
       setIsLoading(true);
       try {
         const response = await axios.get(
@@ -49,9 +49,9 @@ const HomePage = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        searchInputRef.current && 
+        searchInputRef.current &&
         !searchInputRef.current.contains(event.target) &&
-        suggestionsRef.current && 
+        suggestionsRef.current &&
         !suggestionsRef.current.contains(event.target)
       ) {
         setShowSuggestions(false);
@@ -98,7 +98,7 @@ const HomePage = () => {
               Find courses and professors at <span className="font-bold">American University of Beirut</span>
             </p>
           </div>
-          
+
           {/* Search Box */}
           <div className="w-full max-w-2xl mx-auto relative mb-12">
             <form onSubmit={handleSearchSubmit} className="relative">
@@ -114,26 +114,21 @@ const HomePage = () => {
                 onFocus={() => searchQuery.trim().length >= 2 && setShowSuggestions(true)}
                 className="w-full pl-12 pr-4 py-5 bg-white border border-gray-300 rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-transparent text-lg"
               />
-              <button 
-                type="submit" 
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#860033] text-white px-6 py-3 rounded-full font-medium hover:bg-[#6a0026] transition-all"
-              >
-                Search
-              </button>
             </form>
-            
+
             {/* Suggestions Dropdown */}
             {showSuggestions && (
-              <div 
+              <div
                 ref={suggestionsRef}
                 className="absolute z-10 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-60 overflow-y-auto"
               >
+                {/* The suggestions content remains the same */}
                 {isLoading ? (
                   <div className="p-3 text-center text-gray-500">Loading suggestions...</div>
                 ) : suggestions.length > 0 ? (
                   <ul>
                     {suggestions.map((suggestion) => (
-                      <li 
+                      <li
                         key={`${suggestion.type}-${suggestion.id}`}
                         onClick={() => handleSuggestionClick(suggestion)}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex flex-col border-b border-gray-100 last:border-b-0"
@@ -149,7 +144,7 @@ const HomePage = () => {
               </div>
             )}
           </div>
-          
+
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/departments" className="text-[#860033] hover:bg-[#860033]/10 px-5 py-3 rounded-lg transition-colors text-lg font-medium flex items-center">
               <i className="bx bx-building-house mr-2"></i> Browse Departments
@@ -163,7 +158,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Feature Highlights - Simplified */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -175,7 +170,7 @@ const HomePage = () => {
               <h3 className="text-xl font-bold mb-3 text-center">Anonymous Feedback</h3>
               <p className="text-gray-600">Share your honest opinions about courses and professors without revealing your identity.</p>
             </div>
-            
+
             <div className="bg-gray-50 rounded-xl p-6 shadow-sm">
               <div className="w-16 h-16 mx-auto mb-4 bg-[#E0C6F5] rounded-full flex items-center justify-center">
                 <i className="bx bx-user-voice text-3xl text-[#860033]"></i>
@@ -183,7 +178,7 @@ const HomePage = () => {
               <h3 className="text-xl font-bold mb-3 text-center">Find Your Courses</h3>
               <p className="text-gray-600">Easily search and discover the best courses based on fellow students' experiences.</p>
             </div>
-            
+
             <div className="bg-gray-50 rounded-xl p-6 shadow-sm">
               <div className="w-16 h-16 mx-auto mb-4 bg-[#A8DAFF] rounded-full flex items-center justify-center">
                 <i className="bx bx-like text-3xl text-[#860033]"></i>
@@ -194,7 +189,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      
+
       {/* Footer */}
       <Footer />
     </div>
