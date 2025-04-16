@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const reviewController = require("../controllers/reviewController");
 const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const Review = require("../models/Review"); // Add this import
 
 // Create a review
@@ -27,6 +28,8 @@ router.put("/:id", reviewController.updateReview);
 
 // Delete a review
 router.delete("/:id", reviewController.deleteReview);
+
+
 
 // Upvote a review
 router.post("/:id/upvote", async (req, res) => {
@@ -111,6 +114,79 @@ router.post("/:id/downvote", async (req, res) => {
   } catch (err) {
     res.status(500).json({ 
       message: "Failed to downvote review.", 
+      error: err.message 
+    });
+  }
+});
+
+router.post('/:id/report', auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username, reason, details } = req.body;
+
+    const review = await Review.findById(id);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found." });
+    }
+
+    // Check if user already reported this review
+    const alreadyReported = review.reports.some(report => report.reporter === username);
+    if (alreadyReported) {
+      return res.status(400).json({ message: "You have already reported this review." });
+    }
+
+    // Add new report
+    review.reports.push({
+      reporter: username,
+      reason,
+      details: details || "No additional details"
+    });
+    review.reportCount = review.reports.length;
+    
+    await review.save();
+
+    res.status(200).json({ 
+      success: true,
+      message: "Review reported successfully!", 
+      review 
+    });
+  } catch (err) {
+    console.error("Error reporting review:", err);
+    res.status(500).json({ 
+      success: false,
+      message: "Failed to report review.", 
+      error: err.message 
+    });
+  }
+});
+
+// Get reported reviews (for admin)
+router.get('/reported', auth, adminAuth, async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const reviews = await Review.find({ reportCount: { $gt: 0 } })
+      .sort({ reportCount: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('course', 'name courseNumber')
+      .populate('professor', 'name title');
+
+    const total = await Review.countDocuments({ reportCount: { $gt: 0 } });
+
+    res.status(200).json({
+      reviews,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ 
+      message: "Failed to fetch reported reviews.", 
       error: err.message 
     });
   }
