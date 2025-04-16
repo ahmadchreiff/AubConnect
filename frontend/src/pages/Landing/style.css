@@ -29,11 +29,19 @@
   font-size: 35px;
   font-family: Arial;
   padding-left: none;
-
   padding-top: 2px;
-  height: 130px;
-  width: auto;
+  height: 180px;
+  max-width: 100%;      
+  object-fit: contain;  
+  transform: scale(1.2); 
+  transform-origin: center center; 
+  text-shadow: none !important; 
 }
+
+.logo:hover {
+    text-shadow: none !important; 
+    box-shadow: none  !important;
+  }
 .menu {
   width: auto;
   height: 70px;
@@ -107,6 +115,7 @@ ul li a:hover {
   z-index: 1;
   width: 100%;
   padding: 0 40px;
+  text-align: left; 
 
   margin-right: 50px;
 
@@ -147,6 +156,8 @@ ul li a:hover {
   position: relative;
   transition: all 0.35s;
   outline: none;
+  margin-right: 20px;
+  font-weight: bold;
 }
 .main_button a {
   position: relative;
@@ -171,6 +182,7 @@ ul li a:hover {
 .main_button:hover:after {
   width: 100%;
 }
+
 .main_img_container {
   display: flex;
   text-align: center;
@@ -194,7 +206,49 @@ ul li a:hover {
   width: 100% !important;
   gap: 20px !important;
 }
-
+.login_button {
+    font-size: 1rem;
+    background-color: #860033;
+    padding: 10px 32px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    margin-top: 2rem;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.35s;
+    outline: none;
+    margin-right: 20px;
+    font-weight: bold;
+  }
+  
+  .login_button a {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .login_button:after {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: black;
+    transition: all 0.35s;
+    border-radius: 4px;
+  }
+  
+  .login_button:hover {
+    color: grey;
+  }
+  
+  .login_button:hover:after {
+    width: 100%;
+  }
+  
 .reviews-section::before {
   content: '';
   position: absolute;

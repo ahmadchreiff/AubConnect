@@ -32,6 +32,7 @@ const Landing = () => {
           <p className="bigger-message">Your Ultimate Resource for Course and Professor Reviews at AUB</p>
           <p className="smaller-text">Explore real student experiences, honest feedback, and helpful insights to choose the right courses and professors for you.</p>
           <button className="main_button"><a href="/">Get Started</a></button>
+          <button className="login_button"><a href="/">Log in</a></button>
         </div>
         <div className="main_img_container">
           <img src={pic1} alt="pic" id="main_img" />
