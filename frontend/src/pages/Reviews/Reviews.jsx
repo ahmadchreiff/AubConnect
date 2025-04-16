@@ -21,7 +21,10 @@ const ReviewsPage = () => {
   const entityName = queryParams.get('name'); // professor name or course name
   const departmentId = queryParams.get('department'); // Only for courses
   const courseNumber = queryParams.get('courseNumber'); // Only for courses
-
+  const [selectedCourse, setSelectedCourse] = useState("");
+  const [selectedProfessor, setSelectedProfessor] = useState("");
+  const [uniqueCourses, setUniqueCourses] = useState([]);
+  const [uniqueProfessors, setUniqueProfessors] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
@@ -170,6 +173,50 @@ const ReviewsPage = () => {
       setNewReview(prev => ({ ...prev, course: "" }));
     }
   }, [newReview.department, courses]);
+
+  useEffect(() => {
+    // Extract unique courses from reviews
+    const courseMap = new Map();
+    const professorMap = new Map();
+
+    reviews.forEach(review => {
+      if (review.type === 'course' && review.course) {
+        // For course, use the course ID as the key
+        const courseId = review.course._id || review.course;
+        // Only add if not already in the map
+        if (!courseMap.has(courseId)) {
+          courseMap.set(courseId, {
+            id: courseId,
+            title: review.title,
+            // You can add more properties if needed
+          });
+        }
+      } else if (review.type === 'professor' && review.professor) {
+        // For professor, use the professor ID as the key
+        const profId = review.professor._id || review.professor;
+        // Only add if not already in the map
+        if (!professorMap.has(profId)) {
+          professorMap.set(profId, {
+            id: profId,
+            name: review.title,
+            // You can add more properties if needed
+          });
+        }
+      }
+    });
+
+    // Convert maps to arrays and sort alphabetically
+    const sortedCourses = Array.from(courseMap.values()).sort((a, b) =>
+      a.title.localeCompare(b.title)
+    );
+
+    const sortedProfessors = Array.from(professorMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    setUniqueCourses(sortedCourses);
+    setUniqueProfessors(sortedProfessors);
+  }, [reviews]);
 
   // Function to get the username from the JWT token
   const getUsernameFromToken = () => {
@@ -388,7 +435,6 @@ const ReviewsPage = () => {
   };
 
   // Handle editing a review
-
   const handleEditReview = (id) => {
     const reviewToEdit = reviews.find((review) => review._id === id);
     if (reviewToEdit) {
@@ -496,11 +542,27 @@ const ReviewsPage = () => {
       });
     }
 
-    // Rest of your filtering and sorting logic remains the same
+    // Filter by review type
     if (filter === "courses") {
       filtered = filtered.filter(review => review.type === "course");
     } else if (filter === "professors") {
       filtered = filtered.filter(review => review.type === "professor");
+    }
+
+    // Filter by specific course
+    if (selectedCourse) {
+      filtered = filtered.filter(review =>
+        review.type === "course" &&
+        (review.course?._id === selectedCourse || review.course === selectedCourse)
+      );
+    }
+
+    // Filter by specific professor
+    if (selectedProfessor) {
+      filtered = filtered.filter(review =>
+        review.type === "professor" &&
+        (review.professor?._id === selectedProfessor || review.professor === selectedProfessor)
+      );
     }
 
     // Sorting logic remains the same
@@ -665,40 +727,133 @@ const ReviewsPage = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters and Sorting */}
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
+        <div className="flex flex-col gap-4 bg-white rounded-lg shadow-sm p-4 mb-6">
+          {/* Filter buttons */}
+          <div className="flex flex-wrap gap-2 overflow-x-auto pb-2 w-full">
             <button
               className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'all' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
-              onClick={() => setFilter('all')}
+              onClick={() => {
+                setFilter('all');
+                setSelectedCourse("");
+                setSelectedProfessor("");
+              }}
             >
               All Reviews
             </button>
             <button
               className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'courses' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
-              onClick={() => setFilter('courses')}
+              onClick={() => {
+                setFilter('courses');
+                setSelectedProfessor("");
+              }}
             >
               Courses
             </button>
             <button
               className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'professors' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
-              onClick={() => setFilter('professors')}
+              onClick={() => {
+                setFilter('professors');
+                setSelectedCourse("");
+              }}
             >
               Professors
             </button>
           </div>
-          <div className="flex items-center">
-            <label className="mr-2 text-gray-600 whitespace-nowrap">Sort by:</label>
-            <select
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
-            >
-              <option value="newest">Newest</option>
-              <option value="highest">Highest Rating</option>
-              <option value="lowest">Lowest Rating</option>
-              <option value="mostHelpful">Most Helpful</option>
-            </select>
+
+          {/* Advanced filters */}
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Course filter - only show when viewing all or courses */}
+            {(filter === 'all' || filter === 'courses') && (
+              <div className="w-full md:w-1/3">
+                <label className="block text-sm font-medium text-gray-600 mb-1">Filter by Course</label>
+                <select
+                  value={selectedCourse}
+                  onChange={(e) => setSelectedCourse(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+                >
+                  <option value="">All Courses</option>
+                  {uniqueCourses.map(course => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Professor filter - only show when viewing all or professors */}
+            {(filter === 'all' || filter === 'professors') && (
+              <div className="w-full md:w-1/3">
+                <label className="block text-sm font-medium text-gray-600 mb-1">Filter by Professor</label>
+                <select
+                  value={selectedProfessor}
+                  onChange={(e) => setSelectedProfessor(e.target.value)}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+                >
+                  <option value="">All Professors</option>
+                  {uniqueProfessors.map(professor => (
+                    <option key={professor.id} value={professor.id}>
+                      {professor.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Sort option */}
+            <div className="w-full md:w-1/3">
+              <label className="block text-sm font-medium text-gray-600 mb-1">Sort by</label>
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+              >
+                <option value="newest">Newest</option>
+                <option value="highest">Highest Rating</option>
+                <option value="lowest">Lowest Rating</option>
+                <option value="mostHelpful">Most Helpful</option>
+              </select>
+            </div>
           </div>
+
+          {/* Active filters display */}
+          {(selectedCourse || selectedProfessor) && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {selectedCourse && (
+                <div className="bg-pink-50 text-[#860033] px-3 py-1 rounded-full text-sm flex items-center">
+                  <span>Course: {uniqueCourses.find(c => c.id === selectedCourse)?.title}</span>
+                  <button
+                    onClick={() => setSelectedCourse("")}
+                    className="ml-2 hover:text-[#6a0026]"
+                  >
+                    <i className="bx bx-x"></i>
+                  </button>
+                </div>
+              )}
+              {selectedProfessor && (
+                <div className="bg-pink-50 text-[#860033] px-3 py-1 rounded-full text-sm flex items-center">
+                  <span>Professor: {uniqueProfessors.find(p => p.id === selectedProfessor)?.name}</span>
+                  <button
+                    onClick={() => setSelectedProfessor("")}
+                    className="ml-2 hover:text-[#6a0026]"
+                  >
+                    <i className="bx bx-x"></i>
+                  </button>
+                </div>
+              )}
+              {(selectedCourse || selectedProfessor) && (
+                <button
+                  onClick={() => {
+                    setSelectedCourse("");
+                    setSelectedProfessor("");
+                  }}
+                  className="text-[#860033] hover:underline text-sm ml-1"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Reviews Section */}
@@ -786,10 +941,10 @@ const ReviewsPage = () => {
                           onClick={() => handleUpvote(review._id)}
                           disabled={review.username === loggedInUsername}
                           className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.upvotes?.includes(loggedInUsername)
-                              ? "bg-[#860033]/10 text-[#860033]"
-                              : review.username === loggedInUsername
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
+                            ? "bg-[#860033]/10 text-[#860033]"
+                            : review.username === loggedInUsername
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-50 hover:bg-pink-50 text-gray-600 hover:text-[#860033]"
                             }`}
                         >
                           <i className={`bx ${review.upvotes?.includes(loggedInUsername) ? 'bxs-like' : 'bx-like'}`}></i>
@@ -799,10 +954,10 @@ const ReviewsPage = () => {
                           onClick={() => handleDownvote(review._id)}
                           disabled={review.username === loggedInUsername}
                           className={`flex items-center space-x-1 px-3 py-1 rounded-full transition-colors ${review.downvotes?.includes(loggedInUsername)
-                              ? "bg-red-100 text-red-600"
-                              : review.username === loggedInUsername
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
+                            ? "bg-red-100 text-red-600"
+                            : review.username === loggedInUsername
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-50 hover:bg-red-50 text-gray-600 hover:text-red-600"
                             }`}
                         >
                           <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'}`}></i>
