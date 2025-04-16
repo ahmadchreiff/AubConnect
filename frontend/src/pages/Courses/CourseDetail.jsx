@@ -19,6 +19,7 @@ const CourseDetail = () => {
   const [success, setSuccess] = useState(null);
   const [loggedInUsername, setLoggedInUsername] = useState("");
   const navigate = useNavigate();
+  const [toastError, setToastError] = useState(null);
 
   // Add these states for the review form
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -169,12 +170,21 @@ const CourseDetail = () => {
     }
   };
 
-  // Handle upvote
+  // Update handleUpvote
   const handleUpvote = async (reviewId) => {
     try {
       const username = getUsernameFromToken();
       if (!username) {
-        setError("You must be logged in to upvote reviews.");
+        setToastError("You must be logged in to upvote reviews.");
+        setTimeout(() => setToastError(null), 3000);
+        return;
+      }
+
+      // Check if this is the user's own review
+      const review = reviews.find(r => r._id === reviewId);
+      if (review && review.username === username) {
+        setToastError("You cannot upvote your own review.");
+        setTimeout(() => setToastError(null), 3000);
         return;
       }
 
@@ -196,17 +206,26 @@ const CourseDetail = () => {
       setSuccess(response.data.message);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to process vote.");
-      setTimeout(() => setError(null), 3000);
+      setToastError(err.response?.data?.message || "Failed to process vote.");
+      setTimeout(() => setToastError(null), 3000);
     }
   };
 
-  // Handle downvote
+  // Update handleDownvote
   const handleDownvote = async (reviewId) => {
     try {
       const username = getUsernameFromToken();
       if (!username) {
-        setError("You must be logged in to downvote reviews.");
+        setToastError("You must be logged in to downvote reviews.");
+        setTimeout(() => setToastError(null), 3000);
+        return;
+      }
+
+      // Check if this is the user's own review
+      const review = reviews.find(r => r._id === reviewId);
+      if (review && review.username === username) {
+        setToastError("You cannot downvote your own review.");
+        setTimeout(() => setToastError(null), 3000);
         return;
       }
 
@@ -228,11 +247,10 @@ const CourseDetail = () => {
       setSuccess(response.data.message);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to process vote.");
-      setTimeout(() => setError(null), 3000);
+      setToastError(err.response?.data?.message || "Failed to process vote.");
+      setTimeout(() => setToastError(null), 3000);
     }
   };
-
   // Calculate average rating
   const averageRating = reviews.length
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
@@ -243,10 +261,18 @@ const CourseDetail = () => {
       {/* Unified Navbar */}
       <Navbar />
 
-      {/* Notification Messages */}
-      {error && (
-        <div className="fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50">
-          {error}
+      {/* Toast Notification Messages */}
+      {toastError && (
+        <div className="fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded shadow-lg z-50 flex items-center">
+          <span>{toastError}</span>
+          <button
+            onClick={() => setToastError(null)}
+            className="ml-3 text-white/80 hover:text-white"
+          >
+            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
         </div>
       )}
       {success && (
