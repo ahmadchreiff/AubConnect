@@ -20,6 +20,14 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ message: 'User not found', error: 'USER_NOT_FOUND' });
     }
 
+    // Check if the user is banned or suspended
+    if (user.status !== 'active') {
+      return res.status(403).json({ 
+        message: 'Your account has been suspended or banned', 
+        error: 'ACCOUNT_INACTIVE' 
+      });
+    }
+
     // Add user to request object
     req.user = user;
     next();

@@ -44,7 +44,8 @@ const sendVerificationCode = async (req, res) => {
     };
 
     // Send the verification code via email
-    await sendVerificationEmail(email, verificationCode);
+    // await sendVerificationEmail(email, verificationCode);
+    await emailService.sendVerificationEmail(email, verificationCode);
 
     res.status(200).json({ message: 'Verification code sent successfully' });
   } catch (err) {
@@ -96,7 +97,8 @@ const verifyCode = async (req, res) => {
   }
 };
 
-// Login
+
+// // Login
 // const login = async (req, res) => {
 //   const { email, password } = req.body;
 
@@ -118,12 +120,19 @@ const verifyCode = async (req, res) => {
 //       userId: user._id,
 //       username: user.username, // Include the username in the token
 //     };
-//     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+//     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
-//     // Return success response with redirect URL
+//     // Return success response with user data and redirect URL
 //     res.status(200).json({ 
 //       message: 'Login successful', 
 //       token, 
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         username: user.username,
+//         createdAt: user.createdAt
+//       },
 //       redirectUrl: "/homepage" 
 //     });
 //   } catch (err) {
@@ -148,10 +157,19 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials - Incorrect password', error: 'INCORRECT_PASSWORD' });
     }
 
-    // Generate JWT with user's username included
+    // Check if user is banned or suspended
+    if (user.status !== 'active') {
+      return res.status(403).json({ 
+        message: 'Your account has been suspended or banned', 
+        error: 'ACCOUNT_INACTIVE' 
+      });
+    }
+
+    // Generate JWT with user's username and role included
     const payload = { 
       userId: user._id,
-      username: user.username, // Include the username in the token
+      username: user.username,
+      role: user.role
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
@@ -163,9 +181,12 @@ const login = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        username: user.username
+        username: user.username,
+        role: user.role,
+        status: user.status,
+        createdAt: user.createdAt
       },
-      redirectUrl: "/homepage" 
+      redirectUrl: user.role === 'admin' ? "/admin/dashboard" : "/homepage"
     });
   } catch (err) {
     console.error('Error during login:', err);

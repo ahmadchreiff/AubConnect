@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const userRoutes = require('./routes/userRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 dotenv.config();
 
 
@@ -38,7 +39,8 @@ app.use("/api/departments", require("./routes/departmentRoutes"));
 app.use("/api/courses", require("./routes/courseRoutes"));
 app.use('/api/users', userRoutes);
 app.use('/api/search', searchRoutes);
-app.use('/api/professors', require('./routes/professorRoutes')); // Add professors route
+app.use('/api/professors', require('./routes/professorRoutes')); 
+app.use('/api/admin', adminRoutes);
 
 // Start the application
 startServer();

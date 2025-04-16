@@ -1,9 +1,10 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const location = useLocation();
   
   // Show loading state if authentication check is in progress
   if (loading) {
@@ -17,6 +18,14 @@ const ProtectedRoute = () => {
   // Redirect to login if not authenticated
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
+  }
+  
+  // Redirect admins to admin dashboard
+  if (isAdmin()) {
+    // Check if not already in admin area
+    if (!location.pathname.startsWith('/admin')) {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
   }
   
   return <Outlet />;

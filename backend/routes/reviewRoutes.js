@@ -1,8 +1,8 @@
-// routes/reviewRoutes.js
 const express = require("express");
 const router = express.Router();
 const reviewController = require("../controllers/reviewController");
 const auth = require('../middleware/auth');
+const Review = require("../models/Review"); // Add this import
 
 // Create a review
 router.post("/", reviewController.postReview);
@@ -39,10 +39,15 @@ router.post("/:id/upvote", async (req, res) => {
       return res.status(404).json({ message: "Review not found." });
     }
 
-    // Check if the user has already upvoted
+    // Check if the user has already upvoted - toggle logic
     if (review.upvotes.includes(username)) {
-      return res.status(400).json({ 
-        message: "You have already upvoted this review." 
+      // Remove the upvote if already upvoted (toggle off)
+      review.upvotes = review.upvotes.filter((user) => user !== username);
+      await review.save();
+      
+      return res.status(200).json({ 
+        message: "Upvote removed successfully!", 
+        review 
       });
     }
 
@@ -78,10 +83,15 @@ router.post("/:id/downvote", async (req, res) => {
       return res.status(404).json({ message: "Review not found." });
     }
 
-    // Check if the user has already downvoted
+    // Check if the user has already downvoted - toggle logic
     if (review.downvotes.includes(username)) {
-      return res.status(400).json({ 
-        message: "You have already downvoted this review." 
+      // Remove the downvote if already downvoted (toggle off)
+      review.downvotes = review.downvotes.filter((user) => user !== username);
+      await review.save();
+      
+      return res.status(200).json({ 
+        message: "Downvote removed successfully!", 
+        review 
       });
     }
 

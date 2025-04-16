@@ -10,10 +10,10 @@ const Navbar = () => {
 
   // Helper function to determine if a link is active
   const isActive = (path) => {
-    if (path === '/' && location.pathname === '/') {
+    if (path === '/homepage' && (location.pathname === '/homepage' || location.pathname === '/')) {
       return true;
     }
-    if (path !== '/' && location.pathname.startsWith(path)) {
+    if (path !== '/homepage' && location.pathname.startsWith(path)) {
       return true;
     }
     return false;
@@ -25,7 +25,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           {/* Logo and brand */}
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
+            <Link to="/homepage" className="flex-shrink-0 flex items-center">
               <div className="h-10 w-10 mr-2">
                 <svg viewBox="0 0 100 100" className="h-full w-full fill-current text-[#860033]">
                   <path d="M50,15 C35,15 25,25 25,40 C25,50 30,55 40,65 C45,70 50,85 50,85 C50,85 55,70 60,65 C70,55 75,50 75,40 C75,25 65,15 50,15 Z"></path>
@@ -37,6 +37,12 @@ const Navbar = () => {
           
           {/* Navigation */}
           <div className="flex items-center gap-3">
+            <Link 
+              to="/homepage" 
+              className={`${isActive('/homepage') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium flex items-center`}
+            >
+              <i className='bx bx-home-alt mr-1'></i> Home
+            </Link>
             <Link 
               to="/departments" 
               className={`${isActive('/departments') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
@@ -60,12 +66,6 @@ const Navbar = () => {
               className={`${isActive('/reviews') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
             >
               Reviews
-            </Link>
-            <Link 
-              to="/about" 
-              className={`${isActive('/about') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
-            >
-              About
             </Link>
             
             {isAuthenticated() ? (

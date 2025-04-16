@@ -67,8 +67,13 @@ export const AuthProvider = ({ children }) => {
       // Update current user
       setCurrentUser(user);
       
+      // Log the login success
+      console.log('Login successful:', user.role);
+      
+      // Return the complete response data
       return response.data;
     } catch (err) {
+      console.error('Login error:', err);
       throw err;
     }
   };
@@ -108,6 +113,40 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Check if user is an admin
+  const isAdmin = () => {
+    if (!currentUser) return false;
+    return currentUser.role === 'admin';
+  };
+
+  // Check if admin should be redirected to admin dashboard
+  const shouldRedirectAdmin = () => {
+    if (!currentUser) return false;
+    return currentUser.role === 'admin';
+  };
+
+  // Add this function to your AuthContext.jsx
+const checkPageAccess = (pathname) => {
+  // If no user is logged in, they can only access public pages
+  if (!currentUser) {
+    const publicPaths = ['/', '/login', '/signup', '/forgot-password'];
+    return publicPaths.includes(pathname);
+  }
+  
+  // If user is admin, they can only access admin pages
+  if (currentUser.role === 'admin') {
+    return pathname.startsWith('/admin');
+  }
+  
+  // Regular users can't access admin pages
+  if (pathname.startsWith('/admin')) {
+    return false;
+  }
+  
+  // Regular users can access all other pages
+  return true;
+};
+
   // Value to be provided by the context
   const value = {
     currentUser,
@@ -116,7 +155,10 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     getUserInfo,
-    isAuthenticated
+    isAuthenticated,
+    isAdmin,
+    shouldRedirectAdmin,
+    checkPageAccess // Add this new function
   };
 
   return (
