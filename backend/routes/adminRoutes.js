@@ -35,13 +35,18 @@ router.delete('/reviews/:reviewId', deleteReview);
 
 // Reported reviews
 router.get('/reviews/reported', getReportedReviews);
+// In adminRoutes.js
 router.patch('/reviews/:reviewId/clear-reports', async (req, res) => {
   try {
     const { reviewId } = req.params;
     
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.status(404).json({ message: 'Review not found', error: 'REVIEW_NOT_FOUND' });
+      return res.status(404).json({ 
+        success: false,
+        message: 'Review not found',
+        error: 'REVIEW_NOT_FOUND' 
+      });
     }
     
     review.reports = [];
@@ -49,12 +54,48 @@ router.patch('/reviews/:reviewId/clear-reports', async (req, res) => {
     await review.save();
     
     res.status(200).json({ 
+      success: true,
       message: 'Reports cleared successfully',
       review
     });
   } catch (err) {
     console.error('Error clearing reports:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error', 
+      error: err.message 
+    });
+  }
+});
+
+router.patch('/reviews/:reviewId/reject', async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ 
+        success: false,
+        message: 'Review not found',
+        error: 'REVIEW_NOT_FOUND' 
+      });
+    }
+    
+    review.status = 'rejected';
+    await review.save();
+    
+    res.status(200).json({ 
+      success: true,
+      message: 'Review rejected successfully',
+      review
+    });
+  } catch (err) {
+    console.error('Error rejecting review:', err);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error', 
+      error: err.message 
+    });
   }
 });
 

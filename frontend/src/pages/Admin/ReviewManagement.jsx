@@ -358,75 +358,103 @@ const ReportedReviewsTab = () => {
   const [reportedReviews, setReportedReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const fetchReportedReviews = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('http://localhost:5001/api/admin/reviews/reported', {
-          params: {
-            page: currentPage,
-            limit: 10
-          },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        
-        setReportedReviews(response.data.reviews);
-        setTotalPages(response.data.pagination.pages);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching reported reviews:', err);
-        setError(err.response?.data?.message || 'Failed to load reported reviews');
-        setLoading(false);
-      }
-    };
+  const fetchReportedReviews = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await axios.get('http://localhost:5001/api/admin/reviews/reported', {
+        params: {
+          page: currentPage,
+          limit: 10
+        },
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      setReportedReviews(response.data.reviews);
+      setTotalPages(response.data.pagination.pages);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching reported reviews:', err);
+      setError(err.response?.data?.message || 'Failed to load reported reviews');
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchReportedReviews();
   }, [currentPage]);
 
-  const handleClearReports = async (reviewId) => {
-    try {
-      await axios.patch(
-        `http://localhost:5001/api/admin/reviews/${reviewId}/clear-reports`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+  // Update the handleClearReports function
+const handleClearReports = async (reviewId) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Authentication required");
+      return;
+    }
+
+    const response = await axios.patch(
+      `http://localhost:5001/api/admin/reviews/${reviewId}/clear-reports`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      );
+      }
+    );
+
+    if (response.data.message === 'Reports cleared successfully') {
       setReportedReviews(reportedReviews.filter(review => review._id !== reviewId));
       setSuccess('Reports cleared successfully');
       setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      console.error('Error clearing reports:', err);
-      setError(err.response?.data?.message || 'Failed to clear reports');
+    } else {
+      setError(response.data.message || 'Failed to clear reports');
     }
-  };
+  } catch (err) {
+    console.error('Error clearing reports:', err);
+    setError(err.response?.data?.message || 'Failed to clear reports');
+  }
+};
 
-  const handleRejectReview = async (reviewId) => {
-    try {
-      await axios.patch(
-        `http://localhost:5001/api/admin/reviews/${reviewId}/reject`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
+// Update the handleRejectReview function
+const handleRejectReview = async (reviewId) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("Authentication required");
+      return;
+    }
+
+    const response = await axios.patch(
+      `http://localhost:5001/api/admin/reviews/${reviewId}/reject`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      );
+      }
+    );
+
+    if (response.data.message === 'Review rejected successfully') {
       setReportedReviews(reportedReviews.filter(review => review._id !== reviewId));
       setSuccess('Review rejected successfully');
       setTimeout(() => setSuccess(''), 3000);
-    } catch (err) {
-      console.error('Error rejecting review:', err);
-      setError(err.response?.data?.message || 'Failed to reject review');
+    } else {
+      setError(response.data.message || 'Failed to reject review');
     }
-  };
+  } catch (err) {
+    console.error('Error rejecting review:', err);
+    setError(err.response?.data?.message || 'Failed to reject review');
+  }
+};
 
   if (loading && reportedReviews.length === 0) {
     return (
