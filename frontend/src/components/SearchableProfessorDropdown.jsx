@@ -1,3 +1,4 @@
+// SearchableProfessorDropdown.jsx
 import React, { useState, useEffect, useRef } from "react";
 
 const SearchableProfessorDropdown = ({ professors, selectedProfessor, onChange }) => {
@@ -29,7 +30,7 @@ const SearchableProfessorDropdown = ({ professors, selectedProfessor, onChange }
 
   // Handle professor selection
   const handleSelect = (professorId) => {
-    onChange({ target: { name: "professor", value: professorId } });
+    onChange({ target: { value: professorId } }); // Changed this line
     setIsOpen(false);
     setSearchTerm("");
   };
