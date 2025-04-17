@@ -144,7 +144,6 @@ const HomePage = () => {
               </div>
             )}
           </div>
-
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/departments" className="text-[#860033] hover:bg-[#860033]/10 px-5 py-3 rounded-lg transition-colors text-lg font-medium flex items-center">
               <i className="bx bx-building-house mr-2"></i> Browse Departments
@@ -158,7 +157,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
       {/* Feature Highlights - Simplified */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -170,7 +168,6 @@ const HomePage = () => {
               <h3 className="text-xl font-bold mb-3 text-center">Anonymous Feedback</h3>
               <p className="text-gray-600">Share your honest opinions about courses and professors without revealing your identity.</p>
             </div>
-
             <div className="bg-gray-50 rounded-xl p-6 shadow-sm">
               <div className="w-16 h-16 mx-auto mb-4 bg-[#E0C6F5] rounded-full flex items-center justify-center">
                 <i className="bx bx-user-voice text-3xl text-[#860033]"></i>
@@ -178,7 +175,6 @@ const HomePage = () => {
               <h3 className="text-xl font-bold mb-3 text-center">Find Your Courses</h3>
               <p className="text-gray-600">Easily search and discover the best courses based on fellow students' experiences.</p>
             </div>
-
             <div className="bg-gray-50 rounded-xl p-6 shadow-sm">
               <div className="w-16 h-16 mx-auto mb-4 bg-[#A8DAFF] rounded-full flex items-center justify-center">
                 <i className="bx bx-like text-3xl text-[#860033]"></i>
@@ -189,7 +185,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
       {/* Footer */}
       <Footer />
     </div>

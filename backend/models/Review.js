@@ -69,7 +69,14 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     enum: ['pending','approved','rejected'],
     default: 'approved'
-  }
+  },
+  reports: [{
+    reporter: { type: String, required: true }, // username of who reported
+    reason: { type: String, required: true },
+    details: { type: String },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  reportCount: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model("Review", reviewSchema);

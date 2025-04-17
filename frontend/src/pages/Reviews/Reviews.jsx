@@ -9,8 +9,8 @@ import Footer from "../Components/Footer";
 import SearchableProfessorDropdown from "../../components/SearchableProfessorDropdown";
 import "boxicons/css/boxicons.min.css";
 
-
 const ReviewsPage = () => {
+  // React hooks: useState and context setup
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,6 +21,8 @@ const ReviewsPage = () => {
   const entityName = queryParams.get('name'); // professor name or course name
   const departmentId = queryParams.get('department'); // Only for courses
   const courseNumber = queryParams.get('courseNumber'); // Only for courses
+
+  // State variables
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedProfessor, setSelectedProfessor] = useState("");
   const [uniqueCourses, setUniqueCourses] = useState([]);
@@ -49,6 +51,12 @@ const ReviewsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [sortOption, setSortOption] = useState("newest");
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [currentReportReview, setCurrentReportReview] = useState(null);
+  const [reportReason, setReportReason] = useState('');
+  const [reportDetails, setReportDetails] = useState('');
+
+  // useEffect hooks
   // Handle auto-opening the form with prefilled data from URL params
   useEffect(() => {
     // Check if we have query parameters to prefill the form
@@ -103,8 +111,7 @@ const ReviewsPage = () => {
     }
   }, [newReview.course, newReview.professor, newReview.department, newReview.type, courses, professors, departments]);
 
-
-  // Fetch reviews, departments, courses, and professors on mount
+  // Fetch initial data
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -112,7 +119,7 @@ const ReviewsPage = () => {
 
         // Fetch reviews
         const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
-
+        
         // Client-side safety filter to remove rejected reviews
         const filteredReviews = reviewsRes.data.filter(review =>
           review.status !== 'rejected'
@@ -130,9 +137,10 @@ const ReviewsPage = () => {
         // Fetch all professors
         const professorsRes = await axios.get("http://localhost:5001/api/professors");
         setProfessors(professorsRes.data);
+
       } catch (err) {
-        setError("Failed to fetch initial data.");
-        console.error("Error fetching initial data:", err);
+        setError("Failed to fetch data. Please try again later.");
+        console.error("Error fetching data:", err);
       } finally {
         setIsLoading(false);
       }
@@ -140,30 +148,33 @@ const ReviewsPage = () => {
 
     fetchInitialData();
 
-    // Set the logged-in username
-    const username = getUsernameFromToken();
-    if (username) {
-      setLoggedInUsername(username);
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setLoggedInUsername(decoded.username);
+      } catch (err) {
+        console.error("Error decoding token:", err);
+      }
     }
   }, []);
 
-  // Filter courses when department selection changes
+  // Filter courses based on selected department
   useEffect(() => {
     if (newReview.department) {
-      const filtered = courses.filter(
-        course => {
-          // Check if department is an object with _id property
-          if (typeof course.department === 'object' && course.department !== null) {
-            return course.department._id === newReview.department;
-          }
-          // Check if department is a string ID directly
-          else {
-            return course.department === newReview.department;
-          }
+      const filtered = courses.filter(course => {
+        // Check if department is an object with _id property
+        if (typeof course.department === 'object' && course.department !== null) {
+          return course.department._id === newReview.department;
         }
-      );
+        // Check if department is a string ID directly
+        else {
+          return course.department === newReview.department;
+        }
+      });
       setFilteredCourses(filtered);
-
+      
       // Reset course selection if the previously selected course isn't in this department
       if (newReview.course && !filtered.find(c => c._id === newReview.course)) {
         setNewReview(prev => ({ ...prev, course: "" }));
@@ -174,6 +185,7 @@ const ReviewsPage = () => {
     }
   }, [newReview.department, courses]);
 
+  // Extract unique courses and professors from reviews
   useEffect(() => {
     // Extract unique courses from reviews
     const courseMap = new Map();
@@ -218,7 +230,115 @@ const ReviewsPage = () => {
     setUniqueProfessors(sortedProfessors);
   }, [reviews]);
 
-  // Function to get the username from the JWT token
+  // Derived/computed variables
+  // Calculate statistics for more meaningful metrics
+  const calculateStats = () => {
+    if (reviews.length === 0) return { courseCount: 0, professorCount: 0, highestRated: { title: 'N/A', rating: 0 } };
+
+    const courseReviews = reviews.filter(review => review.type === 'course');
+    const professorReviews = reviews.filter(review => review.type === 'professor');
+
+    // Find highest rated item
+    const highestRated = [...reviews].sort((a, b) => b.rating - a.rating)[0] || { title: 'N/A', rating: 0 };
+
+    // Get unique courses/professors (only count unique titles)
+    const uniqueCourses = new Set(courseReviews.map(review => review.title));
+    const uniqueProfessors = new Set(professorReviews.map(review => review.title));
+
+    return {
+      courseCount: uniqueCourses.size,
+      professorCount: uniqueProfessors.size,
+      highestRated
+    };
+  };
+
+  // Filter and search reviews
+  const filteredReviews = () => {
+    try {
+      if (!Array.isArray(reviews)) return []; // Safety check
+      
+      let filtered = [...reviews];
+    
+      // Apply search query
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(review => {
+          // Skip if review is invalid
+          if (!review || typeof review !== 'object') return false;
+          
+          // Check title and review text as before
+          if (review.title.toLowerCase().includes(query) ||
+            review.reviewText.toLowerCase().includes(query) ||
+            review.username.toLowerCase().includes(query)) {
+            return true;
+          }
+
+          // Additional checks for course information
+          if (review.type === "course") {
+            // Check course name if available
+            if (review.course?.name?.toLowerCase().includes(query)) {
+              return true;
+            }
+            // Check course number if available
+            if (review.course?.courseNumber?.toLowerCase().includes(query)) {
+              return true;
+            }
+            // Check department code if available
+            if (review.department?.code?.toLowerCase().includes(query)) {
+              return true;
+            }
+          }
+
+          return false;
+        });
+      }
+
+      // Filter by review type
+      if (filter === "courses") {
+        filtered = filtered.filter(review => review.type === "course");
+      } else if (filter === "professors") {
+        filtered = filtered.filter(review => review.type === "professor");
+      }
+
+      // Filter by specific course
+      if (selectedCourse) {
+        filtered = filtered.filter(review =>
+          review.type === "course" &&
+          (review.course?._id === selectedCourse || review.course === selectedCourse)
+        );
+      }
+
+      // Filter by specific professor
+      if (selectedProfessor) {
+        filtered = filtered.filter(review =>
+          review.type === "professor" &&
+          (review.professor?._id === selectedProfessor || review.professor === selectedProfessor)
+        );
+      }
+
+      // Sorting logic
+      if (sortOption === "highest") {
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      } else if (sortOption === "lowest") {
+        filtered.sort((a, b) => (a.rating || 0) - (b.rating || 0));
+      } else if (sortOption === "mostHelpful") {
+        filtered.sort((a, b) =>
+          ((b.upvotes?.length || 0) - (b.downvotes?.length || 0)) -
+          ((a.upvotes?.length || 0) - (a.downvotes?.length || 0))
+        );
+      } else {
+        // Default: newest first
+        filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      }
+
+      return filtered;
+    } catch (err) {
+      console.error("Error filtering reviews:", err);
+      return []; // Return empty array if error occurs
+    }
+  };
+
+  // Helper functions
   const getUsernameFromToken = () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -232,6 +352,19 @@ const ReviewsPage = () => {
       setError("Invalid token. Please log in again.");
       return null;
     }
+  };
+
+  // Handler functions
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setNewReview({
+      ...newReview,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleRatingChange = (rating) => {
+    setNewReview({ ...newReview, rating });
   };
 
   // Handle upvote
@@ -260,11 +393,9 @@ const ReviewsPage = () => {
         }
       );
 
-      setReviews((prevReviews) =>
-        prevReviews.map((review) =>
-          review._id === id ? response.data.review : review
-        )
-      );
+      // Refresh reviews
+      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+      setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
 
       setSuccess(response.data.message);
       setTimeout(() => setSuccess(""), 3000);
@@ -301,11 +432,9 @@ const ReviewsPage = () => {
         }
       );
 
-      setReviews((prevReviews) =>
-        prevReviews.map((review) =>
-          review._id === id ? response.data.review : review
-        )
-      );
+      // Refresh reviews
+      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+      setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
 
       setSuccess(response.data.message);
       setTimeout(() => setSuccess(""), 3000);
@@ -316,24 +445,7 @@ const ReviewsPage = () => {
     }
   };
 
-  // Handle input changes for the review form
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setNewReview({
-      ...newReview,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
-  // Handle rating changes
-  const handleRatingChange = (rating) => {
-    setNewReview({ ...newReview, rating });
-  };
-
   // Submit or update a review
-  // This is only the modified section of the submitReview function from Reviews.jsx
-  // Replace this section in the component
-
   const submitReview = async () => {
     const username = getUsernameFromToken();
     if (!username) {
@@ -374,28 +486,29 @@ const ReviewsPage = () => {
       const reviewData = {
         ...newReview,
         username, // Always use actual username for ownership
-        anonymous: newReview.anonymous // Pass anonymous flag instead of changing username
+        isAnonymous: newReview.anonymous, // Match both field names from branches
+        anonymous: newReview.anonymous, // Pass anonymous flag instead of changing username
+        displayName: newReview.anonymous ? "Anonymous" : username
       };
 
       let response;
+      const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      };
 
       if (editReviewId) {
         // Update the review
         response = await axios.put(
           `http://localhost:5001/api/reviews/${editReviewId}`,
           reviewData,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          }
+          config
         );
       } else {
         // Submit a new review
         response = await axios.post(
           "http://localhost:5001/api/reviews",
           reviewData,
-          {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          }
+          config
         );
       }
 
@@ -453,7 +566,7 @@ const ReviewsPage = () => {
         professor: reviewToEdit.professor?._id || "",
         rating: reviewToEdit.rating,
         reviewText: reviewToEdit.reviewText,
-        anonymous: reviewToEdit.isAnonymous || false
+        anonymous: reviewToEdit.isAnonymous || reviewToEdit.anonymous || false
       });
       setEditReviewId(id);
       setIsModalOpen(true);
@@ -472,12 +585,21 @@ const ReviewsPage = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:5001/api/reviews/${id}`, {
-        data: { username },
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      const updatedReviews = reviews.filter((review) => review._id !== id);
-      setReviews(updatedReviews);
+      const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+      };
+
+      await axios.delete(
+        `http://localhost:5001/api/reviews/${id}`,
+        {
+          ...config,
+          data: { username } // Send username in the request body
+        }
+      );
+
+      // Refresh reviews
+      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+      setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
       setSuccess("Review deleted successfully!");
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
@@ -486,109 +608,69 @@ const ReviewsPage = () => {
     }
   };
 
-  // Calculate statistics for more meaningful metrics
-  const calculateStats = () => {
-    if (reviews.length === 0) return { courseCount: 0, professorCount: 0, highestRated: { title: 'N/A', rating: 0 } };
+  // Handle report submission
+  const submitReport = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("You must be logged in to report a review.");
+      return;
+    }
 
-    const courseReviews = reviews.filter(review => review.type === 'course');
-    const professorReviews = reviews.filter(review => review.type === 'professor');
+    if (!reportReason) {
+      setError("Please select a reason for reporting.");
+      return;
+    }
 
-    // Find highest rated item
-    const highestRated = [...reviews].sort((a, b) => b.rating - a.rating)[0] || { title: 'N/A', rating: 0 };
+    try {
+      const config = {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      };
 
-    // Get unique courses/professors (only count unique titles)
-    const uniqueCourses = new Set(courseReviews.map(review => review.title));
-    const uniqueProfessors = new Set(professorReviews.map(review => review.title));
+      const response = await axios.post(
+        `http://localhost:5001/api/reviews/${currentReportReview._id}/report`,
+        {
+          reason: reportReason,
+          details: reportDetails || "No additional details",
+          username: loggedInUsername  // Changed from 'reporter' to 'username'
+        },
+        config
+      );
 
-    return {
-      courseCount: uniqueCourses.size,
-      professorCount: uniqueProfessors.size,
-      highestRated
-    };
+      if (response.data.message === "Review reported successfully!") {
+        setIsReportModalOpen(false);
+        setCurrentReportReview(null);
+        setReportReason('');
+        setReportDetails('');
+        setSuccess("Report submitted successfully!");
+        setTimeout(() => setSuccess(""), 3000);
+      } else {
+        setError(response.data.message || "Report submission failed.");
+      }
+    } catch (err) {
+      console.error("Report submission error:", err);
+      
+      let errorMsg = "Failed to submit report";
+      if (err.response) {
+        if (err.response.status === 404) {
+          errorMsg = "Review not found";
+        } else if (err.response.data?.message) {
+          errorMsg = err.response.data.message;
+        }
+      }
+      setError(errorMsg);
+    }
   };
 
-  // Filter and search reviews
-  const filteredReviews = () => {
-    let filtered = [...reviews];
-
-    // Apply search query
-    if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(review => {
-        // Check title and review text as before
-        if (review.title.toLowerCase().includes(query) ||
-          review.reviewText.toLowerCase().includes(query) ||
-          review.username.toLowerCase().includes(query)) {
-          return true;
-        }
-
-        // Additional checks for course information
-        if (review.type === "course") {
-          // Check course name if available
-          if (review.course?.name?.toLowerCase().includes(query)) {
-            return true;
-          }
-          // Check course number if available
-          if (review.course?.courseNumber?.toLowerCase().includes(query)) {
-            return true;
-          }
-          // Check department code if available
-          if (review.department?.code?.toLowerCase().includes(query)) {
-            return true;
-          }
-        }
-
-        return false;
-      });
-    }
-
-    // Filter by review type
-    if (filter === "courses") {
-      filtered = filtered.filter(review => review.type === "course");
-    } else if (filter === "professors") {
-      filtered = filtered.filter(review => review.type === "professor");
-    }
-
-    // Filter by specific course
-    if (selectedCourse) {
-      filtered = filtered.filter(review =>
-        review.type === "course" &&
-        (review.course?._id === selectedCourse || review.course === selectedCourse)
-      );
-    }
-
-    // Filter by specific professor
-    if (selectedProfessor) {
-      filtered = filtered.filter(review =>
-        review.type === "professor" &&
-        (review.professor?._id === selectedProfessor || review.professor === selectedProfessor)
-      );
-    }
-
-    // Sorting logic remains the same
-    if (sortOption === "highest") {
-      filtered.sort((a, b) => b.rating - a.rating);
-    } else if (sortOption === "lowest") {
-      filtered.sort((a, b) => a.rating - b.rating);
-    } else if (sortOption === "mostHelpful") {
-      filtered.sort((a, b) =>
-        ((b.upvotes?.length || 0) - (b.downvotes?.length || 0)) -
-        ((a.upvotes?.length || 0) - (a.downvotes?.length || 0))
-      );
-    } else {
-      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    }
-
-    return filtered;
-  };
-
+  // UI Helper functions
   const getRatingColor = (rating) => {
     if (rating >= 4) return "bg-green-100 text-green-700";
     if (rating >= 3) return "bg-yellow-100 text-yellow-700";
     return "bg-red-100 text-red-700";
   };
 
-  // Format date for display
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -598,19 +680,19 @@ const ReviewsPage = () => {
     });
   };
 
+  // Render
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Unified Navbar */}
       <Navbar />
 
-      {/* Hero Section with Stats */}
+      {/* Hero Section */}
       <section className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
               <h1 className="text-3xl font-bold mb-2">Campus Reviews</h1>
               <p className="text-lg opacity-90">
-                See what students are saying about courses and professors at AUB
+                See what students are saying about courses and professors
               </p>
 
               <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
@@ -811,7 +893,7 @@ const ReviewsPage = () => {
                 <option value="newest">Newest</option>
                 <option value="highest">Highest Rating</option>
                 <option value="lowest">Lowest Rating</option>
-                {/* <option value="mostHelpful">Most Helpful</option> */}
+                <option value="mostHelpful">Most Helpful</option>
               </select>
             </div>
           </div>
@@ -883,9 +965,6 @@ const ReviewsPage = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             <AnimatePresence>
-            // This is the modification for the review cards in the Reviews.jsx component
-              // Look for this section in the returned reviews map function and update it
-
               {filteredReviews().map((review, index) => (
                 <motion.div
                   key={review._id}
@@ -916,7 +995,7 @@ const ReviewsPage = () => {
                           </p>
                         )}
                         <p className="text-sm text-gray-500">
-                          by {review.displayName || review.username}
+                          by {review.anonymous || review.isAnonymous ? "Anonymous" : review.username}
                         </p>
                       </div>
                       <div className={`${getRatingColor(review.rating)} text-xl font-bold rounded-lg h-12 w-12 flex items-center justify-center`}>
@@ -963,9 +1042,20 @@ const ReviewsPage = () => {
                           <i className={`bx ${review.downvotes?.includes(loggedInUsername) ? 'bxs-dislike' : 'bx-dislike'}`}></i>
                           <span>{review.downvotes?.length || 0}</span>
                         </button>
+                        {loggedInUsername && loggedInUsername !== review.username && (
+                          <button
+                            onClick={() => {
+                              setCurrentReportReview(review);
+                              setIsReportModalOpen(true);
+                            }}
+                            className="flex items-center space-x-1 px-3 py-1 rounded-full bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors"
+                          >
+                            <i className="bx bx-flag"></i>
+                            <span>Report</span>
+                          </button>
+                        )}
                       </div>
 
-                      {/* Updated to check username against actual username, not display name */}
                       {review.username === loggedInUsername && (
                         <div className="flex space-x-2">
                           {/* Only show Edit button if review has no feedback */}
@@ -994,7 +1084,7 @@ const ReviewsPage = () => {
         )}
       </div>
 
-      {/* Modal for review submission */}
+      {/* Review Submission Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <motion.div
@@ -1042,10 +1132,10 @@ const ReviewsPage = () => {
 
                   {newReview.type === "course" ? (
                     <>
-                      {/* Department Selection */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Department</label>
+                          Department
+                        </label>
                         <select
                           name="department"
                           value={newReview.department}
@@ -1061,7 +1151,6 @@ const ReviewsPage = () => {
                         </select>
                       </div>
 
-                      {/* Course Selection */}
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Course
@@ -1084,7 +1173,7 @@ const ReviewsPage = () => {
                         </select>
                       </div>
                     </>
-                  ) : (
+                  ) : newReview.type === "professor" && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Professor
@@ -1092,7 +1181,15 @@ const ReviewsPage = () => {
                       <SearchableProfessorDropdown
                         professors={professors}
                         selectedProfessor={newReview.professor}
-                        onChange={handleInputChange}
+                        onChange={(e) => {
+                          const professorId = e.target.value;
+                          const selectedProf = professors.find(p => p._id === professorId);
+                          setNewReview({
+                            ...newReview,
+                            professor: professorId,
+                            title: selectedProf ? `Review for ${selectedProf.name}` : "Professor Review"
+                          });
+                        }}
                       />
                     </div>
                   )}
@@ -1174,7 +1271,103 @@ const ReviewsPage = () => {
         )}
       </AnimatePresence>
 
-      {/* Unified Footer */}
+      {/* Report Modal */}
+      <AnimatePresence>
+        {isReportModalOpen && currentReportReview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={() => setIsReportModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-4 px-6 flex justify-between items-center">
+                <h2 className="text-xl font-bold">Report Review</h2>
+                <button
+                  onClick={() => setIsReportModalOpen(false)}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <i className="bx bx-x text-2xl"></i>
+                </button>
+              </div>
+
+              <div className="p-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-gray-700 mb-2">You are reporting the following review:</p>
+                    <div className="bg-gray-50 p-3 rounded-md">
+                      <p className="font-medium">{currentReportReview.title}</p>
+                      <p className="text-gray-600 text-sm line-clamp-2">{currentReportReview.reviewText}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Reason for Reporting
+                    </label>
+                    <select
+                      value={reportReason}
+                      onChange={(e) => setReportReason(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+                      required
+                    >
+                      <option value="">Select a reason</option>
+                      <option value="inappropriate">Inappropriate content</option>
+                      <option value="spam">Spam or advertisement</option>
+                      <option value="misinformation">False information</option>
+                      <option value="harassment">Harassment or bullying</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Additional Details (Optional)
+                    </label>
+                    <textarea
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      placeholder="Please provide more details about your report..."
+                      rows="3"
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end space-x-3">
+                  <button
+                    onClick={() => setIsReportModalOpen(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033] transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={submitReport}
+                    disabled={!reportReason}
+                    className={`px-4 py-2 rounded-md text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
+                      !reportReason
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-[#860033] to-[#6a0026] hover:from-[#9a0039] hover:to-[#7a002d] focus:ring-[#860033]'
+                    }`}
+                  >
+                    Submit Report
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Footer />
     </div>
   );

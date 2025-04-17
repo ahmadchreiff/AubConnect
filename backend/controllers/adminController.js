@@ -291,6 +291,35 @@ const deleteReview = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+const getReportedReviews = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    
+    const reviews = await Review.find({ reportCount: { $gt: 0 } })
+      .populate('course', 'code name')
+      .populate('professor', 'name department')
+      .sort({ reportCount: -1, createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+    
+    const total = await Review.countDocuments({ reportCount: { $gt: 0 } });
+    
+    res.status(200).json({
+      reviews,
+      pagination: {
+        total,
+        page,
+        limit,
+        pages: Math.ceil(total / limit)
+      }
+    });
+  } catch (err) {
+    console.error('Error getting reported reviews:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
 
 module.exports = {
   getPlatformStats,
@@ -300,5 +329,6 @@ module.exports = {
   getAllReviews,  // Add these new functions
   approveReview,
   rejectReview,
-  deleteReview
+  deleteReview,
+  getReportedReviews
 };

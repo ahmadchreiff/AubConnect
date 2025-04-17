@@ -407,7 +407,7 @@ const getReviewsByUser = async (req, res) => {
 const deleteReview = async (req, res) => {
   try {
     const { id } = req.params;
-    const { username } = req.body;
+    const { username } = req.body; // Get username from request body
 
     const review = await Review.findById(id);
     if (!review) {

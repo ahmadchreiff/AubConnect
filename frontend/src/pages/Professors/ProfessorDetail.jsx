@@ -9,7 +9,6 @@ const ProfessorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser, isAuthenticated } = useAuth();
-
   const [professor, setProfessor] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -186,8 +185,39 @@ const ProfessorDetail = () => {
       setTimeout(() => setToastError(null), 3000);
     }
   };
-
-
+  
+  const handleDeleteReview = async (reviewId) => {
+    if (!isAuthenticated()) {
+      return;
+    }
+    
+    if (!window.confirm('Are you sure you want to delete this review?')) {
+      return;
+    }
+    
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}`,
+        { 
+          data: { username: currentUser.username },
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
+        }
+      );
+      
+      setReviews(reviews.filter(review => review._id !== reviewId));
+      setSuccess('Review deleted successfully!');
+      
+      // Refresh professor data to get updated rating
+      const professorRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/professors/${id}`);
+      setProfessor(professorRes.data);
+      
+      setTimeout(() => setSuccess(''), 5000);
+    } catch (err) {
+      console.error('Error deleting review:', err);
+      setError(err.response?.data?.message || 'Failed to delete review.');
+    }
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -433,7 +463,8 @@ const ProfessorDetail = () => {
                     Write a Review
                   </button>
                 </div>
-
+                                   
+                {/* Review Form */}
                 {showReviewForm && (
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                     <h3 className="text-lg font-medium text-gray-900 mb-4">Share Your Experience</h3>
@@ -556,8 +587,20 @@ const ProfessorDetail = () => {
                           </div>
                           <div className="mt-4 text-gray-700">{review.reviewText}</div>
                         </div>
-
-
+                        
+                        {/* User actions */}
+                        {isAuthenticated() && currentUser.username === review.username && (
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => handleDeleteReview(review._id)}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       {/* Upvotes and downvotes */}
