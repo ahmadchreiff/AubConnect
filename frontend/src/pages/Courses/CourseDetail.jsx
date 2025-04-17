@@ -349,12 +349,12 @@ const CourseDetail = () => {
                       more statistics
                     </Link>
 
-                    <Link
+                    {/* <Link
                       to={`/courses/${id}/stat`}
                       className="text-gray-500 text-xs underline hover:text-gray-700 m-0 p-0"
                     >
                       more statistics
-                    </Link>
+                    </Link> */}
 
                     <button
                       onClick={() => navigate(`/reviews?type=course&id=${id}&name=${encodeURIComponent(course.name)}&department=${course.department._id}&courseNumber=${encodeURIComponent(course.courseNumber)}`)}

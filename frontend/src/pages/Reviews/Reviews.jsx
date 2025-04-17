@@ -893,7 +893,7 @@ const ReviewsPage = () => {
                 <option value="newest">Newest</option>
                 <option value="highest">Highest Rating</option>
                 <option value="lowest">Lowest Rating</option>
-                <option value="mostHelpful">Most Helpful</option>
+                {/* <option value="mostHelpful">Most Helpful</option> */}
               </select>
             </div>
           </div>
