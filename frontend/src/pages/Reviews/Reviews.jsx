@@ -104,84 +104,98 @@ const ReviewsPage = () => {
     }
   }, [newReview.department, courses]);
 
-  // Handle review submission
-  const submitReview = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("You must be logged in to post a review.");
-      return;
+  // Update the submitReview function
+const submitReview = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    setError("You must be logged in to post a review.");
+    return;
+  }
+
+  // Validation
+  if (newReview.type === "course" && (!newReview.department || !newReview.course)) {
+    setError("Please select both department and course.");
+    return;
+  }
+  
+  if (newReview.type === "professor" && !newReview.professor) {
+    setError("Please select a professor.");
+    return;
+  }
+
+  if (newReview.rating === 0) {
+    setError("Please select a rating.");
+    return;
+  }
+
+  if (!newReview.reviewText.trim()) {
+    setError("Please write your review.");
+    return;
+  }
+
+  try {
+    // Prepare the review data
+    const reviewData = {
+      type: newReview.type,
+      rating: newReview.rating,
+      reviewText: newReview.reviewText,
+      username: loggedInUsername,
+      anonymous: newReview.anonymous,
+      // For professor reviews
+      ...(newReview.type === "professor" && {
+        professor: newReview.professor // This should be the professor ID
+      }),
+      // For course reviews
+      ...(newReview.type === "course" && {
+        department: newReview.department,
+        course: newReview.course
+      })
+    };
+
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+
+    let response;
+    if (editReviewId) {
+      response = await axios.put(
+        `http://localhost:5001/api/reviews/${editReviewId}`,
+        reviewData,
+        config
+      );
+    } else {
+      response = await axios.post(
+        "http://localhost:5001/api/reviews",
+        reviewData,
+        config
+      );
     }
 
-    // Validation
-    if (newReview.type === "course" && (!newReview.department || !newReview.course)) {
-      setError("Please select both department and course.");
-      return;
-    }
-    if (newReview.type === "professor" && !newReview.professor) {
-      setError("Please select a professor.");
-      return;
-    }
-    if (newReview.rating === 0) {
-      setError("Please select a rating.");
-      return;
-    }
-    if (!newReview.reviewText.trim()) {
-      setError("Please write your review.");
-      return;
-    }
+    // Refresh reviews
+    const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+    setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
 
-    try {
-      const reviewData = {
-        ...newReview,
-        username: loggedInUsername,
-        anonymous: newReview.anonymous
-      };
+    // Reset form
+    setNewReview({
+      type: "course",
+      title: "",
+      department: "",
+      course: "",
+      professor: "",
+      rating: 0,
+      reviewText: "",
+      anonymous: false,
+    });
+    setEditReviewId(null);
+    setIsModalOpen(false);
 
-      const config = {
-        headers: { Authorization: `Bearer ${token}` }
-      };
-
-      let response;
-      if (editReviewId) {
-        response = await axios.put(
-          `http://localhost:5001/api/reviews/${editReviewId}`,
-          reviewData,
-          config
-        );
-      } else {
-        response = await axios.post(
-          "http://localhost:5001/api/reviews",
-          reviewData,
-          config
-        );
-      }
-
-      // Refresh reviews
-      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
-      setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
-
-      // Reset form
-      setNewReview({
-        type: "course",
-        title: "",
-        department: "",
-        course: "",
-        professor: "",
-        rating: 0,
-        reviewText: "",
-        anonymous: false,
-      });
-      setEditReviewId(null);
-      setIsModalOpen(false);
-
-      setSuccess(editReviewId ? "Review updated!" : "Review posted!");
-      setTimeout(() => setSuccess(""), 3000);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to submit review.");
-      console.error("Error submitting review:", err);
-    }
-  };
-
+    setSuccess(editReviewId ? "Review updated!" : "Review posted!");
+    setTimeout(() => setSuccess(""), 3000);
+  } catch (err) {
+    console.error("Error submitting review:", err.response?.data || err);
+    setError(err.response?.data?.message || "Failed to submit review.");
+  }
+};
   // Handle report submission
   // Update the submitReport function in Reviews.jsx
 const submitReport = async () => {
@@ -294,28 +308,34 @@ const submitReport = async () => {
     }
   };
 
-  // Handle delete review
   const handleDeleteReview = async (reviewId) => {
     const token = localStorage.getItem("token");
     if (!token) {
       setError("You must be logged in to delete a review.");
       return;
     }
-
+  
     if (!window.confirm("Are you sure you want to delete this review?")) {
       return;
     }
-
+  
     try {
       const config = {
         headers: { Authorization: `Bearer ${token}` }
       };
-
+  
+      // Get the decoded token to get the username
+      const decoded = jwtDecode(token);
+      const username = decoded.username;
+  
       await axios.delete(
         `http://localhost:5001/api/reviews/${reviewId}`,
-        config
+        {
+          ...config,
+          data: { username } // Send username in the request body
+        }
       );
-
+  
       // Refresh reviews
       const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
       setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
@@ -326,7 +346,6 @@ const submitReport = async () => {
       console.error("Error deleting review:", err);
     }
   };
-
   // Filter and sort reviews
   const filteredReviews = () => {
     try {

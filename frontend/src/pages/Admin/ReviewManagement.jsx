@@ -354,6 +354,7 @@ const ReviewManagement = () => {
 };
 
 // In the ReportedReviewsTab component in ReviewManagement.jsx
+// In the ReportedReviewsTab component in ReviewManagement.jsx
 const ReportedReviewsTab = () => {
   const [reportedReviews, setReportedReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -390,71 +391,73 @@ const ReportedReviewsTab = () => {
     fetchReportedReviews();
   }, [currentPage]);
 
-  // Update the handleClearReports function
-const handleClearReports = async (reviewId) => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Authentication required");
-      return;
-    }
-
-    const response = await axios.patch(
-      `http://localhost:5001/api/admin/reviews/${reviewId}/clear-reports`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+  const handleClearReports = async (reviewId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication required");
+        return;
       }
-    );
 
-    if (response.data.message === 'Reports cleared successfully') {
-      setReportedReviews(reportedReviews.filter(review => review._id !== reviewId));
-      setSuccess('Reports cleared successfully');
-      setTimeout(() => setSuccess(''), 3000);
-    } else {
-      setError(response.data.message || 'Failed to clear reports');
-    }
-  } catch (err) {
-    console.error('Error clearing reports:', err);
-    setError(err.response?.data?.message || 'Failed to clear reports');
-  }
-};
-
-// Update the handleRejectReview function
-const handleRejectReview = async (reviewId) => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("Authentication required");
-      return;
-    }
-
-    const response = await axios.patch(
-      `http://localhost:5001/api/admin/reviews/${reviewId}/reject`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      const response = await axios.patch(
+        `http://localhost:5001/api/admin/reviews/${reviewId}/clear-reports`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      }
-    );
+      );
 
-    if (response.data.message === 'Review rejected successfully') {
-      setReportedReviews(reportedReviews.filter(review => review._id !== reviewId));
-      setSuccess('Review rejected successfully');
-      setTimeout(() => setSuccess(''), 3000);
-    } else {
-      setError(response.data.message || 'Failed to reject review');
+      if (response.data.message === 'Reports cleared successfully') {
+        setReportedReviews(reportedReviews.filter(review => review._id !== reviewId));
+        setSuccess('Reports cleared successfully');
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(response.data.message || 'Failed to clear reports');
+        setTimeout(() => setError(null), 3000);
+      }
+    } catch (err) {
+      console.error('Error clearing reports:', err);
+      setError(err.response?.data?.message || 'Failed to clear reports');
+      setTimeout(() => setError(null), 3000);
     }
-  } catch (err) {
-    console.error('Error rejecting review:', err);
-    setError(err.response?.data?.message || 'Failed to reject review');
-  }
-};
+  };
+
+  const handleRejectReview = async (reviewId) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication required");
+        return;
+      }
+
+      const response = await axios.patch(
+        `http://localhost:5001/api/admin/reviews/${reviewId}/reject`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.message === 'Review rejected successfully') {
+        setReportedReviews(reportedReviews.filter(review => review._id !== reviewId));
+        setSuccess('Review rejected successfully');
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(response.data.message || 'Failed to reject review');
+        setTimeout(() => setError(null), 3000);
+      }
+    } catch (err) {
+      console.error('Error rejecting review:', err);
+      setError(err.response?.data?.message || 'Failed to reject review');
+      setTimeout(() => setError(null), 3000);
+    }
+  };
 
   if (loading && reportedReviews.length === 0) {
     return (
@@ -466,11 +469,30 @@ const handleRejectReview = async (reviewId) => {
 
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden">
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 mx-4 mt-4">
-          <p>{error}</p>
+      {/* Success Notification */}
+      {success && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg flex items-center">
+            <svg className="h-5 w-5 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span>{success}</span>
+          </div>
         </div>
       )}
+
+      {/* Error Notification */}
+      {error && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg flex items-center">
+            <svg className="h-5 w-5 text-red-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">

@@ -29,8 +29,6 @@ router.put("/:id", reviewController.updateReview);
 // Delete a review
 router.delete("/:id", reviewController.deleteReview);
 
-
-
 // Upvote a review
 router.post("/:id/upvote", async (req, res) => {
   try {
