@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "boxicons/css/boxicons.min.css";
@@ -14,6 +14,9 @@ const Login = () => {
   const navigate = useNavigate();
   const { login, isAdmin } = useAuth();
   const [recaptchaToken, setRecaptchaToken] = useState("");
+  const recaptchaRef = useRef(null);
+
+
 
 
   // Mount animation
@@ -65,8 +68,24 @@ const Login = () => {
       }, 1000);
 
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
       console.error("Login error:", err);
+
+      // Reset reCAPTCHA after failed login
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+        setRecaptchaToken("");
+      }
+
+      // Handle rate limiting error specially
+      if (err.response?.data?.error === 'RATE_LIMITED') {
+        const lockedUntil = new Date(err.response.data.lockedUntil);
+        const minutes = Math.ceil((lockedUntil - new Date()) / 60000);
+
+        setError(`Too many failed login attempts. Please try again in ${minutes} minutes.`);
+      } else {
+        setError(err.response?.data?.message || "Login failed. Please try again.");
+      }
+
       setIsLoading(false);
     }
   };
@@ -207,6 +226,7 @@ const Login = () => {
                   {/* reCAPTCHA */}
                   <div className="mt-4 flex justify-center">
                     <ReCAPTCHA
+                      ref={recaptchaRef}
                       sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                       onChange={handleRecaptchaChange}
                       theme="light"

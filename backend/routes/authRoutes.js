@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 const auth = require('../middleware/auth');
-const verifyRecaptcha = require('../middleware/recaptcha'); // Add this
+const verifyRecaptcha = require('../middleware/recaptcha'); 
+const { loginRateLimiter } = require('../middleware/rateLimiter'); 
+
+// Apply rate limiter to login route
+router.post('/login', loginRateLimiter, verifyRecaptcha, authController.login);
 
 // Apply reCAPTCHA middleware to login and signup routes
 router.post('/login', verifyRecaptcha, authController.login);
