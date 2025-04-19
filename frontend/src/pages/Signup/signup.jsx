@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "boxicons/css/boxicons.min.css";
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 const Signup = () => {
   const [password, setPassword] = useState("");
@@ -20,12 +22,17 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+
 
   // Mount animation
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  const handleRecaptchaChange = (token) => {
+    setRecaptchaToken(token);
+  };
   const requirements = [
     { regex: /.{8,}/, id: "lengthReq", text: "At least 8 characters" },
     { regex: /[a-z]/, id: "lowercaseReq", text: "At least 1 lowercase letter" },
@@ -73,7 +80,7 @@ const Signup = () => {
     setIsLoading(true);
     try {
       const verifyResponse = await axios.post("http://localhost:5001/api/auth/verify-code", { email, verificationCode });
-  
+
       if (verifyResponse.data.token) {
         localStorage.setItem('token', verifyResponse.data.token);
         setTimeout(() => {
@@ -88,24 +95,31 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     validateEmailFormat();
     validatePasswordMatch();
-  
+
     if (emailError || passwordError || passwordFormateError) {
       return;
     }
-    
+
+    // Validate reCAPTCHA
+    if (!recaptchaToken) {
+      setError("Please verify that you are not a robot");
+      return;
+    }
+
     setIsLoading(true);
-  
+
     try {
       await axios.post("http://localhost:5001/api/auth/send-verification-code", {
         name: username,
         username,
         email,
         password,
+        recaptchaToken  // Add this line
       });
-  
+
       setShowVerificationPopup(true);
       setError("");
       setIsLoading(false);
@@ -137,19 +151,18 @@ const Signup = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Main Content */}
       <div className="relative overflow-y-auto">
         {/* Background Image with Overlay */}
         <div className="fixed inset-0 z-0">
           <div className="absolute inset-0 bg bg-cover bg-center opacity-40 animate-slow-pan"></div>
         </div>
-        
+
         <div className=" absolute inset-0 bg-gradient-to-br from-[#6D0B24]/90 to-[#45051A]/80 mix-blend-multiply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-center pt-4 pb-16">
-          <div 
-            className={`w-full max-w-md transition-all duration-1000 transform ${
-              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-            } mb-16 mt-4`}
+          <div
+            className={`w-full max-w-md transition-all duration-1000 transform ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+              } mb-16 mt-4`}
           >
             {/* Signup Card */}
             <div className="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
@@ -164,7 +177,7 @@ const Signup = () => {
                 <h2 className="text-white text-center text-2xl font-serif font-bold">Create Account</h2>
                 <p className="text-white/80 text-center mt-1 text-sm">Join the AUB student community</p>
               </div>
-              
+
               {/* Card Body */}
               <div className="p-4 md:p-6">
                 {/* Error message */}
@@ -176,7 +189,7 @@ const Signup = () => {
                     </div>
                   </div>
                 )}
-                
+
                 <form onSubmit={handleSubmit} className="space-y-3">
                   {/* Username Field */}
                   <div className="space-y-1">
@@ -197,7 +210,7 @@ const Signup = () => {
                       />
                     </div>
                   </div>
-                  
+
                   {/* Email Field */}
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-700 block">
@@ -225,7 +238,7 @@ const Signup = () => {
                       <p className="text-xs text-gray-500 mt-1">Only @mail.aub.edu email addresses are accepted</p>
                     )}
                   </div>
-                  
+
                   {/* Password Field */}
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-700 block">
@@ -260,11 +273,10 @@ const Signup = () => {
                         <i className={`bx ${passwordVisible ? "bx-hide" : "bx-show"} text-gray-500 hover:text-gray-700 transition-colors`}></i>
                       </button>
                     </div>
-                    
+
                     {/* Password Requirements */}
-                    <div className={`mt-2 bg-gray-50 rounded-md border border-gray-200 p-3 transition-all duration-300 ${
-                      requirementsVisible ? "opacity-100 max-h-60" : "opacity-0 max-h-0 overflow-hidden"
-                    }`}>
+                    <div className={`mt-2 bg-gray-50 rounded-md border border-gray-200 p-3 transition-all duration-300 ${requirementsVisible ? "opacity-100 max-h-60" : "opacity-0 max-h-0 overflow-hidden"
+                      }`}>
                       <p className="text-xs font-medium text-gray-700 mb-2">Password must contain:</p>
                       <ul className="space-y-1">
                         {requirements.map(({ id, text, regex }) => {
@@ -278,14 +290,14 @@ const Signup = () => {
                         })}
                       </ul>
                     </div>
-                    
+
                     {passwordFormateError && (
                       <p className="text-red-600 text-xs mt-1 flex items-center">
                         <i className="bx bx-error-circle mr-1"></i> {passwordFormateError}
                       </p>
                     )}
                   </div>
-                  
+
                   {/* Confirm Password Field */}
                   <div className="space-y-1">
                     <label className="text-sm font-medium text-gray-700 block">
@@ -312,24 +324,31 @@ const Signup = () => {
                         <i className={`bx ${passwordConfirmVisible ? "bx-hide" : "bx-show"} text-gray-500 hover:text-gray-700 transition-colors`}></i>
                       </button>
                     </div>
-                    
+
                     {passwordError && (
                       <p className="text-red-600 text-xs mt-1 flex items-center">
                         <i className="bx bx-error-circle mr-1"></i> {passwordError}
                       </p>
                     )}
                   </div>
-                  
+                  {/* reCAPTCHA */}
+                  <div className="mt-4 flex justify-center">
+                    <ReCAPTCHA
+                      sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                      onChange={handleRecaptchaChange}
+                      theme="light"
+                    />
+                  </div>
+
                   {/* Signup Button */}
                   <div className="pt-2">
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none transition-all duration-300 relative overflow-hidden ${
-                        isLoading
-                          ? "bg-[#6D0B24]/70 cursor-not-allowed"
-                          : "bg-[#6D0B24] hover:bg-[#990F34]"
-                      }`}
+                      className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none transition-all duration-300 relative overflow-hidden ${isLoading
+                        ? "bg-[#6D0B24]/70 cursor-not-allowed"
+                        : "bg-[#6D0B24] hover:bg-[#990F34]"
+                        }`}
                     >
                       <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent transform -translate-x-full animate-shimmer"></span>
                       <span className="relative flex items-center">
@@ -347,7 +366,7 @@ const Signup = () => {
                   </div>
                 </form>
               </div>
-              
+
               {/* Card Footer */}
               <div className="bg-gray-50 px-4 py-3 border-t border-gray-200">
                 <div className="flex flex-col space-y-4">
@@ -362,7 +381,7 @@ const Signup = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Copyright */}
             <div className="mt-3 mb-8 text-center text-gray-500 text-xs">
               <p>© {new Date().getFullYear()} American University of Beirut. All rights reserved.</p>
@@ -370,17 +389,17 @@ const Signup = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Verification Popup Modal */}
       {showVerificationPopup && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 transition-opacity duration-300 overflow-y-auto py-4">
-          <div 
+          <div
             className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden transform transition-all duration-300 my-8"
           >
             <div className="bg-[#6D0B24] p-4">
               <h3 className="text-white text-xl font-serif font-bold text-center">Verify Your Email</h3>
             </div>
-            
+
             <div className="p-6">
               <div className="mb-6 text-center">
                 <div className="h-16 w-16 mx-auto bg-[#6D0B24]/10 rounded-full flex items-center justify-center mb-4">
@@ -389,7 +408,7 @@ const Signup = () => {
                 <p className="text-gray-600">We've sent a verification code to your email <span className="font-medium">{email}</span></p>
                 <p className="text-gray-500 text-sm mt-1">Check your inbox (and spam folder) and enter the code below</p>
               </div>
-              
+
               <div className="mb-6">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -404,7 +423,7 @@ const Signup = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="flex space-x-3">
                 <button
                   onClick={() => setShowVerificationPopup(false)}
@@ -430,7 +449,7 @@ const Signup = () => {
                   )}
                 </button>
               </div>
-              
+
               <div className="mt-4 text-center text-sm text-gray-500">
                 <p>Didn't receive the code? <button className="text-[#6D0B24] hover:text-[#990F34] font-medium">Resend</button></p>
               </div>
@@ -438,7 +457,7 @@ const Signup = () => {
           </div>
         </div>
       )}
-      
+
       {/* Add these styles to your global CSS or a style tag */}
       <style>{`
         @keyframes shimmer {

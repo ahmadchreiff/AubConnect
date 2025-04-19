@@ -19,16 +19,16 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('token');
-      
+
       if (!token) {
         setLoading(false);
         return;
       }
-      
+
       try {
         // Set default auth header for all requests
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        
+
         // Fetch current user data
         const response = await axios.get('http://localhost:5001/api/users/check-auth');
         setCurrentUser(response.data.user);
@@ -49,27 +49,28 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Login function
-  const login = async (email, password) => {
+  const login = async (email, password, recaptchaToken) => {
     try {
       const response = await axios.post('http://localhost:5001/api/auth/login', {
         email,
-        password
+        password,
+        recaptchaToken  // Add the reCAPTCHA token to the request body
       });
-      
+
       const { token, user } = response.data;
-      
+
       // Store token in localStorage
       localStorage.setItem('token', token);
-      
+
       // Set default auth header
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
+
       // Update current user
       setCurrentUser(user);
-      
+
       // Log the login success
       console.log('Login successful:', user.role);
-      
+
       // Return the complete response data
       return response.data;
     } catch (err) {
@@ -89,7 +90,7 @@ export const AuthProvider = ({ children }) => {
   const getUserInfo = () => {
     const token = localStorage.getItem('token');
     if (!token) return null;
-    
+
     try {
       return jwtDecode(token);
     } catch (err) {
@@ -102,11 +103,11 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = () => {
     const token = localStorage.getItem('token');
     if (!token) return false;
-    
+
     try {
       const decoded = jwtDecode(token);
       const currentTime = Date.now() / 1000;
-      
+
       return decoded.exp > currentTime;
     } catch (err) {
       return false;
@@ -126,26 +127,26 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Add this function to your AuthContext.jsx
-const checkPageAccess = (pathname) => {
-  // If no user is logged in, they can only access public pages
-  if (!currentUser) {
-    const publicPaths = ['/', '/login', '/signup', '/forgot-password'];
-    return publicPaths.includes(pathname);
-  }
-  
-  // If user is admin, they can only access admin pages
-  if (currentUser.role === 'admin') {
-    return pathname.startsWith('/admin');
-  }
-  
-  // Regular users can't access admin pages
-  if (pathname.startsWith('/admin')) {
-    return false;
-  }
-  
-  // Regular users can access all other pages
-  return true;
-};
+  const checkPageAccess = (pathname) => {
+    // If no user is logged in, they can only access public pages
+    if (!currentUser) {
+      const publicPaths = ['/', '/login', '/signup', '/forgot-password'];
+      return publicPaths.includes(pathname);
+    }
+
+    // If user is admin, they can only access admin pages
+    if (currentUser.role === 'admin') {
+      return pathname.startsWith('/admin');
+    }
+
+    // Regular users can't access admin pages
+    if (pathname.startsWith('/admin')) {
+      return false;
+    }
+
+    // Regular users can access all other pages
+    return true;
+  };
 
   // Value to be provided by the context
   const value = {
