@@ -17,8 +17,8 @@ const Stat = ({ type = "course" }) => {
     const fetchReviews = async () => {
       try {
         const endpoint = type === "course"
-          ? `http://localhost:5001/api/courses/${id}/reviews`
-          : `http://localhost:5001/api/professors/${id}/reviews`;
+          ? `https://aubconnectbackend-h22c.onrender.com/api/courses/${id}/reviews`
+          : `https://aubconnectbackend-h22c.onrender.com/api/professors/${id}/reviews`;
           
         const response = await fetch(endpoint);
         if (!response.ok) {

@@ -72,7 +72,7 @@ const Signup = () => {
   const verifyCode = async () => {
     setIsLoading(true);
     try {
-      const verifyResponse = await axios.post("http://localhost:5001/api/auth/verify-code", { email, verificationCode });
+      const verifyResponse = await axios.post("https://aubconnectbackend-h22c.onrender.com/api/auth/verify-code", { email, verificationCode });
   
       if (verifyResponse.data.token) {
         localStorage.setItem('token', verifyResponse.data.token);
@@ -99,7 +99,7 @@ const Signup = () => {
     setIsLoading(true);
   
     try {
-      await axios.post("http://localhost:5001/api/auth/send-verification-code", {
+      await axios.post("https://aubconnectbackend-h22c.onrender.com/api/auth/send-verification-code", {
         name: username,
         username,
         email,

@@ -21,7 +21,7 @@ const ReviewManagement = () => {
   const fetchReviews = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5001/api/admin/reviews', {
+      const response = await axios.get('https://aubconnectbackend-h22c.onrender.com/api/admin/reviews', {
         params: {
           page: currentPage,
           limit: 10,
@@ -42,7 +42,7 @@ const ReviewManagement = () => {
 
   const rejectReview = async (reviewId) => {
     try {
-      await axios.patch(`http://localhost:5001/api/admin/reviews/${reviewId}/reject`);
+      await axios.patch(`https://aubconnectbackend-h22c.onrender.com/api/admin/reviews/${reviewId}/reject`);
       setReviews(reviews.map(review => 
         review._id === reviewId ? { ...review, status: 'rejected' } : review
       ));
@@ -54,7 +54,7 @@ const ReviewManagement = () => {
 
   const approveReview = async (reviewId) => {
     try {
-      await axios.patch(`http://localhost:5001/api/admin/reviews/${reviewId}/approve`);
+      await axios.patch(`https://aubconnectbackend-h22c.onrender.com/api/admin/reviews/${reviewId}/approve`);
       setReviews(reviews.map(review => 
         review._id === reviewId ? { ...review, status: 'approved' } : review
       ));
@@ -70,7 +70,7 @@ const ReviewManagement = () => {
     }
     
     try {
-      await axios.delete(`http://localhost:5001/api/admin/reviews/${reviewId}`);
+      await axios.delete(`https://aubconnectbackend-h22c.onrender.com/api/admin/reviews/${reviewId}`);
       setReviews(reviews.filter(review => review._id !== reviewId));
     } catch (err) {
       console.error('Error deleting review:', err);
@@ -367,7 +367,7 @@ const ReportedReviewsTab = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get('http://localhost:5001/api/admin/reviews/reported', {
+      const response = await axios.get('https://aubconnectbackend-h22c.onrender.com/api/admin/reviews/reported', {
         params: {
           page: currentPage,
           limit: 10
@@ -400,7 +400,7 @@ const ReportedReviewsTab = () => {
       }
 
       const response = await axios.patch(
-        `http://localhost:5001/api/admin/reviews/${reviewId}/clear-reports`,
+        `https://aubconnectbackend-h22c.onrender.com/api/admin/reviews/${reviewId}/clear-reports`,
         {},
         {
           headers: {
@@ -434,7 +434,7 @@ const ReportedReviewsTab = () => {
       }
 
       const response = await axios.patch(
-        `http://localhost:5001/api/admin/reviews/${reviewId}/reject`,
+        `https://aubconnectbackend-h22c.onrender.com/api/admin/reviews/${reviewId}/reject`,
         {},
         {
           headers: {
