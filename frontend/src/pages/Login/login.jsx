@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "boxicons/css/boxicons.min.css";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +13,11 @@ const Login = () => {
   const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
   const { login, isAdmin } = useAuth();
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const recaptchaRef = useRef(null);
+
+
+
 
   // Mount animation
   useEffect(() => {
@@ -22,7 +28,12 @@ const Login = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  // Update the handleSubmit function in your login.jsx file
+  // Add this function to handle reCAPTCHA changes
+  const handleRecaptchaChange = (token) => {
+    setRecaptchaToken(token);
+  };
+
+  // Update your handleSubmit function to include the reCAPTCHA token
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -32,10 +43,16 @@ const Login = () => {
       return;
     }
 
+    // Validate reCAPTCHA
+    if (!recaptchaToken) {
+      setError("Please verify that you are not a robot");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await login(email, password);
+      const response = await login(email, password, recaptchaToken);
       console.log("Login successful:", response);
 
       // Show success animation before redirecting
@@ -51,8 +68,24 @@ const Login = () => {
       }, 1000);
 
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Please try again.");
       console.error("Login error:", err);
+
+      // Reset reCAPTCHA after failed login
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+        setRecaptchaToken("");
+      }
+
+      // Handle rate limiting error specially
+      if (err.response?.data?.error === 'RATE_LIMITED') {
+        const lockedUntil = new Date(err.response.data.lockedUntil);
+        const minutes = Math.ceil((lockedUntil - new Date()) / 60000);
+
+        setError(`Too many failed login attempts. Please try again in ${minutes} minutes.`);
+      } else {
+        setError(err.response?.data?.message || "Login failed. Please try again.");
+      }
+
       setIsLoading(false);
     }
   };
@@ -190,14 +223,24 @@ const Login = () => {
                     </Link>
                   </div>
 
+                  {/* reCAPTCHA */}
+                  <div className="mt-4 flex justify-center">
+                    <ReCAPTCHA
+                      ref={recaptchaRef}
+                      sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                      onChange={handleRecaptchaChange}
+                      theme="light"
+                    />
+                  </div>
+
                   {/* Login Button */}
                   <div className="pt-2">
                     <button
                       type="submit"
                       disabled={isLoading}
                       className={`w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none transition-all duration-300 relative overflow-hidden ${isLoading
-                          ? "bg-[#6D0B24]/70 cursor-not-allowed"
-                          : "bg-[#6D0B24] hover:bg-[#990F34]"
+                        ? "bg-[#6D0B24]/70 cursor-not-allowed"
+                        : "bg-[#6D0B24] hover:bg-[#990F34]"
                         }`}
                     >
                       <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent transform -translate-x-full animate-shimmer"></span>

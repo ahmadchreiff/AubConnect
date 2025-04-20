@@ -2,6 +2,8 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const emailService = require('../services/emailService');
+const { trackLoginSuccess, trackLoginFailure } = require('../middleware/rateLimiter');
+
 
 const isPasswordResetRequest = (req) => {
   return req.get('X-Request-Type') === 'password-reset' || 
@@ -98,62 +100,24 @@ const verifyCode = async (req, res) => {
 };
 
 
-// // Login
-// const login = async (req, res) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     // Check if user exists
-//     const user = await User.findOne({ email });
-//     if (!user) {
-//       return res.status(400).json({ message: 'Invalid credentials - User not found', error: 'USER_NOT_FOUND' });
-//     }
-
-//     // Compare passwords
-//     const isMatch = await user.comparePassword(password);
-//     if (!isMatch) {
-//       return res.status(400).json({ message: 'Invalid credentials - Incorrect password', error: 'INCORRECT_PASSWORD' });
-//     }
-
-//     // Generate JWT with user's username included
-//     const payload = { 
-//       userId: user._id,
-//       username: user.username, // Include the username in the token
-//     };
-//     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
-
-//     // Return success response with user data and redirect URL
-//     res.status(200).json({ 
-//       message: 'Login successful', 
-//       token, 
-//       user: {
-//         id: user._id,
-//         name: user.name,
-//         email: user.email,
-//         username: user.username,
-//         createdAt: user.createdAt
-//       },
-//       redirectUrl: "/homepage" 
-//     });
-//   } catch (err) {
-//     console.error('Error during login:', err);
-//     res.status(500).json({ message: 'Server error occurred', error: err.message });
-//   }
-// };
 // Login
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, recaptchaToken } = req.body;
 
   try {
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
+      // Track failed login attempt
+      trackLoginFailure(email);
       return res.status(400).json({ message: 'Invalid credentials - User not found', error: 'USER_NOT_FOUND' });
     }
 
     // Compare passwords
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
+      // Track failed login attempt
+      trackLoginFailure(email);
       return res.status(400).json({ message: 'Invalid credentials - Incorrect password', error: 'INCORRECT_PASSWORD' });
     }
 
@@ -164,6 +128,9 @@ const login = async (req, res) => {
         error: 'ACCOUNT_INACTIVE' 
       });
     }
+
+    // Track successful login - reset counter
+    trackLoginSuccess(email);
 
     // Generate JWT with user's username and role included
     const payload = { 

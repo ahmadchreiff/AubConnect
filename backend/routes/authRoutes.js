@@ -2,21 +2,21 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 const auth = require('../middleware/auth');
+const verifyRecaptcha = require('../middleware/recaptcha'); 
+const { loginRateLimiter } = require('../middleware/rateLimiter'); 
 
-// Route to send verification code
-router.post('/send-verification-code', authController.sendVerificationCode);
+// Apply rate limiter to login route
+router.post('/login', loginRateLimiter, verifyRecaptcha, authController.login);
 
-// Route to verify the code
+// Apply reCAPTCHA middleware to login and signup routes
+router.post('/login', verifyRecaptcha, authController.login);
+router.post('/send-verification-code', verifyRecaptcha, authController.sendVerificationCode);
+
+// Keep other routes as they are
 router.post('/verify-code', authController.verifyCode);
-
-// Route to log in
-router.post('/login', authController.login);
-
-// Route to get current user (protected)
 router.get('/me', auth, authController.getCurrentUser);
-
-// Password reset routes 
 router.post('/forgot-password', authController.sendPasswordResetCode);
 router.post('/verify-reset-code', authController.verifyResetCode);
 router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;
