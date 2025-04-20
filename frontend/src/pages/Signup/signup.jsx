@@ -277,8 +277,7 @@ const Signup = () => {
                     {/* Password Requirements */}
                     <div className={`mt-2 bg-gray-50 rounded-md border border-gray-200 p-3 transition-all duration-300 ${requirementsVisible ? "opacity-100 max-h-60" : "opacity-0 max-h-0 overflow-hidden"
                       }`}>
-                      <p className="text-xs font-medium text-gray-700 mb-2">Password must contain:</p>
-                      <ul className="space-y-1">
+                     
                         {requirements.map(({ id, text, regex }) => {
                           const isValid = regex.test(password);
                           return (
@@ -288,7 +287,7 @@ const Signup = () => {
                             </li>
                           );
                         })}
-                      </ul>
+                 
                     </div>
 
                     {passwordFormateError && (
