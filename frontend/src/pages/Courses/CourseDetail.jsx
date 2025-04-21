@@ -36,7 +36,7 @@ const CourseDetail = () => {
     const fetchCourseAndReviews = async () => {
       try {
         // Fetch course details
-        const courseResponse = await fetch(`http://localhost:5001/api/courses/${id}`);
+        const courseResponse = await fetch(`https://aubconnectbackend-h22c.onrender.com/api/courses/${id}`);
 
         if (!courseResponse.ok) {
           throw new Error("Failed to fetch course details");
@@ -46,7 +46,7 @@ const CourseDetail = () => {
         setCourse(courseData);
 
         // Fetch reviews for this course
-        const reviewsResponse = await fetch(`http://localhost:5001/api/courses/${id}/reviews`);
+        const reviewsResponse = await fetch(`https://aubconnectbackend-h22c.onrender.com/api/courses/${id}/reviews`);
 
         if (!reviewsResponse.ok) {
           throw new Error("Failed to fetch course reviews");
@@ -136,7 +136,7 @@ const CourseDetail = () => {
       // Log exactly what we're sending
       console.log('Sending review data:', reviewData);
 
-      const res = await axios.post(`http://localhost:5001/api/reviews`, reviewData, {
+      const res = await axios.post(`https://aubconnectbackend-h22c.onrender.com/api/reviews`, reviewData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
@@ -155,7 +155,7 @@ const CourseDetail = () => {
       setSuccess('Review submitted successfully!');
 
       // Refresh course data to get updated rating
-      const courseResponse = await fetch(`http://localhost:5001/api/courses/${id}`);
+      const courseResponse = await fetch(`https://aubconnectbackend-h22c.onrender.com/api/courses/${id}`);
       const courseData = await courseResponse.json();
       setCourse(courseData);
 
@@ -189,7 +189,7 @@ const CourseDetail = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:5001/api/reviews/${reviewId}/upvote`,
+        `https://aubconnectbackend-h22c.onrender.com/api/reviews/${reviewId}/upvote`,
         { username },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -230,7 +230,7 @@ const CourseDetail = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:5001/api/reviews/${reviewId}/downvote`,
+        `https://aubconnectbackend-h22c.onrender.com/api/reviews/${reviewId}/downvote`,
         { username },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

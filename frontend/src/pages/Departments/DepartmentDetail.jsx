@@ -17,7 +17,7 @@ const DepartmentDetail = () => {
     const fetchDepartmentAndCourses = async () => {
       try {
         // Fetch department details
-        const departmentResponse = await fetch(`http://localhost:5001/api/departments/${id}`);
+        const departmentResponse = await fetch(`https://aubconnectbackend-h22c.onrender.com/api/departments/${id}`);
         
         if (!departmentResponse.ok) {
           throw new Error("Failed to fetch department details");
@@ -27,7 +27,7 @@ const DepartmentDetail = () => {
         setDepartment(departmentData);
 
         // Fetch courses for this department
-        const coursesResponse = await fetch(`http://localhost:5001/api/departments/${id}/courses`);
+        const coursesResponse = await fetch(`https://aubconnectbackend-h22c.onrender.com/api/departments/${id}/courses`);
         
         if (!coursesResponse.ok) {
           throw new Error("Failed to fetch department courses");

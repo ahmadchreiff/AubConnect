@@ -25,7 +25,7 @@ const HomePage = () => {
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:5001/api/search/suggestions?query=${encodeURIComponent(searchQuery)}`
+          `https://aubconnectbackend-h22c.onrender.com/api/search/suggestions?query=${encodeURIComponent(searchQuery)}`
         );
         setSuggestions(response.data.suggestions);
         setShowSuggestions(true);

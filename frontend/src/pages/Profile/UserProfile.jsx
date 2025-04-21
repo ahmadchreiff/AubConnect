@@ -31,7 +31,7 @@ const UserProfile = () => {
       if (!token) return;
 
       await axios.put(
-        'http://localhost:5001/api/users/profile',
+        'https://aubconnectbackend-h22c.onrender.com/api/users/profile',
         { name, username },
         {
           headers: {

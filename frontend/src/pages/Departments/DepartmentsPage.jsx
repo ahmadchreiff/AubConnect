@@ -14,7 +14,7 @@ const DepartmentsPage = () => {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/departments");
+        const response = await fetch("https://aubconnectbackend-h22c.onrender.com/api/departments");
         
         if (!response.ok) {
           throw new Error("Failed to fetch departments");

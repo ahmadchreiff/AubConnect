@@ -118,7 +118,7 @@ const ReviewsPage = () => {
         setIsLoading(true);
 
         // Fetch reviews
-        const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+        const reviewsRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/reviews");
         
         // Client-side safety filter to remove rejected reviews
         const filteredReviews = reviewsRes.data.filter(review =>
@@ -127,15 +127,15 @@ const ReviewsPage = () => {
         setReviews(filteredReviews);
 
         // Fetch departments
-        const departmentsRes = await axios.get("http://localhost:5001/api/departments");
+        const departmentsRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/departments");
         setDepartments(departmentsRes.data);
 
         // Fetch all courses
-        const coursesRes = await axios.get("http://localhost:5001/api/courses");
+        const coursesRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/courses");
         setCourses(coursesRes.data);
 
         // Fetch all professors
-        const professorsRes = await axios.get("http://localhost:5001/api/professors");
+        const professorsRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/professors");
         setProfessors(professorsRes.data);
 
       } catch (err) {
@@ -386,7 +386,7 @@ const ReviewsPage = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:5001/api/reviews/${id}/upvote`,
+        `https://aubconnectbackend-h22c.onrender.com/api/reviews/${id}/upvote`,
         { username },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -394,7 +394,7 @@ const ReviewsPage = () => {
       );
 
       // Refresh reviews
-      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+      const reviewsRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/reviews");
       setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
 
       setSuccess(response.data.message);
@@ -425,7 +425,7 @@ const ReviewsPage = () => {
       }
 
       const response = await axios.post(
-        `http://localhost:5001/api/reviews/${id}/downvote`,
+        `https://aubconnectbackend-h22c.onrender.com/api/reviews/${id}/downvote`,
         { username },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -433,7 +433,7 @@ const ReviewsPage = () => {
       );
 
       // Refresh reviews
-      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+      const reviewsRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/reviews");
       setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
 
       setSuccess(response.data.message);
@@ -499,21 +499,21 @@ const ReviewsPage = () => {
       if (editReviewId) {
         // Update the review
         response = await axios.put(
-          `http://localhost:5001/api/reviews/${editReviewId}`,
+          `https://aubconnectbackend-h22c.onrender.com/api/reviews/${editReviewId}`,
           reviewData,
           config
         );
       } else {
         // Submit a new review
         response = await axios.post(
-          "http://localhost:5001/api/reviews",
+          "https://aubconnectbackend-h22c.onrender.com/api/reviews",
           reviewData,
           config
         );
       }
 
       // Fetch updated reviews
-      const reviewsResponse = await axios.get("http://localhost:5001/api/reviews");
+      const reviewsResponse = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/reviews");
 
       // Filter out rejected reviews
       const filteredReviews = reviewsResponse.data.filter(review =>
@@ -590,7 +590,7 @@ const ReviewsPage = () => {
       };
 
       await axios.delete(
-        `http://localhost:5001/api/reviews/${id}`,
+        `https://aubconnectbackend-h22c.onrender.com/api/reviews/${id}`,
         {
           ...config,
           data: { username } // Send username in the request body
@@ -598,7 +598,7 @@ const ReviewsPage = () => {
       );
 
       // Refresh reviews
-      const reviewsRes = await axios.get("http://localhost:5001/api/reviews");
+      const reviewsRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/reviews");
       setReviews(reviewsRes.data.filter(review => review.status !== 'rejected'));
       setSuccess("Review deleted successfully!");
       setTimeout(() => setSuccess(""), 3000);
@@ -630,7 +630,7 @@ const ReviewsPage = () => {
       };
 
       const response = await axios.post(
-        `http://localhost:5001/api/reviews/${currentReportReview._id}/report`,
+        `https://aubconnectbackend-h22c.onrender.com/api/reviews/${currentReportReview._id}/report`,
         {
           reason: reportReason,
           details: reportDetails || "No additional details",

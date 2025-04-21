@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
         // Fetch current user data
-        const response = await axios.get('http://localhost:5001/api/users/check-auth');
+        const response = await axios.get('https://aubconnectbackend-h22c.onrender.com/api/users/check-auth');
         setCurrentUser(response.data.user);
       } catch (err) {
         console.error('Auth check failed:', err);
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (email, password, recaptchaToken) => {
     try {
-      const response = await axios.post('http://localhost:5001/api/auth/login', {
+      const response = await axios.post('https://aubconnectbackend-h22c.onrender.com/api/auth/login', {
         email,
         password,
         recaptchaToken  // Add the reCAPTCHA token to the request body

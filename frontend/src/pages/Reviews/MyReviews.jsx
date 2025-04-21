@@ -17,7 +17,7 @@ const MyReviews = () => {
         const token = localStorage.getItem('token');
         if (!token) return;
 
-        const response = await axios.get('http://localhost:5001/api/users/reviews', {
+        const response = await axios.get('https://aubconnectbackend-h22c.onrender.com/api/users/reviews', {
           headers: {
             Authorization: `Bearer ${token}`
           }

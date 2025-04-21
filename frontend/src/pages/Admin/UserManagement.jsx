@@ -23,7 +23,7 @@ const UserManagement = () => {
   const fetchUsers = async (page = 1, searchTerm = '') => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5001/api/admin/users`, {
+      const response = await axios.get(`https://aubconnectbackend-h22c.onrender.com/api/admin/users`, {
         params: {
           page,
           limit: pagination.limit,
@@ -89,7 +89,7 @@ const UserManagement = () => {
     }
     
     try {
-      await axios.put('http://localhost:5001/api/admin/users/status', {
+      await axios.put('https://aubconnectbackend-h22c.onrender.com/api/admin/users/status', {
         userId: selectedUser._id,
         status: newStatus
       });
@@ -113,7 +113,7 @@ const UserManagement = () => {
   // Handle role update
   const handleUpdateUserRole = async (userId, newRole) => {
     try {
-      await axios.put('http://localhost:5001/api/admin/users/role', {
+      await axios.put('https://aubconnectbackend-h22c.onrender.com/api/admin/users/role', {
         userId,
         role: newRole
       });

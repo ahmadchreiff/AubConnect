@@ -22,7 +22,7 @@ const ForgotPassword = () => {
     try {
       // Use full backend URL with port 5001
       const response = await axios.post(
-        'http://localhost:5001/api/auth/forgot-password',
+        'https://aubconnectbackend-h22c.onrender.com/api/auth/forgot-password',
         { email },
         {
           headers: {
@@ -52,7 +52,7 @@ const ForgotPassword = () => {
     
     try {
       const response = await axios.post(
-        'http://localhost:5001/api/auth/verify-reset-code', 
+        'https://aubconnectbackend-h22c.onrender.com/api/auth/verify-reset-code', 
         { email, code },
         {
           headers: {
@@ -92,7 +92,7 @@ const ForgotPassword = () => {
     try {
       const token = localStorage.getItem('resetToken');
       const response = await axios.post(
-        'http://localhost:5001/api/auth/reset-password',
+        'https://aubconnectbackend-h22c.onrender.com/api/auth/reset-password',
         { token, newPassword },
         {
           headers: {
