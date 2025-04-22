@@ -74,6 +74,22 @@ const ReviewsPage = () => {
     };
   }, [viewFullReview]); // Only re-run when modal state changes
 
+  // Add this useEffect to handle body scroll locking when creating a new review
+  useEffect(() => {
+    if (isModalOpen) {
+      // When the modal opens, prevent body scrolling
+      document.body.style.overflow = 'hidden';
+    } else {
+      // When the modal closes, restore body scrolling
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup function to ensure we restore scrolling if component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isModalOpen]); // Only re-run when modal state changes
+
   // Handle auto-opening the form with prefilled data from URL params
   useEffect(() => {
     // Check if we have query parameters to prefill the form
