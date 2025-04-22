@@ -36,12 +36,12 @@ const Navbar = () => {
               </div>
               <span className="font-serif text-xl tracking-tight text-[#860033]">AubConnect</span>
             </Link> */}
-<Link to="/homepage" className="flex-shrink-0 flex items-center">
-  <div className="flex flex-col items-start">
-    <span className="font-sans text-2xl font-bold tracking-tight text-[#860033]">AUBConnect</span>
-    <span className="text-xs tracking-[0.25em] text-black font-normal self-center">reviews</span>
-  </div>
-</Link>
+            <Link to="/homepage" className="flex-shrink-0 flex items-center">
+              <div className="flex flex-col items-start">
+                <span className="font-sans text-2xl font-bold tracking-tight text-[#860033]">AUBConnect</span>
+                <span className="text-xs tracking-[0.25em] text-black font-normal self-center">reviews</span>
+              </div>
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -76,7 +76,6 @@ const Navbar = () => {
             >
               Reviews
             </Link>
-
             {isAuthenticated() ? (
               <UserDropdown />
             ) : (
