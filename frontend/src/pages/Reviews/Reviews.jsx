@@ -843,7 +843,10 @@ const ReviewsPage = () => {
           </div>
 
           {/* Advanced filters */}
-          <div className="flex flex-col md:flex-row gap-4">
+          {/* <div className="flex flex-col md:flex-row gap-4"> */}
+          <div className="flex flex-row gap-4">
+
+
             {/* Course filter - only show when viewing all or courses */}
             {(filter === 'all' || filter === 'courses') && (
               <div className="w-full md:w-1/3">
