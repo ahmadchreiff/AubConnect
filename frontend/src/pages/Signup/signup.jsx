@@ -80,7 +80,7 @@ const Signup = () => {
     setIsLoading(true);
     try {
       const verifyResponse = await axios.post("https://aubconnectbackend-h22c.onrender.com/api/auth/verify-code", { email, verificationCode });
-  
+
       if (verifyResponse.data.token) {
         localStorage.setItem('token', verifyResponse.data.token);
         setTimeout(() => {
@@ -153,16 +153,16 @@ const Signup = () => {
       </div>
 
       {/* Main Content */}
-      <div className="relative overflow-y-auto">
+      <div className="relative overflow-hidden">
         {/* Background Image with Overlay */}
-        <div className="fixed inset-0 z-0">
-          <div className="absolute inset-0 bg bg-cover bg-center opacity-40 animate-slow-pan"></div>
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#6D0B24]/90 to-[#45051A]/80 mix-blend-multiply"></div>
+          <div className="absolute inset-0 bg-[url('/campus-background.jpg')] bg-cover bg-center opacity-40 animate-slow-pan"></div>
         </div>
 
-        <div className=" absolute inset-0 bg-gradient-to-br from-[#6D0B24]/90 to-[#45051A]/80 mix-blend-multiply relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-center pt-4 pb-16">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-[calc(100vh-4rem)] flex items-center justify-center">
           <div
-            className={`w-full max-w-md transition-all duration-1000 transform ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-              } mb-16 mt-4`}
+            className={`w-full max-w-md transition-all duration-1000 transform ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}
           >
             {/* Signup Card */}
             <div className="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
@@ -277,17 +277,17 @@ const Signup = () => {
                     {/* Password Requirements */}
                     <div className={`mt-2 bg-gray-50 rounded-md border border-gray-200 p-3 transition-all duration-300 ${requirementsVisible ? "opacity-100 max-h-60" : "opacity-0 max-h-0 overflow-hidden"
                       }`}>
-                     
-                        {requirements.map(({ id, text, regex }) => {
-                          const isValid = regex.test(password);
-                          return (
-                            <li key={id} className="flex items-center text-xs">
-                              <i className={`bx ${isValid ? "bx-check text-green-500" : "bx-x text-gray-400"} mr-2`}></i>
-                              <span className={isValid ? "text-green-600" : "text-gray-600"}>{text}</span>
-                            </li>
-                          );
-                        })}
-                 
+
+                      {requirements.map(({ id, text, regex }) => {
+                        const isValid = regex.test(password);
+                        return (
+                          <li key={id} className="flex items-center text-xs">
+                            <i className={`bx ${isValid ? "bx-check text-green-500" : "bx-x text-gray-400"} mr-2`}></i>
+                            <span className={isValid ? "text-green-600" : "text-gray-600"}>{text}</span>
+                          </li>
+                        );
+                      })}
+
                     </div>
 
                     {passwordFormateError && (
@@ -382,7 +382,7 @@ const Signup = () => {
             </div>
 
             {/* Copyright */}
-            <div className="mt-3 mb-8 text-center text-gray-500 text-xs">
+            <div className="mt-6 text-center text-gray-500 text-xs">
               <p>© {new Date().getFullYear()} American University of Beirut. All rights reserved.</p>
             </div>
           </div>
