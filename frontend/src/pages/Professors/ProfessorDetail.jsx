@@ -185,39 +185,39 @@ const ProfessorDetail = () => {
       setTimeout(() => setToastError(null), 3000);
     }
   };
-  
+
   const handleDeleteReview = async (reviewId) => {
     if (!isAuthenticated()) {
       return;
     }
-    
+
     if (!window.confirm('Are you sure you want to delete this review?')) {
       return;
     }
-    
+
     try {
       await axios.delete(
         `${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/reviews/${reviewId}`,
-        { 
+        {
           data: { username: currentUser.username },
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         }
       );
-      
+
       setReviews(reviews.filter(review => review._id !== reviewId));
       setSuccess('Review deleted successfully!');
-      
+
       // Refresh professor data to get updated rating
       const professorRes = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/professors/${id}`);
       setProfessor(professorRes.data);
-      
+
       setTimeout(() => setSuccess(''), 5000);
     } catch (err) {
       console.error('Error deleting review:', err);
       setError(err.response?.data?.message || 'Failed to delete review.');
     }
   };
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -340,12 +340,14 @@ const ProfessorDetail = () => {
                 <div className="flex justify-between items-start">
                   <h1 className="text-2xl font-bold">{professor.name}</h1>
                   {professor.avgRating > 0 && (
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-1 flex items-center">
-                      <svg className="h-5 w-5 text-yellow-300 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 flex items-center min-w-[90px] justify-center">
+                      <svg className="h-5 w-5 text-yellow-300 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
-                      <span className="font-bold">{professor.avgRating.toFixed(1)}</span>
-                      <span className="text-sm text-white/80 ml-1">/ 5</span>
+                      <div className="flex items-baseline">
+                        <span className="font-bold text-lg">{professor.avgRating.toFixed(1)}</span>
+                        <span className="text-sm text-white/80 ml-2">/&nbsp;5</span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -463,7 +465,7 @@ const ProfessorDetail = () => {
                     Write a Review
                   </button>
                 </div>
-                                   
+
                 {/* Review Form */}
                 {showReviewForm && (
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg">
@@ -587,7 +589,7 @@ const ProfessorDetail = () => {
                           </div>
                           <div className="mt-4 text-gray-700">{review.reviewText}</div>
                         </div>
-                        
+
                         {/* User actions */}
                         {isAuthenticated() && currentUser.username === review.username && (
                           <div className="flex space-x-2">
