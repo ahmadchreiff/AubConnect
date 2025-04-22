@@ -154,9 +154,9 @@ const Stat = ({ type = "course" }) => {
   }
 
   return (
-    <div className="text-gray-700 max-w-screen-xl font-sans bg-gray-50 overflow-x-hidden min-h-screen flex flex-col">
+    <div className="text-gray-700 font-sans bg-gray-50 overflow-x-hidden min-h-screen flex flex-col">
       <Navbar/>
-      <div className="flex-1 p-5 max-w-screen-xl mx-auto w-full">
+      <div className="flex-1 p-5 mx-auto w-full">
         <div className="text-center mb-8">
           <h1 className="text-[#860033] font-bold text-5xl mb-2">{type === "course" ? "Course" : "Professor"} Review Statistics</h1>
           <p className="text-gray-600">Comprehensive analysis of student feedback</p>
