@@ -421,25 +421,36 @@ const deleteReview = async (req, res) => {
       });
     }
 
-    // Store professor ID if it's a professor review
-    const professorId = review.type === "professor" ? review.professor : null;
+    // Store professor ID if it's a professor review - ensure it's a string
+    let professorId = null;
+    if (review.type === "professor" && review.professor) {
+      professorId = review.professor.toString();
+    }
 
+    // Delete the review
     await Review.findByIdAndDelete(id);
 
     // Update professor rating if it was a professor review
     if (professorId) {
-      await professorController.updateProfessorRating(professorId);
+      // Make sure to await the rating update before sending response
+      try {
+        await professorController.updateProfessorRating(professorId);
+        console.log(`Professor rating updated after review deletion: ${professorId}`);
+      } catch (updateErr) {
+        console.error("Error updating professor rating after review deletion:", updateErr);
+        // Still continue with the response even if rating update fails
+      }
     }
 
     res.status(200).json({ message: "Review deleted successfully!" });
   } catch (err) {
+    console.error("Delete review error:", err);
     res.status(500).json({ 
       message: "Failed to delete review.", 
       error: err.message 
     });
   }
 };
-
 module.exports = { 
   postReview,
   getAllReviews,

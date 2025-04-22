@@ -235,41 +235,62 @@ const deleteProfessor = async (req, res) => {
     });
   }
 };
-
 /**
  * Update professor average rating
  * @param {string} professorId - The ID of the professor
  */
 const updateProfessorRating = async (professorId) => {
   try {
+    // Ensure professorId is a string
+    const profId = professorId.toString();
+    
+    console.log(`Updating rating for professor ${profId}`);
+    
+    // Check if professor exists
+    const professor = await Professor.findById(profId);
+    if (!professor) {
+      console.error(`Professor with ID ${profId} not found during rating update`);
+      return;
+    }
+    
     // Only include approved reviews in rating calculation
     const reviews = await Review.find({ 
-      professor: professorId, 
+      professor: profId, 
       type: "professor",
       status: "approved" // Only consider approved reviews
     });
     
+    let newRating = 0;
+    
     if (reviews.length > 0) {
       const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
       const avgRating = totalRating / reviews.length;
+      newRating = parseFloat(avgRating.toFixed(1));
       
       await Professor.findByIdAndUpdate(
-        professorId,
-        { avgRating: parseFloat(avgRating.toFixed(1)) }
+        profId,
+        { avgRating: newRating }
       );
       
-      console.log(`Updated professor ${professorId} rating to ${avgRating.toFixed(1)} based on ${reviews.length} reviews`);
+      console.log(`Updated professor ${profId} rating to ${newRating} based on ${reviews.length} reviews`);
     } else {
       // If no approved reviews exist, set rating to 0
       await Professor.findByIdAndUpdate(
-        professorId,
+        profId,
         { avgRating: 0 }
       );
       
-      console.log(`Reset professor ${professorId} rating to 0 (no approved reviews)`);
+      console.log(`Reset professor ${profId} rating to 0 (no approved reviews)`);
     }
+    
+    // Verify the update happened
+    const updatedProfessor = await Professor.findById(profId);
+    console.log(`Professor ${profId} rating is now: ${updatedProfessor.avgRating}`);
+    
+    return newRating;
   } catch (err) {
     console.error("Failed to update professor rating:", err);
+    throw err; // Rethrow to allow caller to handle
   }
 };
 
