@@ -134,9 +134,10 @@ export const AuthProvider = ({ children }) => {
       return publicPaths.includes(pathname);
     }
 
-    // If user is admin, they can only access admin pages
+    // If user is admin, they can access admin pages and public pages
     if (currentUser.role === 'admin') {
-      return pathname.startsWith('/admin');
+      return pathname.startsWith('/admin') || 
+             ['/', '/login', '/signup', '/forgot-password'].includes(pathname);
     }
 
     // Regular users can't access admin pages
