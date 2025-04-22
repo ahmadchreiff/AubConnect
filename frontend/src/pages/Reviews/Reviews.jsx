@@ -23,6 +23,7 @@ const ReviewsPage = () => {
   const courseNumber = queryParams.get('courseNumber'); // Only for courses
 
   // State variables
+  const [viewFullReview, setViewFullReview] = useState(null);
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedProfessor, setSelectedProfessor] = useState("");
   const [uniqueCourses, setUniqueCourses] = useState([]);
@@ -57,6 +58,22 @@ const ReviewsPage = () => {
   const [reportDetails, setReportDetails] = useState('');
 
   // useEffect hooks
+  // Add this useEffect to handle body scroll locking
+  useEffect(() => {
+    if (viewFullReview) {
+      // When the modal opens, prevent body scrolling
+      document.body.style.overflow = 'hidden';
+    } else {
+      // When the modal closes, restore body scrolling
+      document.body.style.overflow = 'auto';
+    }
+
+    // Cleanup function to ensure we restore scrolling if component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [viewFullReview]); // Only re-run when modal state changes
+
   // Handle auto-opening the form with prefilled data from URL params
   useEffect(() => {
     // Check if we have query parameters to prefill the form
@@ -119,7 +136,7 @@ const ReviewsPage = () => {
 
         // Fetch reviews
         const reviewsRes = await axios.get("https://aubconnectbackend-h22c.onrender.com/api/reviews");
-        
+
         // Client-side safety filter to remove rejected reviews
         const filteredReviews = reviewsRes.data.filter(review =>
           review.status !== 'rejected'
@@ -174,7 +191,7 @@ const ReviewsPage = () => {
         }
       });
       setFilteredCourses(filtered);
-      
+
       // Reset course selection if the previously selected course isn't in this department
       if (newReview.course && !filtered.find(c => c._id === newReview.course)) {
         setNewReview(prev => ({ ...prev, course: "" }));
@@ -252,20 +269,28 @@ const ReviewsPage = () => {
     };
   };
 
+  const openFullReview = (review) => {
+    setViewFullReview(review);
+  };
+
+  const closeFullReview = () => {
+    setViewFullReview(null);
+  };
+
   // Filter and search reviews
   const filteredReviews = () => {
     try {
       if (!Array.isArray(reviews)) return []; // Safety check
-      
+
       let filtered = [...reviews];
-    
+
       // Apply search query
       if (searchQuery.trim() !== "") {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(review => {
           // Skip if review is invalid
           if (!review || typeof review !== 'object') return false;
-          
+
           // Check title and review text as before
           if (review.title.toLowerCase().includes(query) ||
             review.reviewText.toLowerCase().includes(query) ||
@@ -623,7 +648,7 @@ const ReviewsPage = () => {
 
     try {
       const config = {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
@@ -651,7 +676,7 @@ const ReviewsPage = () => {
       }
     } catch (err) {
       console.error("Report submission error:", err);
-      
+
       let errorMsg = "Failed to submit report";
       if (err.response) {
         if (err.response.status === 404) {
@@ -1015,7 +1040,18 @@ const ReviewsPage = () => {
                       ))}
                     </div>
 
-                    <p className="text-gray-700 mb-5 line-clamp-4">{review.reviewText}</p>
+                    {/* <p className="text-gray-700 mb-5 line-clamp-4">{review.reviewText}</p> */}
+                    <div className="text-gray-700 mb-5">
+                      <p className="line-clamp-4">{review.reviewText}</p>
+                      {review.reviewText.length > 240 && (
+                        <button
+                          onClick={() => openFullReview(review)}
+                          className="text-[#860033] font-medium hover:underline mt-1 text-sm flex items-center"
+                        >
+                          View Full Review <i className="bx bx-chevron-right ml-1"></i>
+                        </button>
+                      )}
+                    </div>
 
                     <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
                       <div className="flex space-x-3">
@@ -1356,11 +1392,10 @@ const ReviewsPage = () => {
                     whileTap={{ scale: 0.98 }}
                     onClick={submitReport}
                     disabled={!reportReason}
-                    className={`px-4 py-2 rounded-md text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
-                      !reportReason
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-gradient-to-r from-[#860033] to-[#6a0026] hover:from-[#9a0039] hover:to-[#7a002d] focus:ring-[#860033]'
-                    }`}
+                    className={`px-4 py-2 rounded-md text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${!reportReason
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-[#860033] to-[#6a0026] hover:from-[#9a0039] hover:to-[#7a002d] focus:ring-[#860033]'
+                      }`}
                   >
                     Submit Report
                   </motion.button>
@@ -1371,6 +1406,93 @@ const ReviewsPage = () => {
         )}
       </AnimatePresence>
 
+      {/* Full Review Modal */}
+      <AnimatePresence>
+        {viewFullReview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={closeFullReview}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg shadow-xl max-w-2xl w-full overflow-hidden flex flex-col"
+              style={{ maxHeight: '80vh' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header - Fixed */}
+              <div className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-4 px-6 flex justify-between items-center">
+                <h2 className="text-xl font-bold truncate">
+                  {viewFullReview.title}
+                </h2>
+                <button
+                  onClick={closeFullReview}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <i className="bx bx-x text-2xl"></i>
+                </button>
+              </div>
+
+              {/* Content - Scrollable */}
+              <div className="p-6 overflow-y-auto flex-grow custom-scrollbar">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${viewFullReview.type === "course"
+                        ? "bg-pink-100 text-[#860033]"
+                        : "bg-amber-100 text-amber-800"
+                        }`}>
+                        {viewFullReview.type === "course" ? "Course" : "Professor"}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {formatDate(viewFullReview.createdAt)}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      by {viewFullReview.anonymous || viewFullReview.isAnonymous
+                        ? "Anonymous"
+                        : viewFullReview.username}
+                    </p>
+                  </div>
+                  <div className={`${getRatingColor(viewFullReview.rating)} text-xl font-bold rounded-lg h-12 w-12 flex items-center justify-center`}>
+                    {viewFullReview.rating.toFixed(1)}
+                  </div>
+                </div>
+
+                <div className="flex mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <i
+                      key={star}
+                      className={`bx ${star <= viewFullReview.rating ? 'bxs-star text-[#ffd700]' : 'bx-star text-gray-300'
+                        } text-xl`}
+                    ></i>
+                  ))}
+                </div>
+
+                <p className="text-gray-700 whitespace-pre-line mb-6">
+                  {viewFullReview.reviewText}
+                </p>
+              </div>
+
+              {/* Footer - Fixed */}
+              <div className="p-4 border-t border-gray-200 bg-gray-50">
+                <div className="flex justify-end">
+                  <button
+                    onClick={closeFullReview}
+                    className="px-6 py-2 bg-gradient-to-r from-[#860033] to-[#6a0026] rounded-md text-white shadow-sm hover:from-[#9a0039] hover:to-[#7a002d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#860033] transition-all duration-200"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <Footer />
     </div>
   );
