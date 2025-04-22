@@ -56,6 +56,9 @@ const ReviewsPage = () => {
   const [currentReportReview, setCurrentReportReview] = useState(null);
   const [reportReason, setReportReason] = useState('');
   const [reportDetails, setReportDetails] = useState('');
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [postingNewReview, setPostingNewReview] = useState(false);
+
 
   // useEffect hooks
   // Add this useEffect to handle body scroll locking
@@ -523,6 +526,13 @@ const ReviewsPage = () => {
       return;
     }
 
+    // Set appropriate loading states
+    setSubmitLoading(true);
+    // Only set postingNewReview to true if it's a new review (not an edit)
+    if (!editReviewId) {
+      setPostingNewReview(true);
+    }
+
     try {
       const reviewData = {
         ...newReview,
@@ -585,7 +595,12 @@ const ReviewsPage = () => {
         setError(err.response?.data?.message || "Failed to submit review.");
       }
       console.error("Error submitting review:", err);
+    } finally {
+      // Reset both loading states
+      setSubmitLoading(false);
+      setPostingNewReview(false);
     }
+
   };
 
   // Handle editing a review
@@ -1312,12 +1327,24 @@ const ReviewsPage = () => {
                     Cancel
                   </button>
                   <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: submitLoading ? 1 : 1.02 }}
+                    whileTap={{ scale: submitLoading ? 1 : 0.98 }}
                     onClick={submitReview}
-                    className="px-4 py-2 bg-gradient-to-r from-[#860033] to-[#6a0026] rounded-md text-white shadow-sm hover:from-[#9a0039] hover:to-[#7a002d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#860033] transition-all duration-200"
+                    disabled={submitLoading}
+                    className={`px-4 py-2 bg-gradient-to-r from-[#860033] to-[#6a0026] rounded-md text-white shadow-sm hover:from-[#9a0039] hover:to-[#7a002d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#860033] transition-all duration-200 ${submitLoading ? 'opacity-80' : ''
+                      }`}
                   >
-                    {editReviewId ? "Update Review" : "Submit Review"}
+                    {submitLoading ? (
+                      <div className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {editReviewId ? "Updating..." : "Submitting..."}
+                      </div>
+                    ) : (
+                      <>{editReviewId ? "Update Review" : "Submit Review"}</>
+                    )}
                   </motion.button>
                 </div>
               </div>
