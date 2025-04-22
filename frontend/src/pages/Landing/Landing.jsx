@@ -10,17 +10,27 @@ import { Link } from 'react-router-dom';
 const Landing = () => {
   return (
     <div className="top">
-      <div className="navbar">
-        <div className="icon">
-          <img src={logo} alt="AUBConnect Logo" className="logo" />
-        </div>
-        <div className="menu">
-          <ul>
-            <li className="navbar__btn">
-              <Link to="/signup" className="button">Sign Up</Link>
-              <Link to="/login" className="button">Log in</Link>
-            </li>
-          </ul>
+      <div className="modern-navbar">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            {/* Logo and brand */}
+            <div className="flex items-center">
+              <div className="flex flex-col items-start">
+                <span className="font-sans text-2xl font-bold tracking-tight text-[#860033]">AUBConnect</span>
+                <span className="text-xs tracking-[0.25em] text-black font-normal self-center">reviews</span>
+              </div>
+            </div>
+
+            {/* Navigation buttons */}
+            <div className="flex items-center gap-3">
+              <Link to="/signup" className="bg-[#860033] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#6a0026] transition-all duration-200">
+                Sign Up
+              </Link>
+              <Link to="/login" className="text-gray-700 hover:text-[#860033] px-4 py-2 text-sm font-medium border border-gray-300 rounded-md">
+                Log In
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -77,7 +87,7 @@ const Landing = () => {
           </div>
 
           <div className="footer-section">
-  
+
           </div>
         </div>
         <p className="footer-bottom">&copy; 2025 AUBConnect. All rights reserved.</p>

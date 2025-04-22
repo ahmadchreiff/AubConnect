@@ -3,6 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import UserDropdown from "../../components/UserDropdown";
 import "boxicons/css/boxicons.min.css";
+import logo from '../../pages/Landing/images/otherlogo.png'; // Update the path according to your structure
+
+
 
 const Navbar = () => {
   const { isAuthenticated } = useAuth();
@@ -25,49 +28,55 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           {/* Logo and brand */}
           <div className="flex items-center">
-            <Link to="/homepage" className="flex-shrink-0 flex items-center">
+            {/* <Link to="/homepage" className="flex-shrink-0 flex items-center">
               <div className="h-10 w-10 mr-2">
                 <svg viewBox="0 0 100 100" className="h-full w-full fill-current text-[#860033]">
                   <path d="M50,15 C35,15 25,25 25,40 C25,50 30,55 40,65 C45,70 50,85 50,85 C50,85 55,70 60,65 C70,55 75,50 75,40 C75,25 65,15 50,15 Z"></path>
                 </svg>
               </div>
               <span className="font-serif text-xl tracking-tight text-[#860033]">AubConnect</span>
-            </Link>
+            </Link> */}
+<Link to="/homepage" className="flex-shrink-0 flex items-center">
+  <div className="flex flex-col items-start">
+    <span className="font-sans text-2xl font-bold tracking-tight text-[#860033]">AUBConnect</span>
+    <span className="text-xs tracking-[0.25em] text-black font-normal self-center">reviews</span>
+  </div>
+</Link>
           </div>
-          
+
           {/* Navigation */}
           <div className="flex items-center gap-3">
-            <Link 
-              to="/homepage" 
+            <Link
+              to="/homepage"
               className={`${isActive('/homepage') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium flex items-center`}
             >
               <i className='bx bx-home-alt mr-1'></i> Home
             </Link>
-            <Link 
-              to="/departments" 
+            <Link
+              to="/departments"
               className={`${isActive('/departments') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
             >
               Departments
             </Link>
-            <Link 
-              to="/courses" 
+            <Link
+              to="/courses"
               className={`${isActive('/courses') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
             >
               Courses
             </Link>
-            <Link 
-              to="/professors" 
+            <Link
+              to="/professors"
               className={`${isActive('/professors') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
             >
               Professors
             </Link>
-            <Link 
-              to="/reviews" 
+            <Link
+              to="/reviews"
               className={`${isActive('/reviews') ? 'text-[#860033]' : 'text-gray-700 hover:text-[#860033]'} px-3 py-2 text-sm font-medium`}
             >
               Reviews
             </Link>
-            
+
             {isAuthenticated() ? (
               <UserDropdown />
             ) : (
