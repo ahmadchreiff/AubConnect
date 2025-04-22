@@ -14,6 +14,35 @@ const HomePage = () => {
   const suggestionsRef = useRef(null);
   const navigate = useNavigate();
 
+  // Check admin status on component mount
+   useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const response = await axios.get(
+          "https://aubconnectbackend-h22c.onrender.com/api/auth/verify",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        // Check if user is admin and active (matches your adminAuth.js logic)
+        if (
+          response.data.user?.role === "admin" &&
+          response.data.user?.status === "active"
+        ) {
+          setIsAdmin(true);
+        }
+      } catch (err) {
+        console.error("Error verifying admin status:", err);
+      }
+    };
+
+    checkAdminStatus();
+  }, []);
+
   // Fetch suggestions when search query changes
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -85,6 +114,18 @@ const HomePage = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Navbar */}
       <Navbar />
+      {/* Admin Dashboard Button - Only visible to active admins */}
+      {isAdmin && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <Link
+            to="/admin/dashboard"
+            className="bg-[#6D0B24] text-white px-4 py-3 rounded-lg shadow-lg hover:bg-[#5a0a1e] transition flex items-center"
+          >
+            <i className="bx bx-arrow-back mr-2"></i>
+            Admin Dashboard
+          </Link>
+        </div>
+      )}
 
       {/* Hero Section with Search */}
       <section className="relative bg-gradient-to-b from-white to-gray-50 flex-grow flex items-center">
