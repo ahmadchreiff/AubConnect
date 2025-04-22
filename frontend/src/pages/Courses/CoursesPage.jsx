@@ -76,7 +76,7 @@ const CoursesPage = () => {
   });
 
   // Get available course levels
-  const courseLevels = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  const courseLevels = ["1", "2", "3"];
 
   return (
     <div className="min-h-screen flex flex-col">
