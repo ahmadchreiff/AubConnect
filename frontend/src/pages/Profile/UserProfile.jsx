@@ -319,7 +319,7 @@ const UserProfile = () => {
                 <div className="flex flex-col items-center">
                   <div className="text-6xl font-bold mb-2">{userStats.reviewCount}</div>
                   <div className="text-xl opacity-90 mb-6">Reviews Posted</div>
-                  <a href="/reviews/user" className="px-6 py-3 bg-white text-[#6D0B24] rounded-lg font-medium hover:bg-white/90 transition-colors">
+                  <a href="/my-reviews" className="px-6 py-3 bg-white text-[#6D0B24] rounded-lg font-medium hover:bg-white/90 transition-colors">
                     View Your Reviews
                   </a>
                 </div>
@@ -406,7 +406,7 @@ const UserProfile = () => {
                     />
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -420,7 +420,7 @@ const UserProfile = () => {
                         required
                       />
                     </div>
-                  </div>
+                  </div> */}
 
                   {error && (
                     <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center">
