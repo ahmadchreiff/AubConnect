@@ -1,4 +1,3 @@
-// Create a new file: src/components/RouteGuard.jsx
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -16,12 +15,16 @@ const RouteGuard = ({ children }) => {
     
     // Check if the user has access to this page
     if (!checkPageAccess(pathname)) {
-      // Redirect based on user type
+      // If user is not authenticated, redirect to login
       if (!isAuthenticated()) {
         navigate('/login', { replace: true });
-      } else if (isAdmin()) {
+      } 
+      // If user is admin and trying to access non-admin pages, redirect to admin dashboard
+      else if (isAdmin() && !pathname.startsWith('/admin')) {
         navigate('/admin/dashboard', { replace: true });
-      } else {
+      }
+      // If regular user trying to access admin pages, redirect to homepage
+      else if (!isAdmin() && pathname.startsWith('/admin')) {
         navigate('/homepage', { replace: true });
       }
     }
