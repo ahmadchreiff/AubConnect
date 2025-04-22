@@ -18,21 +18,21 @@ const DepartmentDetail = () => {
       try {
         // Fetch department details
         const departmentResponse = await fetch(`https://aubconnectbackend-h22c.onrender.com/api/departments/${id}`);
-        
+
         if (!departmentResponse.ok) {
           throw new Error("Failed to fetch department details");
         }
-        
+
         const departmentData = await departmentResponse.json();
         setDepartment(departmentData);
 
         // Fetch courses for this department
         const coursesResponse = await fetch(`https://aubconnectbackend-h22c.onrender.com/api/departments/${id}/courses`);
-        
+
         if (!coursesResponse.ok) {
           throw new Error("Failed to fetch department courses");
         }
-        
+
         const coursesData = await coursesResponse.json();
         setCourses(coursesData);
         setLoading(false);
@@ -45,7 +45,7 @@ const DepartmentDetail = () => {
 
     fetchDepartmentAndCourses();
   }, [id]);
-  
+
   // Filter courses based on search query
   const filteredCourses = courses.filter(
     (course) =>
@@ -58,10 +58,10 @@ const DepartmentDetail = () => {
     // Extract the first digit from the course number (e.g., "200" -> "2")
     const match = course.courseNumber.match(/\d+/);
     if (!match) return groups;
-    
+
     const firstDigit = match[0].charAt(0);
     const levelName = `${firstDigit}00-level Courses`;
-    
+
     if (!groups[levelName]) {
       groups[levelName] = [];
     }
@@ -104,7 +104,7 @@ const DepartmentDetail = () => {
             </div>
           ) : department ? (
             <>
-              {/* Department Header */}
+              {/* Department Header
               <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-center">
                   <div>
@@ -113,11 +113,33 @@ const DepartmentDetail = () => {
                     <p className="text-gray-600">Faculty of {department.faculty}</p>
                   </div>
                   <div className="mt-4 md:mt-0">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#860033] bg-opacity-10 text-[#860033]">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[#860033] bg-opacity-10 text-[#ffffff]">
                       {courses.length} Courses
                     </span>
                   </div>
                 </div>
+                {department.description && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <h3 className="text-lg font-medium mb-2">About This Department</h3>
+                    <p className="text-gray-700">{department.description}</p>
+                  </div>
+                )}
+              </div> */}
+              {/* Department Header */}
+              <div className="bg-white p-6 rounded-lg shadow-sm mb-8">
+                {/* Center everything before the About section */}
+                <div className="flex flex-col items-center text-center mb-4">
+                  <h1 className="text-3xl font-bold text-[#860033]">{department.code}</h1>
+                  <h2 className="text-xl text-gray-700 mb-2">{department.name}</h2>
+                  <p className="text-gray-600">Faculty of {department.faculty}</p>
+
+                  <div className="mt-4">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white border border-[#860033] text-[#860033]">
+                      {courses.length} Courses
+                    </span>
+                  </div>
+                </div>
+
                 {department.description && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
                     <h3 className="text-lg font-medium mb-2">About This Department</h3>
@@ -157,17 +179,19 @@ const DepartmentDetail = () => {
                       </h2>
                       <div className="grid grid-cols-1 gap-4">
                         {levelCourses
-                          .sort((a, b) => 
+                          .sort((a, b) =>
                             a.courseNumber.localeCompare(b.courseNumber, undefined, { numeric: true })
                           )
                           .map((course) => (
                             <Link
                               key={course._id}
                               to={`/courses/${course._id}`}
-                              className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                              className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex flex-col h-full"
                             >
-                              <div className="flex flex-col md:flex-row md:justify-between md:items-center">
-                                <div>
+                              {/* <div className="flex flex-col md:flex-row md:items-center w-full"> */}
+                              <div className="flex flex-col h-full w-full">
+
+                                <div className="flex-grow">
                                   <div className="flex items-center">
                                     <h3 className="text-lg font-bold text-[#860033]">
                                       {department.code} {course.courseNumber}
@@ -183,8 +207,7 @@ const DepartmentDetail = () => {
                                     </p>
                                   )}
                                 </div>
-                                <div className="mt-4 md:mt-0 text-[#860033]">
-                                  <i className="bx bx-chevron-right text-2xl"></i>
+                                <div className="mt-4 md:mt-0 md:ml-4">
                                 </div>
                               </div>
                             </Link>
