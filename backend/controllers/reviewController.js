@@ -9,7 +9,7 @@ const inappropriateWords = ["die ", "kill ", "fuck ", "shit ", "bitch ", "asshol
   "jackass ", "motherfucker ", "dick ", "cunt ", "slut ", "whore ", "piss ", "cock ", 
   "faggot ", "retard ", "nigger ", "spic ", "chink ", "kike ", "wop ",
   "gook ", "homo ", "negro ", "rape ", "molest ", "terrorist ", "bomb ", 
-  "pedophile ", "crap ", "douche ", "twat ", "scumbag ", "skank ", "prick ", "hell ", "goddamn ", "suck ", 
+  "pedophile ", "crap ", "douche ", "twat ", "scumbag ", "skank ", "prick ", "goddamn ", "suck ", 
   "balls ", "boner ", "buttplug ", "clit ", "cum ", "dildo ", "ejaculate ", "fap ", 
   "felch ", "flamer ", "gag ", "gangbang ", "handjob ", "jerk ", "kinky ", "muff ", 
   "orgasm ", "penis ", "pussy ", "scat ", "semen ", "splooge ", "spunk ", "threesome ", 
