@@ -65,9 +65,9 @@ const HomePage = () => {
   // Handle search form submission
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
+    // if (searchQuery.trim()) {
+    //   navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+    // }
   };
 
   // Handle suggestion click
