@@ -19,8 +19,12 @@ const inappropriateWords = ["die", "kill", "fuck", "shit", "bitch", "asshole", "
 // Function to check for inappropriate content
 const containsInappropriateContent = (text) => {
   const lowerCaseText = text.toLowerCase();
-  return inappropriateWords.some(word => lowerCaseText.includes(word));
+  return inappropriateWords.some(word => {
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    return regex.test(lowerCaseText);
+  });
 };
+
 
 /**
  * Post a new review
