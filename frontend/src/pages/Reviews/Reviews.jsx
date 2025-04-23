@@ -1168,7 +1168,7 @@ const ReviewsPage = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white rounded-lg shadow-xl max-w-lg w-full overflow-hidden"
+              className="bg-white rounded-lg shadow-xl max-w-lg w-full overflow-hidden max-h-[90vh] flex flex-col"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="bg-gradient-to-r from-[#860033] to-[#6a0026] text-white py-4 px-6 flex justify-between items-center">
@@ -1183,7 +1183,7 @@ const ReviewsPage = () => {
                 </button>
               </div>
 
-              <div className="p-6">
+              <div className="p-6 overflow-y-auto flex-grow">
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1318,7 +1318,8 @@ const ReviewsPage = () => {
                     </label>
                   </div>
                 </div>
-
+              </div>
+              <div className="px-6 py-4 flex justify-end space-x-3 border-t border-gray-200">
                 <div className="mt-6 flex justify-end space-x-3">
                   <button
                     onClick={() => setIsModalOpen(false)}
