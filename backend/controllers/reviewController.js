@@ -5,15 +5,15 @@ const Professor = require("../models/Professor");
 const professorController = require("./professorController");
 
 // Add a list of inappropriate words (you can expand this list)
-const inappropriateWords = ["die", "kill", "fuck", "shit", "bitch", "asshole", "bastard", "damn", "dumbass", 
-  "jackass", "motherfucker", "dick", "cunt", "slut", "whore", "piss", "cock", 
-  "faggot", "retard", "nigger", "spic", "chink", "kike", "wop", "tranny", "coon", 
-  "gook", "homo", "dyke", "negro", "rape", "molest", "terrorist", "bomb", 
-  "suicide", "pedophile", "crap", "douche", "twat", "scumbag", "skank", "prick", "hell", "goddamn", "suck", 
-  "balls", "boner", "buttplug", "clit", "cum", "dildo", "ejaculate", "fap", 
-  "felch", "flamer", "gag", "gangbang", "handjob", "jerk", "kinky", "muff", 
-  "orgasm", "penis", "pussy", "scat", "semen", "splooge", "spunk", "threesome", 
-  "tit", "vagina", "wank", "wetback", "kes", "ayre"
+const inappropriateWords = ["die ", "kill ", "fuck ", "shit ", "bitch ", "asshole ", "bastard ", "dumbass ", 
+  "jackass ", "motherfucker ", "dick ", "cunt ", "slut ", "whore ", "piss ", "cock ", 
+  "faggot ", "retard ", "nigger ", "spic ", "chink ", "kike ", "wop ",
+  "gook ", "homo ", "negro ", "rape ", "molest ", "terrorist ", "bomb ", 
+  "pedophile ", "crap ", "douche ", "twat ", "scumbag ", "skank ", "prick ", "hell ", "goddamn ", "suck ", 
+  "balls ", "boner ", "buttplug ", "clit ", "cum ", "dildo ", "ejaculate ", "fap ", 
+  "felch ", "flamer ", "gag ", "gangbang ", "handjob ", "jerk ", "kinky ", "muff ", 
+  "orgasm ", "penis ", "pussy ", "scat ", "semen ", "splooge ", "spunk ", "threesome ", 
+  "tit ", "vagina ", "wank ", "wetback ", "kes ", "ayre "
 ];
 
 // Function to check for inappropriate content
