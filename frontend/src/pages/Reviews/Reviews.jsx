@@ -751,34 +751,34 @@ const ReviewsPage = () => {
                 See what students are saying about courses and professors
               </p>
 
-              <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6">
+              <div className="flex justify-between mt-6">
                 <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
-                    <i className="bx bx-book-alt text-lg"></i>
+                  <div className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
+                    <i className="bx bx-book-alt text-base"></i>
                   </div>
                   <div>
-                    <p className="text-xl font-semibold">{calculateStats().courseCount}</p>
-                    <p className="text-sm text-white/80">Courses</p>
+                    <p className="text-lg font-semibold">{calculateStats().courseCount}</p>
+                    <p className="text-xs text-white/80">Courses</p>
                   </div>
                 </div>
 
                 <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
-                    <i className="bx bx-user text-lg"></i>
+                  <div className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
+                    <i className="bx bx-user text-base"></i>
                   </div>
                   <div>
-                    <p className="text-xl font-semibold">{calculateStats().professorCount}</p>
-                    <p className="text-sm text-white/80">Professors</p>
+                    <p className="text-lg font-semibold">{calculateStats().professorCount}</p>
+                    <p className="text-xs text-white/80">Professors</p>
                   </div>
                 </div>
 
                 <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
-                    <i className="bx bx-message-square-detail text-lg"></i>
+                  <div className="h-8 w-8 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mr-2">
+                    <i className="bx bx-message-square-detail text-base"></i>
                   </div>
                   <div>
-                    <p className="text-xl font-semibold">{reviews.length}</p>
-                    <p className="text-sm text-white/80">Reviews</p>
+                    <p className="text-lg font-semibold">{reviews.length}</p>
+                    <p className="text-xs text-white/80">Reviews</p>
                   </div>
                 </div>
               </div>
@@ -867,9 +867,9 @@ const ReviewsPage = () => {
         {/* Filters and Sorting */}
         <div className="flex flex-col gap-4 bg-white rounded-lg shadow-sm p-4 mb-6">
           {/* Filter buttons */}
-          <div className="flex flex-wrap gap-2 overflow-x-auto pb-2 w-full">
+          <div className="flex justify-between gap-2 w-full">
             <button
-              className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'all' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
+              className={`flex-1 px-2 py-2 rounded-md transition-all text-sm ${filter === 'all' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => {
                 setFilter('all');
                 setSelectedCourse("");
@@ -879,7 +879,7 @@ const ReviewsPage = () => {
               All Reviews
             </button>
             <button
-              className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'courses' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
+              className={`flex-1 px-2 py-2 rounded-md transition-all text-sm ${filter === 'courses' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => {
                 setFilter('courses');
                 setSelectedProfessor("");
@@ -888,7 +888,7 @@ const ReviewsPage = () => {
               Courses
             </button>
             <button
-              className={`px-4 py-2 rounded-md transition-all whitespace-nowrap ${filter === 'professors' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
+              className={`flex-1 px-2 py-2 rounded-md transition-all text-sm ${filter === 'professors' ? 'bg-pink-100 text-[#860033] font-medium' : 'hover:bg-gray-100'}`}
               onClick={() => {
                 setFilter('professors');
                 setSelectedCourse("");
@@ -899,13 +899,25 @@ const ReviewsPage = () => {
           </div>
 
           {/* Advanced filters */}
-          {/* <div className="flex flex-col md:flex-row gap-4"> */}
-          <div className="flex flex-row gap-4">
-
-
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            {/* Sort option */}
+            <div className="w-full">
+              <label className="block text-sm font-medium text-gray-600 mb-1">Sort by</label>
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
+              >
+                <option value="newest">Newest</option>
+                <option value="highest">Highest Rating</option>
+                <option value="lowest">Lowest Rating</option>
+              </select>
+            </div>
+            
             {/* Course filter - only show when viewing all or courses */}
             {(filter === 'all' || filter === 'courses') && (
-              <div className="w-full md:w-1/3">
+              <div className="w-full">
                 <label className="block text-sm font-medium text-gray-600 mb-1">Filter by Course</label>
                 <select
                   value={selectedCourse}
@@ -924,7 +936,7 @@ const ReviewsPage = () => {
 
             {/* Professor filter - only show when viewing all or professors */}
             {(filter === 'all' || filter === 'professors') && (
-              <div className="w-full md:w-1/3">
+              <div className="w-full">
                 <label className="block text-sm font-medium text-gray-600 mb-1">Filter by Professor</label>
                 <select
                   value={selectedProfessor}
@@ -941,20 +953,6 @@ const ReviewsPage = () => {
               </div>
             )}
 
-            {/* Sort option */}
-            <div className="w-full md:w-1/3">
-              <label className="block text-sm font-medium text-gray-600 mb-1">Sort by</label>
-              <select
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#860033] focus:border-[#860033]"
-              >
-                <option value="newest">Newest</option>
-                <option value="highest">Highest Rating</option>
-                <option value="lowest">Lowest Rating</option>
-                {/* <option value="mostHelpful">Most Helpful</option> */}
-              </select>
-            </div>
           </div>
 
           {/* Active filters display */}
