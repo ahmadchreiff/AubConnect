@@ -25,7 +25,7 @@ const Navbar = () => {
 
   return (
     <header className="bg-white border-b border-gray-200 py-4">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo with adjusted spacing */}
           <div className="flex items-center flex-shrink-0 mr-4 md:mr-0">
@@ -38,8 +38,8 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation with adjusted spacing */}
-          <div className="hidden md:flex items-center justify-end flex-1">
-            <nav className="flex items-center space-x-6 lg:space-x-8 mr-4 lg:mr-8">
+          <div className="hidden lg:flex items-center justify-end flex-1">
+            <nav className="flex items-center space-x-6 mr-8">
               <Link
                 to="/homepage"
                 className={`${isActive('/homepage') ? 'text-[#860033] font-medium' : 'text-gray-600 hover:text-[#860033]'} text-sm transition-colors`}
@@ -74,10 +74,10 @@ const Navbar = () => {
             {isAuthenticated() && <UserDropdown />}
           </div>
 
-          {/* Mobile menu button - only visible on small screens */}
-          <div className="md:hidden">
+          {/* Mobile menu button - visible on iPad and smaller screens */}
+          <div className="lg:hidden">
             {isAuthenticated() ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center -space-x-1">
                 <UserDropdown mobile={true} />
                 <button
                   onClick={toggleMenu}
@@ -97,9 +97,9 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - visible on iPad and smaller screens */}
         {isMenuOpen && (
-          <div className="md:hidden mt-2 pb-4 space-y-2">
+          <div className="lg:hidden mt-2 pb-4 space-y-2">
             <Link
               to="/homepage"
               onClick={() => setIsMenuOpen(false)}
