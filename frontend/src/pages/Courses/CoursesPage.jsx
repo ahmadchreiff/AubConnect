@@ -12,6 +12,7 @@ const CoursesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("");
+  const [expandedCourse, setExpandedCourse] = useState(null); // Track expanded course for mobile
 
   // Fetch courses and departments from the backend
   useEffect(() => {
@@ -77,6 +78,15 @@ const CoursesPage = () => {
 
   // Get available course levels
   const courseLevels = ["1", "2", "3"];
+
+  // Toggle course description expansion on mobile
+  const toggleCourseExpansion = (courseId) => {
+    if (expandedCourse === courseId) {
+      setExpandedCourse(null);
+    } else {
+      setExpandedCourse(courseId);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -172,68 +182,158 @@ const CoursesPage = () => {
               {filteredCourses.length === 0 ? (
                 <div className="bg-white p-6 rounded-lg shadow-sm text-center">
                   <p className="text-lg text-gray-600">No courses found</p>
+                  <p className="text-sm text-gray-500 mt-2">Try adjusting your search or filters</p>
                 </div>
               ) : (
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                  <table className="w-full">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Code
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Name
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Department
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Credits
-                        </th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {filteredCourses.map((course) => (
-                        <tr key={course._id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap font-medium text-[#860033]">
-                            {course.department.code} {course.courseNumber}
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="text-sm text-gray-900">{course.name}</div>
+                <>
+                  {/* Mobile & Tablet Portrait View - Cards */}
+                  <div className="lg:hidden space-y-4">
+                    {filteredCourses.map((course) => (
+                      <div 
+                        key={course._id} 
+                        className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200"
+                      >
+                        <div 
+                          className="flex justify-between items-start cursor-pointer"
+                          onClick={() => toggleCourseExpansion(course._id)}
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-start">
+                              <h3 className="font-bold text-[#860033] text-lg mr-2">
+                                {course.department.code} {course.courseNumber}
+                              </h3>
+                              <span className="bg-[#860033]/10 text-[#860033] text-xs px-2 py-1 rounded whitespace-nowrap flex-shrink-0 mt-0.5">
+                                {course.creditHours} {course.creditHours === 1 ? 'credit' : 'credits'}
+                              </span>
+                            </div>
+                            <h4 className="text-base font-semibold text-gray-900 mt-1">{course.name}</h4>
+                          </div>
+                          <button className="ml-2 text-gray-500 hover:text-[#860033]">
+                            <i className={`bx bx-chevron-${expandedCourse === course._id ? 'up' : 'down'} text-xl`}></i>
+                          </button>
+                        </div>
+                        
+                        {/* Expanded content */}
+                        {expandedCourse === course._id && (
+                          <div className="mt-3 pt-3 border-t border-gray-100">
                             {course.description && (
-                              <div className="text-xs text-gray-500 truncate max-w-xs">
-                                {course.description.substring(0, 100)}
-                                {course.description.length > 100 ? "..." : ""}
+                              <div className="mb-3">
+                                <p className="text-sm text-gray-600 leading-relaxed">
+                                  {course.description}
+                                </p>
                               </div>
                             )}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <span className="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full">
+                                {course.department.code}
+                              </span>
+                              <span className="bg-gray-100 text-gray-800 text-xs px-2.5 py-1 rounded-full">
+                                {course.courseNumber[0]}00 Level
+                              </span>
+                            </div>
+                            
+                            <div className="flex justify-between items-center pt-2">
+                              <Link 
+                                to={`/departments/${course.department._id}`}
+                                className="text-sm text-gray-600 hover:text-[#860033] hover:underline flex items-center"
+                              >
+                                <i className="bx bx-building mr-1"></i> {course.department.name}
+                              </Link>
+                              <Link
+                                to={`/courses/${course._id}`}
+                                className="text-sm font-medium text-white bg-[#860033] hover:bg-[#6a0026] px-3 py-1.5 rounded-lg flex items-center transition-colors"
+                              >
+                                View Details <i className="bx bx-chevron-right ml-1"></i>
+                              </Link>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Collapsed footer (visible when not expanded) */}
+                        {expandedCourse !== course._id && (
+                          <div className="mt-3 flex justify-between items-center pt-2 border-t border-gray-100">
                             <Link 
                               to={`/departments/${course.department._id}`}
-                              className="hover:text-[#860033] hover:underline"
+                              className="text-sm text-gray-600 hover:text-[#860033] hover:underline"
                             >
                               {course.department.name}
                             </Link>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {course.creditHours}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <Link
                               to={`/courses/${course._id}`}
-                              className="text-[#860033] hover:text-[#6a0026]"
+                              className="text-sm font-medium text-[#860033] hover:text-[#6a0026] flex items-center"
                             >
-                              View
+                              View <i className="bx bx-chevron-right ml-1"></i>
                             </Link>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Tablet Landscape & Desktop View - Table */}
+                  <div className="hidden lg:block bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Code
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
+                              Name
+                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
+                              Department
+                            </th>
+                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                              Credits
+                            </th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {filteredCourses.map((course) => (
+                            <tr key={course._id} className="hover:bg-gray-50">
+                              <td className="px-6 py-4 whitespace-nowrap font-medium text-[#860033]">
+                                {course.department.code} {course.courseNumber}
+                              </td>
+                              <td className="px-6 py-4">
+                                <div className="text-sm text-gray-900 font-medium">{course.name}</div>
+                                {course.description && (
+                                  <div className="text-xs text-gray-500 line-clamp-2 max-w-prose">
+                                    {course.description}
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <Link 
+                                  to={`/departments/${course.department._id}`}
+                                  className="hover:text-[#860033] hover:underline"
+                                >
+                                  {course.department.name}
+                                </Link>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                                <span className="font-medium">{course.creditHours}</span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <Link
+                                  to={`/courses/${course._id}`}
+                                  className="text-[#860033] hover:text-[#6a0026] flex items-center justify-end"
+                                >
+                                  View <i className="bx bx-chevron-right ml-1"></i>
+                                </Link>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           )}
