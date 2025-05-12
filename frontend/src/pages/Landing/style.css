@@ -784,3 +784,74 @@
     transform-style: preserve-3d;
     backface-visibility: hidden;
 }   
+/* Modern Navbar Buttons - Small by default */
+.modern-navbar .text-sm {
+  padding: 0.4rem 0.8rem !important;  /* Smaller padding */
+  font-size: 0.85rem !important;      /* Smaller font */
+  min-width: 80px !important;         /* Compact width */
+  border-radius: 4px !important;      /* Tighter corners */
+}
+
+/* Original buttons container */
+.modern-navbar .flex.gap-3 {
+  display: flex;
+  gap: 0.5rem;                       /* Reduced gap */
+}
+
+/* Stack when navbar is too small */
+@media (max-width: 640px) {
+  .modern-navbar .flex.gap-3 {
+    flex-direction: column;
+    gap: 0.3rem;                     /* Very tight vertical gap */
+    width: auto;
+  }
+  
+  .modern-navbar .text-sm {
+    padding: 0.35rem 0.7rem !important; /* Even more compact */
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 400px) {
+  .modern-navbar .text-sm {
+    min-width: 70px !important;
+    padding: 0.3rem 0.6rem !important;
+  }
+}
+/* Center text in all buttons */
+.modern-navbar .text-sm {
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 0.4rem 0.8rem !important;
+}
+
+/* Ensure text stays centered during transitions */
+.modern-navbar .text-sm span,
+.modern-navbar .text-sm a {
+  width: 100%;
+  text-align: center;
+}
+
+/* Fix for Safari mobile rendering */
+@supports (-webkit-touch-callout: none) {
+  .modern-navbar .text-sm {
+    -webkit-box-pack: center !important;
+    -webkit-justify-content: center !important;
+  }
+}
+
+/* Stacked mobile version */
+@media (max-width: 640px) {
+  .modern-navbar .flex.gap-3 {
+    flex-direction: column;
+    align-items: center; 
+  }
+  
+  .modern-navbar .text-sm {
+    width: 100%;
+    max-width: 120px;
+  }
+}
