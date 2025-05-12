@@ -265,10 +265,16 @@ const Login = () => {
                 <div className="flex flex-col space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="text-center w-full">
-                      <span className="text-gray-600 text-sm">New to AUBConnect? </span>
-                      <Link to="/signup" className="text-[#6D0B24] hover:text-[#990F34] font-medium text-sm transition-colors">
-                        Create account
-                      </Link>
+                     <div className="flex justify-center flex-wrap items-center text-sm text-gray-600 text-center">
+  <span className="mr-1">New to AUBConnect?</span>
+  <Link
+    to="/signup"
+    className="text-[#6D0B24] hover:text-[#990F34] font-medium transition-colors"
+  >
+    Create account
+  </Link>
+</div>
+
                     </div>
                   </div>
                 </div>
