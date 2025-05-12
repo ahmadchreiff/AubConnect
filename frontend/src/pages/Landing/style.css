@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
 * {
   margin: 0;
   padding: 0;
 }
 
-.top {
+.Landig .top {
   width: 100%;
   background-color: white;
 }
 
 /* Modern Navbar Styles */
-.modern-navbar {
+.Landig .modern-navbar {
   width: 100%;
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
@@ -487,3 +487,300 @@
   font-size: 14px;
   color: #aaa;
 }
+/* Enhanced Responsive Styles */
+
+@media (max-width: 1200px) {
+  .main_container {
+    padding: 0 30px;
+  }
+  
+  .main_content h1 {
+    font-size: 3.5rem;
+  }
+  
+  .reviews-section {
+    padding: 40px 30px;
+  }
+  
+  .footer-section {
+    margin-left: 300px;
+  }
+}
+
+@media (max-width: 992px) {
+  .main_container {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding-top: 2rem;
+    height: auto;
+  }
+  
+  .main_img_container {
+    justify-self: center;
+    margin: 40px 0 0 0;
+    order: 2;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #main_img {
+    height: auto;
+    width: 80%;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .main_content {
+    order: 1;
+  }
+  
+  .reviews-section {
+    flex-direction: column;
+    gap: 40px !important;
+  }
+  
+  .intro-text, .review-card {
+    width: 80%;
+  }
+  
+  .footer-section {
+    margin-left: 200px;
+  }
+
+  /* Adjust navbar buttons for tablet */
+  .text-sm {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main_content h1 {
+    font-size: 2.8rem;
+  }
+  
+  .smaller-text {
+    font-size: 1.3rem !important;
+  }
+  
+  .main_content p {
+    font-size: 1.5rem;
+  }
+  
+  .services {
+    flex-direction: column;
+    height: auto;
+    padding: 30px 20px;
+  }
+  
+  .service-card {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 30px;
+    padding: 20px 15px;
+  }
+  
+  .service-card img {
+    padding-left: 0;
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
+    display: block;
+  }
+  
+  .service-card:hover {
+    transform: none;
+  }
+  
+  .footer-section {
+    margin-left: 100px;
+  }
+
+  /* Navbar buttons adjustment */
+  .modern-navbar .flex.gap-3 {
+    gap: 0.5rem;
+  }
+  
+  .text-sm {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .main_content h1 {
+    font-size: 2.2rem;
+  }
+  
+  .main_content p {
+    font-size: 1.2rem;
+  }
+  
+  .main_button {
+    padding: 14px 30px;
+    font-size: 1.1rem;
+  }
+  
+  .intro-text, .review-card {
+    width: 95%;
+    margin: 0 auto;
+  }
+  
+  .review-card {
+    padding: 30px 20px;
+    border-radius: 80px;
+  }
+  
+  .intro-text h2 {
+    font-size: 2rem;
+  }
+  
+  .footer-section {
+    margin-left: 0;
+    width: 100%;
+    padding: 0 15px;
+  }
+  
+  .modern-navbar {
+    padding: 0.8rem 0;
+  }
+  
+  .Landing.text-2xl {
+    font-size: 1.5rem;
+  }
+
+  /* Enhanced mobile navbar buttons */
+  .Landing.modern-navbar .flex.gap-3 {
+    gap: 0.3rem;
+  }
+  
+ .Landing .text-sm {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.7rem;
+    min-width: 80px;
+  }
+
+  /* Ensure all images are properly centered */
+ .Landing #main_img,
+  .Landing.service-card img,
+  .Landing.review-card {
+    transform: none !important; /* Remove any transforms that might affect centering */
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+  }
+}
+
+/* Very small devices (350px-400px) */
+@media (max-width: 400px) {
+  .Landing.main_content h1 {
+    font-size: 1.8rem;
+  }
+  
+ .Landing .smaller-text {
+    font-size: 1.1rem !important;
+  }
+  
+ .Landing .main_button {
+    padding: 12px 25px;
+    font-size: 1rem;
+  }
+  
+ .Landing .review-card {
+    padding: 20px 15px;
+    border-radius: 60px;
+  }
+  
+  .Landing.service-card {
+    width: 95%;
+    padding: 15px 10px;
+  }
+  
+  .Landing.service-card img {
+    max-width: 200px;
+  }
+
+  /* Final adjustment for tiny screens */
+  .Landing.modern-navbar .flex.gap-3 {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+  }
+  
+  .Landing.text-sm {
+    width: 100%;
+    text-align: center;
+    padding: 0.3rem 0;
+    font-size: 0.75rem;
+  }
+
+  /* Ensure perfect centering for all images */
+  .Landing.main_img_container,
+  .Landing.service-card,
+  .Landing.review-card {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Fix button text alignment for iPhone XR and all mobile devices */
+.Landing.text-sm {
+    display: inline-flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: auto !important;
+    min-width: 80px !important;
+    padding: 0.5rem 1rem !important;
+}
+
+/* Specific fixes for iPhone XR (414px width) */
+@media only screen 
+    and (device-width: 414px) 
+    and (device-height: 896px) 
+    and (-webkit-device-pixel-ratio: 2) {
+   .Landing .text-sm {
+        padding: 0.45rem 0.9rem !important;
+        letter-spacing: 0.01em !important;
+    }
+    
+   .Landing .modern-navbar .flex.gap-3 {
+        gap: 0.6rem !important;
+    }
+}
+
+/* Enhanced mobile button centering */
+@media (max-width: 576px) {
+    .Landing.text-sm {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+        padding: 0.4rem 0.8rem !important;
+        min-width: 70px !important;
+    }
+    
+    /* Fix for Safari mobile rendering */
+    @supports (-webkit-touch-callout: none) {
+        .Landing.text-sm {
+            -webkit-box-pack: center !important;
+            -webkit-justify-content: center !important;
+            -webkit-box-align: center !important;
+        }
+    }
+}
+
+/* Button hover states maintain centering */
+.Landing.bg-\[\#860033\]:hover, 
+.Landing .border-gray-300:hover {
+    text-align: center !important;
+    justify-content: center !important;
+}
+
+/* Ensure buttons don't shift during transitions */
+.Landing .transition-all {
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}   
